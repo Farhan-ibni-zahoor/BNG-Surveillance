@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNG Surveillance | Premium Security</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #050505;
+            --bg-panel: #121212;
+            --bg-glass: rgba(20, 20, 20, 0.7);
+            --primary: #f59e0b; /* Amber */
+            --primary-glow: rgba(245, 158, 11, 0.4);
+            --success: #10b981;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .animate-up { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        .animate-fade { animation: fadeIn 0.5s ease-in forwards; opacity: 0; }
+
+        /* --- UTILITIES --- */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .flex-col { flex-direction: column; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .text-gradient {
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #d97706);
+            color: #000;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px var(--primary-glow); }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+        
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        
+        .btn-whatsapp {
+            background: #25D366; color: #000; font-weight: 800;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+        .btn-whatsapp:hover { background: #1da851; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6); }
+
+        /* --- NAVBAR --- */
+        nav {
+            padding: 1.2rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; font-family: 'Space Grotesk', sans-serif; }
+        
+        /* --- MAIN LAYOUT --- */
+        main { flex: 1; padding: 3rem; max-width: 1400px; margin: 0 auto; width: 100%; padding-bottom: 4rem; }
+
+        /* --- AUTH SCREEN --- */
+        .auth-wrapper {
+            position: fixed; inset: 0; z-index: 999;
+            background: url('https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1920&auto=format&fit=crop') center/cover;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .auth-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); }
+        .glass-card {
+            position: relative; background: var(--bg-glass); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 3rem; border-radius: 24px; width: 100%; max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        /* --- SHOP GRID --- */
+        .product-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;
+        }
+        .product-card {
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; transition: all 0.4s ease; position: relative;
+        }
+        .product-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.5); }
+        .product-img { width: 100%; height: 260px; object-fit: cover; transition: transform 0.5s; }
+        .product-card:hover .product-img { transform: scale(1.05); }
+        .product-info { padding: 1.5rem; position: relative; z-index: 2; background: var(--bg-panel); }
+        .product-cat { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+        .product-price { font-size: 1.6rem; font-weight: 700; margin: 0.5rem 0; font-family: 'Space Grotesk', sans-serif; }
+
+        /* --- DASHBOARD --- */
+        .stat-card {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f); border: 1px solid var(--border);
+            padding: 2rem; border-radius: 16px; position: relative; overflow: hidden;
+        }
+        .stat-card::after {
+            content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+        }
+        .stat-val { font-size: 2.5rem; font-weight: 800; margin-top: 0.5rem; font-family: 'Space Grotesk', sans-serif; }
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        /* --- PROFILE & TABLES --- */
+        .profile-card {
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 20px; padding: 2rem;
+        }
+
+        /* --- FORMS & MODALS --- */
+        input, select, textarea {
+            width: 100%; padding: 14px 16px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px;
+            color: white; margin-bottom: 1rem; font-family: 'Outfit', sans-serif;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.07); box-shadow: 0 0 0 4px rgba(245,158,11,0.05); }
+        
+        .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: flex; justify-content: flex-end; }
+        .cart-panel { background: #121212; width: 420px; padding: 2rem; display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #1a1a1a; padding: 2.5rem; border-radius: 20px; width: 550px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+
+        /* PRODUCT DETAIL MODAL SPECIFIC */
+        .detail-img { width: 100%; height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem; }
+        .review-item { background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; border: 1px solid #333; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { text-align: left; padding: 1rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 0.85rem; text-transform: uppercase; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        /* Success Screen */
+        .success-icon { font-size: 5rem; color: var(--success); margin-bottom: 1rem; animation: slideUp 0.8s ease-out; }
+        
+        /* --- NEW SERVICES & FOOTER SECTION --- */
+        .services-section {
+            background: linear-gradient(to bottom, #0f172a, #050505);
+            padding: 4rem 3rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .service-box {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 2rem; border-radius: 16px; max-width: 800px; margin: 0 auto;
+        }
+        .social-links { margin-top: 2rem; display: flex; justify-content: center; gap: 1.5rem; }
+        .social-btn {
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: #222; color: white; font-size: 1.5rem; transition: 0.3s; text-decoration: none;
+        }
+        .social-btn:hover { background: var(--primary); color: black; transform: scale(1.1); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 1rem; }
+            .cart-panel { width: 100%; }
+            main { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo">BNG <span class="text-gradient">Surveillance</span></div>
+        <div id="nav-actions" class="flex items-center gap-4">
+            <!-- JS Injected Buttons -->
+        </div>
+    </nav>
+
+    <!-- MAIN APP ROOT -->
+    <main id="app-root"></main>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:999; display:flex; flex-direction:column; gap:10px;"></div>
+
+    <script>
+        // CONFIGURATION
+        const API_URL = 'http://localhost:5000/api';
+        const RAZORPAY_KEY_ID = 'rzp_test_S6anGX8BwOZEL8';
+        const ADMIN_PHONE_NUMBER = '919797122805';
+
+        let myChart = null;
+
+        const state = {
+            user: JSON.parse(sessionStorage.getItem('user')) || null,
+            cart: []
+        };
+
+        const app = {
+            init: async () => {
+                app.updateNav();
+                if(!state.user) app.showAuth();
+                else state.user.role === 'author' ? app.showAdmin() : app.showShop();
+            },
+
+            /* --- UI HELPERS --- */
+            showToast: (msg) => {
+                const div = document.createElement('div');
+                div.style.cssText = "background:var(--bg-panel); color:white; padding:1rem; border-left:4px solid var(--primary); border-radius:4px; animation: slideUp 0.3s;";
+                div.innerText = msg;
+                document.getElementById('toast-container').appendChild(div);
+                setTimeout(() => { div.style.opacity=0; setTimeout(()=>div.remove(),300); }, 3000);
+            },
+
+            updateNav: () => {
+                const u = state.user;
+                const actions = document.getElementById('nav-actions');
+                if(!u) {
+                    actions.innerHTML = `<button class="btn btn-secondary" onclick="app.showAuth()">Login</button>`;
+                } else {
+                    if(u.role === 'author') {
+                        actions.innerHTML = `
+                            <button class="btn btn-secondary" onclick="app.showAdmin()">Dashboard</button>
+                            <button class="btn btn-danger" onclick="app.logout()">Logout</button>
+                        `;
+                    } else {
+                        actions.innerHTML = `
+                            <button class="btn btn-secondary" onclick="app.showShop()">Shop</button>
+                            <button class="btn btn-secondary" onclick="app.showProfile()"><i class="fa-solid fa-user"></i> My Orders</button>
+                            <button class="btn btn-primary" onclick="app.toggleCart()">
+                                <i class="fa-solid fa-cart-shopping"></i> Cart (${state.cart.length})
+                            </button>
+                            <button class="btn btn-danger" onclick="app.logout()">Logout</button>
+                        `;
+                    }
+                }
+            },
+
+            /* --- AUTHENTICATION --- */
+            showAuth: () => {
+                document.getElementById('app-root').innerHTML = `
+                    <div class="auth-wrapper">
+                        <div class="auth-overlay"></div>
+                        <div class="glass-card animate-up">
+                            <h1 style="font-size:2.2rem; margin-bottom:0.5rem; text-align:center;">Welcome Back</h1>
+                            <p style="color:var(--text-muted); margin-bottom:2rem; text-align:center;">Access to BNG Surveillance Portal</p>
+                            
+                            <form onsubmit="app.login(event)">
+                                <input type="email" name="email" placeholder="Email Address" required>
+                                <input type="password" name="password" placeholder="Password" required>
+                                <button type="submit" class="btn btn-primary" style="width:100%">Enter System</button>
+                            </form>
+                            
+                            <p style="margin-top:1.5rem; text-align:center; font-size:0.9rem; color:var(--text-muted);">
+                                Don't have an account? <a href="#" onclick="app.showRegister()" style="color:var(--primary); text-decoration:none; font-weight:600;">Register</a>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            },
+
+            showRegister: () => {
+                document.getElementById('app-root').innerHTML = `
+                    <div class="auth-wrapper">
+                        <div class="auth-overlay"></div>
+                        <div class="glass-card animate-up">
+                            <h1 style="text-align:center;">Create Account</h1>
+                            <form onsubmit="app.register(event)">
+                                <input type="text" name="name" placeholder="Full Name" required>
+                                <input type="email" name="email" placeholder="Email Address" required>
+                                <input type="password" name="password" placeholder="Password" required>
+                                <button type="submit" class="btn btn-primary" style="width:100%">Sign Up</button>
+                            </form>
+                            <p style="margin-top:1.5rem; text-align:center; font-size:0.9rem;">
+                                Already have an account? <a href="#" onclick="app.showAuth()" style="color:var(--primary);">Login</a>
+                            </p>
+                        </div>
+                    </div>
+                `;
+            },
+
+            login: async (e) => {
+                e.preventDefault();
+                const formData = Object.fromEntries(new FormData(e.target));
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    state.user = data; sessionStorage.setItem('user', JSON.stringify(data));
+                    app.updateNav(); data.role === 'author' ? app.showAdmin() : app.showShop();
+                } else { alert(data.error || "Login Failed"); }
+            },
+
+            register: async (e) => {
+                e.preventDefault();
+                const formData = Object.fromEntries(new FormData(e.target));
+                await fetch(`${API_URL}/register`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formData)
+                });
+                alert("Registration Successful"); app.showAuth();
+            },
+
+            logout: () => {
+                state.user = null; state.cart = []; sessionStorage.removeItem('user'); app.updateNav(); app.showAuth();
+            },
+
+            /* --- CUSTOMER PROFILE --- */
+            showProfile: async () => {
+                const res = await fetch(`${API_URL}/my-orders?email=${state.user.email}`);
+                const orders = await res.json();
+
+                document.getElementById('app-root').innerHTML = `
+                    <div class="animate-up" style="max-width: 900px; margin: 0 auto;">
+                        <h1 style="margin-bottom:2rem; font-size:2rem;">My Orders</h1>
+                        
+                        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--primary); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-truck-fast" style="color:var(--primary); font-size:1.5rem;"></i>
+                            <div>
+                                <h4 style="color:var(--primary); font-size:1rem; margin-bottom:2px;">Delivery Policy</h4>
+                                <p style="font-size:0.9rem; color:#ccc; margin:0;">All orders are delivered to you within <strong>7 days</strong> with service.</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            ${orders.length === 0 ? 
+                                `<div style="text-align:center; padding: 3rem 0; color:var(--text-muted);">
+                                    <i class="fa-solid fa-box-open" style="font-size:3rem; margin-bottom:1rem; opacity:0.5;"></i>
+                                    <p>You haven't placed any orders yet.</p>
+                                </div>` 
+                                : 
+                                `<div style="overflow-x:auto;"><table>
+                                    <thead><tr><th>Order ID</th><th>Items Purchased</th><th>Date</th><th style="text-align:right">Total</th></tr></thead>
+                                    <tbody>
+                                        ${orders.map(o => `
+                                            <tr style="vertical-align:top;">
+                                                <td style="padding-top:1.5rem;">#${o._id.toString().substring(o._id.length-6)}</td>
+                                                <td style="width:50%; padding-top:1rem;">
+                                                    <ul style="list-style:none; margin:0; padding:0;">
+                                                        ${o.items.map(i => `
+                                                            <li style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:8px;">
+                                                                <span style="color:white;">${i.name}</span>
+                                                                <span style="color:var(--text-muted);">₹${i.price.toLocaleString('en-IN')}</span>
+                                                            </li>
+                                                        `).join('')}
+                                                    </ul>
+                                                </td>
+                                                <td style="padding-top:1.5rem; color:var(--text-muted);">${new Date(o.date).toLocaleDateString()}</td>
+                                                <td style="padding-top:1.5rem; text-align:right; font-weight:bold; color:var(--primary);">₹${o.total.toLocaleString('en-IN')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>`
+                            }
+                        </div>
+                    </div>
+                `;
+            },
+
+            /* --- ADMIN DASHBOARD --- */
+            showAdmin: async () => {
+                const orders = await fetch(`${API_URL}/orders`).then(r => r.json());
+                const products = await fetch(`${API_URL}/products`).then(r => r.json());
+                const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
+
+                document.getElementById('app-root').innerHTML = `
+                    <div class="animate-up">
+                        <div class="flex justify-between items-center" style="margin-bottom:2rem">
+                            <h1 style="font-size:2.5rem; font-family:'Space Grotesk'">Command Center</h1>
+                            <button class="btn btn-primary" onclick="app.openProductModal()">+ New Unit</button>
+                        </div>
+
+                        <div class="flex gap-4" style="margin-bottom:2rem; flex-wrap:wrap;">
+                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Revenue</div><div class="stat-val text-gradient">₹${totalSales.toLocaleString('en-IN')}</div></div>
+                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Orders</div><div class="stat-val">${orders.length}</div></div>
+                        </div>
+
+                        <div class="stat-card" style="margin-bottom:2rem">
+                            <h3 style="margin-bottom:1rem;">Recent Orders</h3>
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th></tr></thead>
+                                    <tbody>
+                                        ${orders.map(o => `
+                                            <tr>
+                                                <td>${o.customer}</td>
+                                                <td>${o.phone}</td>
+                                                <td style="font-size:0.8rem; color:#ccc; max-width:200px;">${o.address}</td>
+                                                <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-bottom:1rem">Inventory</h3>
+                        <div class="product-grid">
+                            ${products.map(p => `
+                                <div class="product-card">
+                                    <img src="/uploads/${p.image}" class="product-img">
+                                    <div class="product-info">
+                                        <div class="product-cat">${p.category}</div>
+                                        <h3 style="margin:5px 0">${p.name}</h3>
+                                        <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
+                                        <button class="btn btn-danger" style="margin-top:1rem; width:100%" onclick="app.deleteProduct('${p._id}')">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+            deleteProduct: async (id) => {
+                if(confirm("Delete?")) { await fetch(`${API_URL}/products/${id}`, {method:'DELETE'}); app.showAdmin(); }
+            },
+            openProductModal: () => {
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <h2 style="margin-bottom:1.5rem">Add Hardware</h2>
+                        <form onsubmit="app.addProduct(event)">
+                            <input type="text" name="name" placeholder="Name" required>
+                            <input type="number" name="price" placeholder="Price" required>
+                            <input type="text" name="category" placeholder="Category" required>
+                            <textarea name="desc" placeholder="Description" required></textarea>
+                            <input type="file" name="image" required>
+                            <div class="flex gap-2"><button type="submit" class="btn btn-primary">Save</button><button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button></div>
+                        </form>
+                    </div>`; document.body.appendChild(modal);
+            },
+            addProduct: async (e) => {
+                e.preventDefault(); const formData = new FormData(e.target);
+                await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                document.querySelector('.modal-overlay').remove(); app.showAdmin();
+            },
+
+            /* --- SHOP --- */
+            showShop: async () => {
+                const res = await fetch(`${API_URL}/products`);
+                if (!res.ok) { return alert("Could not load products"); }
+                
+                const products = await res.json();
+                
+                document.getElementById('app-root').innerHTML = `
+                    <div class="animate-up" style="text-align:center; margin-bottom:3rem;">
+                        <h1 style="font-size:3rem; margin-bottom:1rem;">BNG <span class="text-gradient">Store</span></h1>
+                        <p style="color:var(--text-muted);">Professional surveillance technology for the modern era.</p>
+                    </div>
+                    <div class="product-grid">
+                        ${products.map(p => `
+                            <div class="product-card">
+                                <img src="/uploads/${p.image}" class="product-img">
+                                <div class="product-info">
+                                    <div class="product-cat">${p.category}</div>
+                                    <h3 style="margin:5px 0; font-size:1.2rem;">${p.name}</h3>
+                                    <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
+                                    <!-- View Details Button instead of Add to Cart directly -->
+                                    <button class="btn btn-primary" style="width:100%; margin-top:1rem;" onclick="app.viewProduct('${p._id}')">View Details</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- SERVICE & CONTACT SECTION -->
+                    <div class="services-section">
+                        <div class="service-box">
+                            <h2 style="margin-bottom:1.5rem; color:var(--primary);">Our Services</h2>
+                            <p style="font-size:1.1rem; line-height:1.6; color:#ccc; margin-bottom:2rem;">
+                                We provide end-to-end <strong>Technical Repairment</strong> for all surveillance equipment. Whether it is camera calibration, DVR maintenance, or full system installation, our expert team is ready to assist you.
+                            </p>
+                            
+                            <!-- Social Links -->
+                            <div class="social-links">
+                                <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank" class="social-btn">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </a>
+                                <a href="https://www.facebook.com/profile.php?id=61562287274830" target="_blank" class="social-btn">
+                                    <i class="fa-brands fa-facebook-f"></i>
+                                </a>
+                            </div>
+
+                            <div style="margin-top:3rem; border-top:1px solid var(--border); padding-top:2rem;">
+                                <h3 style="color:var(--text-main); font-size:1.5rem;">Thank You</h3>
+                                <p style="color:var(--text-muted); font-size:1rem; line-height:1.6;">
+                                    Thank you for choosing <strong style="color:var(--primary)">BNG Surveillance</strong>. We are committed to providing you with the highest quality security solutions. If you have any questions or need support, feel free to reach out via our social channels.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            /* --- VIEW PRODUCT & ADD TO CART LOGIC --- */
+            viewProduct: async (id) => {
+                const res = await fetch(`${API_URL}/products`);
+                if(!res.ok) return alert("Error fetching product data");
+                
+                const products = await res.json();
+                const product = products.find(p => p._id === id);
+
+                if(!product) return;
+
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <div style="text-align:right; margin-bottom:1rem;">
+                            <button onclick="this.closest('.modal-overlay').remove()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+                        </div>
+                        <img src="/uploads/${product.image}" class="detail-img">
+                        <h2 style="font-size:2rem; margin-bottom:0.5rem;">${product.name}</h2>
+                        <div style="color:var(--primary); font-size:1.5rem; font-weight:bold; margin-bottom:1rem;">₹${product.price.toLocaleString('en-IN')}</div>
+                        
+                        <h4 style="margin-bottom:0.5rem; color:var(--text-muted);">Description</h4>
+                        <p style="line-height:1.6; margin-bottom:2rem;">${product.desc}</p>
+                        
+                        <!-- REVIEWS SECTION -->
+                        <div style="background:#111; padding:1.5rem; border-radius:12px; margin-bottom:2rem;">
+                            <h3 style="margin-bottom:1rem;">User Reviews</h3>
+                            ${product.reviews && product.reviews.length > 0 ? '' : '<p style="color:#888; font-style:italic;">No reviews yet. Be the first!</p>'}
+                            
+                            ${product.reviews ? product.reviews.map(r => `
+                                <div class="review-item">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                                        <strong style="color:white;">${r.user}</strong>
+                                        <span style="font-size:0.8rem; color:#666;">${new Date(r.date).toLocaleDateString()}</span>
+                                    </div>
+                                    <p style="color:#ddd; font-size:0.9rem;">${r.comment}</p>
+                                </div>
+                            `).join('') : ''}
+
+                            <!-- ADD REVIEW FORM -->
+                            <form style="margin-top:1.5rem;" onsubmit="app.addReview(event, '${product._id}')">
+                                <textarea name="comment" placeholder="Write a review..." rows="2" required style="background:#000; border:1px solid #333;"></textarea>
+                                <div class="flex gap-2">
+                                    <button type="submit" class="btn btn-secondary" style="flex:1;">Submit Review</button>
+                                    <button type="button" class="btn btn-primary" style="flex:1;" onclick="app.addToCart('${product._id}', '${product.name}', ${product.price})">Add to Cart</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+
+            addReview: async (e, productId) => {
+                e.preventDefault();
+                if(!state.user) return alert("Please login to review");
+                
+                const comment = e.target.comment.value;
+                const res = await fetch(`${API_URL}/review/${productId}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user: state.user.name, comment })
+                });
+                if(res.ok) {
+                    alert("Review Submitted!");
+                    app.viewProduct(productId); // Reload modal
+                }
+            },
+
+            addToCart: (id, name, price) => {
+                state.cart.push({ _id: id, name, price });
+                app.showToast(`${name} added to cart`);
+                app.updateNav();
+                document.querySelector('.modal-overlay').remove(); // Close details modal after adding
+            },
+            toggleCart: () => {
+                const total = state.cart.reduce((a, b) => a + b.price, 0);
+                const html = `
+                    <div class="cart-overlay" onclick="if(event.target === this) this.remove()">
+                        <div class="cart-panel animate-up">
+                            <div class="flex justify-between"><h2>Cart</h2><button onclick="this.closest('.cart-overlay').remove()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button></div>
+                            <div class="flex-col gap-2" style="margin:1.5rem 0; overflow-y:auto; flex:1;">
+                                ${state.cart.map(i => `<div class="flex justify-between" style="background:#222; padding:10px; border-radius:8px; border:1px solid var(--border);"><span>${i.name}</span><span>₹${i.price}</span></div>`).join('')}
+                            </div>
+                            <div class="flex justify-between" style="font-weight:bold; font-size:1.2rem; margin-bottom:1rem">Total: ₹${total.toLocaleString('en-IN')}</div>
+                            <button class="btn btn-primary" style="width:100%" onclick="app.showCheckout(${total})">Proceed to Pay</button>
+                        </div>
+                    </div>
+                `; document.body.insertAdjacentHTML('beforeend', html);
+            },
+
+            /* --- CHECKOUT & WHATSAPP --- */
+            showCheckout: (total) => {
+                document.querySelector('.cart-overlay').remove();
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <h2 style="margin-bottom:1rem; color:var(--primary)">Shipping Details</h2>
+                        <p style="color:#888; margin-bottom:1rem; font-size:0.9rem">Please enter your details for delivery.</p>
+                        <form id="checkout-form">
+                            <input type="text" id="ship-name" placeholder="Full Name" value="${state.user.name}" readonly style="background:#333; border-color:#444">
+                            <input type="tel" id="ship-phone" placeholder="Phone Number" required>
+                            <textarea id="ship-address" placeholder="Delivery Address" rows="3" required></textarea>
+                            <div class="flex justify-between items-center" style="margin-bottom:1rem; font-size:1.2rem;">
+                                <span>Total to Pay:</span>
+                                <span style="color:var(--primary)">₹${total.toLocaleString('en-IN')}</span>
+                            </div>
+                            <button type="button" class="btn btn-primary" style="width:100%" onclick="app.initiatePayment(${total})">Pay with Razorpay</button>
+                            <button type="button" class="btn btn-secondary" style="width:100%; margin-top:10px" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        </form>
+                    </div>
+                `; document.body.appendChild(modal);
+            },
+
+            initiatePayment: async (amount) => {
+                const phone = document.getElementById('ship-phone').value;
+                const address = document.getElementById('ship-address').value;
+                if(!phone || !address) return alert("Please fill in Phone and Address");
+
+                const btn = document.querySelector('button.btn-primary'); btn.innerText = "Processing...";
+
+                try {
+                    const res = await fetch(`${API_URL}/create-order`, {
+                        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ amount })
+                    });
+                    const order = await res.json();
+
+                    var options = {
+                        "key": RAZORPAY_KEY_ID, "amount": order.amount, "currency": "INR",
+                        "name": "BNG Surveillance", "description": "Order Payment",
+                        "image": "https://cdn-icons-png.flaticon.com/512/3209/3209265.png",
+                        "order_id": order.id,
+                        "handler": function (response){ app.verifyPayment(response, amount, phone, address); },
+                        "prefill": { "name": state.user.name, "email": state.user.email, "contact": phone },
+                        "theme": { "color": "#f59e0b" }
+                    };
+                    var rzp1 = new Razorpay(options); rzp1.open();
+                } catch (err) { alert("Payment Error"); console.error(err); }
+            },
+
+            verifyPayment: async (response, amount, phone, address) => {
+                const res = await fetch(`${API_URL}/verify-payment`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        orderCreationId: response.razorpay_order_id,
+                        razorpayPaymentId: response.razorpay_payment_id,
+                        razorpaySignature: response.razorpay_signature,
+                        customerDetails: {
+                            name: state.user.name, email: state.user.email, phone, address,
+                            items: state.cart, total: amount
+                        }
+                    })
+                });
+                const result = await res.json();
+                if (result.message === "Payment Successful") {
+                    document.querySelector('.modal-overlay').remove();
+                    state.cart = []; app.updateNav();
+                    app.showSuccessScreen(result.orderId, amount, phone, address);
+                } else { alert("Payment Verification Failed"); }
+            },
+
+            showSuccessScreen: (orderId, total, phone, address) => {
+                // Items List for WhatsApp
+                const itemsList = state.cart.length > 0 ? state.cart.map(i => `• ${i.name} (₹${i.price})`).join('%0A') : "Items cleared from local memory";
+                
+                // WHATSAPP MESSAGE BUILDER (Includes Address)
+                const waText = `*NEW ORDER ALERT*%0A%0AOrder ID: #${orderId}%0ACustomer: ${state.user.name}%0APhone: ${phone}%0A*Address:* ${address}%0A%0ATotal: ₹${total.toLocaleString('en-IN')}%0A%0A*Items:*%0A${itemsList}`;
+                const waLink = `https://wa.me/${ADMIN_PHONE_NUMBER}?text=${waText}`;
+
+                document.getElementById('app-root').innerHTML = `
+                    <div style="text-align:center; margin-top:5rem;" class="animate-up">
+                        <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <h1 style="color:var(--success); font-size:2.5rem;">Payment Successful!</h1>
+                        <p style="color:#888; margin:1rem 0; font-size:1.2rem;">Order ID: #${orderId}</p>
+                        
+                        <!-- DELIVERY PROMISE -->
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); padding: 1.5rem; border-radius: 12px; margin: 2rem auto; max-width: 500px;">
+                            <h4><i class="fa-solid fa-check-circle"></i> Confirmation</h4>
+                            <p style="color:white; font-size:1rem; line-height:1.6;">Your order is confirmed and will be delivered to you within <strong>7 days</strong> with service.</p>
+                        </div>
+                        
+                        <div style="max-width:400px; margin:0 auto;">
+                            <a href="${waLink}" target="_blank" class="btn btn-whatsapp" style="width:100%; display:flex; justify-content:center; gap:10px; text-decoration:none;">
+                                <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> Notify Admin on WhatsApp
+                            </a>
+                            <button class="btn btn-secondary" style="width:100%; margin-top:1rem" onclick="app.showShop()">Back to Shop</button>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        app.init();
+    </script>
+</body>
+</html>
