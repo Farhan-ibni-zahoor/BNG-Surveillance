@@ -1,6 +1,5 @@
 // server.js
 
-// 1. IMPORTS
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,58 +8,46 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-// 2. CONFIGURATION
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// RAZORPAY KEYS
+// 1. RAZORPAY KEYS
 const razorpay = new Razorpay({
-    key_id: 'rzp_test_S6anGX8BwOZEL8',
-    key_secret: 'CHEK3LJgZHmCdhd2NyJg5DSf'
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_S6anGX8BwOZEL8', 
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'
 });
 
-// 3. MIDDLEWARE
-app.use(cors());
+// 2. MIDDLEWARE & CORS
+// We allow all origins for safety, but you can restrict to your domain later if needed
+app.use(cors({ origin: '*', credentials: true })); 
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve images statically
 app.use(express.static('public')); // Serve the frontend HTML
 
-// 4. DATABASE CONNECTION
-mongoose.connect('mongodb://localhost:27017/bng-surveillance')
-    .then(() => console.log("✅ MongoDB Connected (Localhost)"))
-    .catch(err => console.log("❌ Database Connection Error:", err));
+// 3. DATABASE CONNECTION (LOCALHOST vs ATLAS)
+// Logic to switch between Localhost and Cloud based on environment
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/bng-surveillance';
 
-// 5. SCHEMAS
+mongoose.connect('mongodb+srv://farhan_admin:<db_password>@cluster0.sniaz6r.mongodb.net/?appName=Cluster0')
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => {
+        console.error("❌ Database Connection Error:", err);
+        // Don't crash the server on startup if DB is down, just log it
+    });
+
+// 4. SCHEMAS
 const UserSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    password: String,
-    role: { type: String, default: 'customer' }
+    name: String, email: String, password: String, role: { type: String, default: 'customer' }
 });
 
-// UPDATED PRODUCT SCHEMA (Includes Reviews)
 const ProductSchema = new mongoose.Schema({
-    name: String,
-    category: String,
-    price: Number,
-    image: String,
-    desc: String,
-    reviews: [{ // NEW: Review System
-        user: String,
-        comment: String,
-        date: { type: Date, default: Date.now }
-    }]
+    name: String, category: String, price: Number, image: String, desc: String,
+    reviews: [{ user: String, comment: String, date: { type: Date, default: Date.now } }]
 });
 
 const OrderSchema = new mongoose.Schema({
-    razorpay_order_id: String,
-    payment_status: String,
-    customer: String,
-    email: String,
-    phone: String,
-    address: String,
-    items: Array,
-    total: Number,
+    razorpay_order_id: String, payment_status: String, customer: String, email: String,
+    phone: String, address: String, items: Array, total: Number,
     date: { type: Date, default: Date.now }
 });
 
@@ -68,21 +55,43 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 6. IMAGE UPLOAD CONFIG
+// 5. IMAGE UPLOAD CONFIG
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
-    }
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage: storage });
 
 
-// 7. ROUTES (API)
+// 6. ROUTES
 
 // --- AUTH ---
+app.post('/api/login', async (req, res) => {
+    try {
+        console.log("Login request received:", req.body); // Debug log
+        const { email, password } = req.body;
+        
+        // Hardcoded Admin Check
+        if(email === "farhanzahoor03@gmail.com" && password === "farhan@coder") {
+            console.log("Admin login successful");
+            return res.json({ name: "Farhan (Admin)", email, role: "author" });
+        }
+
+        // Customer Check
+        const user = await User.findOne({ email, password });
+        if(user) {
+            console.log("Customer login successful");
+            res.json(user);
+        } else {
+            console.log("Invalid credentials");
+            res.status(401).json({ error: "Invalid Credentials" });
+        }
+    } catch (err) {
+        console.error("Login Error:", err);
+        res.status(500).json({ error: "Server Error" });
+    }
+});
+
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -92,29 +101,6 @@ app.post('/api/register', async (req, res) => {
         const newUser = new User({ name, email, password, role: 'customer' });
         await newUser.save();
         res.json({ message: "Registered successfully" });
-    } catch (err) { res.status(500).json(err); }
-});
-
-app.post('/api/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        
-        // Hardcoded Admin Check
-        if(email === "farhanzahoor03@gmail.com" && password === "farhan@coder") {
-            return res.json({ 
-                name: "Farhan (Admin)", 
-                email, 
-                role: "author" 
-            });
-        }
-
-        // Customer Check
-        const user = await User.findOne({ email, password });
-        if(user) {
-            res.json(user);
-        } else {
-            res.status(401).json({ error: "Invalid Credentials" });
-        }
     } catch (err) { res.status(500).json(err); }
 });
 
@@ -138,7 +124,6 @@ app.delete('/api/products/:id', async (req, res) => {
     res.json({ message: "Deleted" });
 });
 
-// --- NEW: ADD REVIEW ROUTE ---
 app.post('/api/review/:id', async (req, res) => {
     try {
         const { user, comment } = req.body;
@@ -155,40 +140,38 @@ app.post('/api/review/:id', async (req, res) => {
 });
 
 // --- RAZORPAY PAYMENT ROUTES ---
-
-// 1. Create Order
 app.post('/api/create-order', async (req, res) => {
     const { amount } = req.body; 
 
     try {
         const options = {
-            amount: amount * 100, // Razorpay expects amount in paise
+            amount: amount * 100, 
             currency: "INR",
             receipt: "receipt_" + Date.now()
         };
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {
+        console.error("Create Order Error:", error);
         res.status(500).json({ error: "Something went wrong creating Razorpay order" });
     }
 });
 
-// 2. Verify Payment & Save Order
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
 
-    const secret = 'CHEK3LJgZHmCdhd2NyJg5DSf'; 
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'; 
     
-    // HMAC SHA256 Verification
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
     const digest = shasum.digest("hex");
 
     if (digest !== razorpaySignature) {
+        console.error("Invalid Signature");
         return res.status(400).json({ message: "Invalid Transaction" });
     }
 
-    // Save Verified Order to Database (With Address & Phone)
+    // Save Verified Order
     const newOrder = new Order({
         razorpay_order_id: orderCreationId,
         payment_status: "Paid",
@@ -210,16 +193,18 @@ app.get('/api/orders', async (req, res) => {
     res.json(orders);
 });
 
-// --- MY ORDERS (CUSTOMER) ---
 app.get('/api/my-orders', async (req, res) => {
     const { email } = req.query;
     if(!email) return res.status(400).json({ error: "Email required" });
     
-    // Find orders matching logged-in user's email
     const orders = await Order.find({ email }).sort({ date: -1 });
     res.json(orders);
 });
 
 
-// 8. START SERVER
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// 7. START SERVER
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Database: ${MONGO_URI}`);
+});
