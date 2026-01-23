@@ -225,7 +225,12 @@
 
     <script>
         // CONFIGURATION
-        const API_URL = 'https://bng-surveillance.onrender.com/api';
+        // Find this section in index.html script
+        const API_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+        ? 'http://localhost:5000/api' 
+        : 'https://bng-surveillance.onrender.com/api';
+
+    
         const RAZORPAY_KEY_ID = 'rzp_test_S6anGX8BwOZEL8';
         const ADMIN_PHONE_NUMBER = '919797122805';
 
