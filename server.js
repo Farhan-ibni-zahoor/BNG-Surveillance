@@ -2,7 +2,6 @@
 
 // 1. IMPORTS
 // Ensure this is at the top with other imports
-const path = require('path'); 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
