@@ -709,14 +709,18 @@
                 const result = await res.json();
                 if (result.message === "Payment Successful") {
                     document.querySelector('.modal-overlay').remove();
-                    state.cart = []; app.updateNav();
-                    app.showSuccessScreen(result.orderId, amount, phone, address);
+                    
+                    // FIX: Pass the items to the success screen BEFORE clearing the cart
+                    const itemsForWhatsApp = state.cart; 
+                    state.cart = []; // Clear cart
+                    app.updateNav();
+                    app.showSuccessScreen(result.orderId, amount, phone, address, itemsForWhatsApp);
                 } else { alert("Payment Verification Failed"); }
             },
 
-            showSuccessScreen: (orderId, total, phone, address) => {
-                // Items List for WhatsApp
-                const itemsList = state.cart.length > 0 ? state.cart.map(i => `• ${i.name} (₹${i.price})`).join('%0A') : "Items cleared from local memory";
+            showSuccessScreen: (orderId, total, phone, address, items) => {
+                // FIX: Use the passed 'items' argument instead of 'state.cart'
+                const itemsList = items.length > 0 ? items.map(i => `• ${i.name} (₹${i.price})`).join('%0A') : "No Items";
                 
                 // WHATSAPP MESSAGE BUILDER (Includes Address)
                 const waText = `*NEW ORDER ALERT*%0A%0AOrder ID: #${orderId}%0ACustomer: ${state.user.name}%0APhone: ${phone}%0A*Address:* ${address}%0A%0ATotal: ₹${total.toLocaleString('en-IN')}%0A%0A*Items:*%0A${itemsList}`;

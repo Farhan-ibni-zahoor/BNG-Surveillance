@@ -1,6 +1,8 @@
 // server.js
 
 // 1. IMPORTS
+// Ensure this is at the top with other imports
+const path = require('path'); 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -95,6 +97,18 @@ app.post('/api/login', async (req, res) => {
             role: "author" 
         });
     }
+
+    // --- AUTH ---
+app.post('/api/register', async (req, res) => {
+    const { name, email, password } = req.body;
+    try {
+        const newUser = new User({ name, email, password });
+        await newUser.save();
+        res.json(newUser);
+    } catch (err) {
+        res.status(500).json({ error: "Registration Failed" });
+    }
+});
 
     // Customer Check
     const user = await User.findOne({ email, password });
@@ -201,6 +215,13 @@ app.get('/api/my-orders', async (req, res) => {
     
     const orders = await Order.find({ email }).sort({ date: -1 });
     res.json(orders);
+});
+
+// --- SERVE FRONTEND ---
+// This tells the server to send index.html when someone visits the URL
+app.get('/', (req, res) => {
+    // Assuming you save index.html in a folder named 'public'
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 
