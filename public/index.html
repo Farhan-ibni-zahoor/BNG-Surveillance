@@ -324,36 +324,24 @@
                 e.preventDefault();
                 const formData = Object.fromEntries(new FormData(e.target));
                 
-                // CHECK: Are you on localhost or Live site?
-                const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                // We use API_URL here, just like the register function
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify(formData)
+                });
                 
-                // Set URL accordingly
-                const targetUrl = isLocalhost ? 'http://localhost:5000/api' : 'https://bng-surveillance.onrender.com/api';
+                const data = await res.json();
                 
-                console.log("Sending request to:", targetUrl); // Debug log
-                
-                try {
-                    const res = await fetch(`${targetUrl}/login`, {
-                        method: 'POST', 
-                        headers: {'Content-Type': 'application/json'}, 
-                        body: JSON.stringify(formData)
-                    });
-                    const data = await res.json();
-                    
-                    if(res.ok) {
-                        state.user = data;
-                        sessionStorage.setItem('user', JSON.stringify(data));
-                        app.updateNav(); 
-                        data.role === 'author' ? app.showAdmin() : app.showShop();
-                    } else {
-                        // IMPROVED ERROR HANDLING
-                        const errorMsg = data.error || "Login Failed (Server rejected request)";
-                        alert("⚠️ Error: " + errorMsg);
-                        console.error("Login Failed:", data); // Debug log
-                    }
-                } catch (err) {
-                    alert("⚠️ Network Error: Could not connect to server.");
-                    console.error("Network Error:", err); // Debug log
+                if(res.ok) {
+                    state.user = data;
+                    sessionStorage.setItem('user', JSON.stringify(data));
+                    app.updateNav(); 
+                    data.role === 'author' ? app.showAdmin() : app.showShop();
+                } else {
+                    const errorMsg = data.error || "Login Failed (Server rejected request)";
+                    alert("⚠️ Error: " + errorMsg);
+                    console.error("Login Failed:", data);
                 }
             },
 
