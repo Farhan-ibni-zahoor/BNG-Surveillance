@@ -17,6 +17,7 @@
             --primary: #f59e0b;
             --primary-glow: rgba(245, 158, 11, 0.4);
             --success: #10b981;
+            --danger: #ef4444;
             --text-main: #ffffff;
             --text-muted: #a1a1aa;
             --border: rgba(255, 255, 255, 0.08);
@@ -38,12 +39,13 @@
         .btn { padding: 12px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
         .btn-primary { background: linear-gradient(135deg, var(--primary), #d97706); color: #000; box-shadow: 0 4px 15px var(--primary-glow); }
         .btn-secondary { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
         .btn-whatsapp { background: #25D366; color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); }
 
         nav { padding: 1.2rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
         main { flex: 1; padding: 3rem; max-width: 1400px; margin: 0 auto; width: 100%; padding-bottom: 4rem; }
 
-        /* HERO SECTION */
+        /* HERO & UI */
         .hero-banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; height: 400px; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 20px; margin-bottom: 3rem; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
         .hero-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, var(--primary) 0%, transparent 100%); opacity: 0.1; z-index: 1; }
         .hero-content { position: relative; z-index: 2; }
@@ -64,6 +66,15 @@
         .product-cat { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
         .product-price { font-size: 1.6rem; font-weight: 700; margin: 0.5rem 0; font-family: 'Space Grotesk', sans-serif; }
 
+        /* ADMIN DASHBOARD ELEMENTS */
+        .stat-card { background: linear-gradient(145deg, #1a1a1a, #0f0f0f); border: 1px solid var(--border); padding: 2rem; border-radius: 16px; position: relative; overflow: hidden; }
+        .stat-val { font-size: 2.5rem; font-weight: 800; margin-top: 0.5rem; font-family: 'Space Grotesk', sans-serif; }
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { text-align: left; padding: 1rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 0.85rem; text-transform: uppercase; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
         /* CART & FORMS */
         input, select, textarea { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 1rem; font-family: 'Outfit', sans-serif; transition: 0.3s; }
         input:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.07); }
@@ -71,6 +82,8 @@
         .cart-panel { background: #121212; width: 420px; padding: 2rem; display: flex; flex-direction: column; border-left: 1px solid var(--border); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
         .modal-content { background: #1a1a1a; padding: 2.5rem; border-radius: 20px; width: 550px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        .detail-img { width: 100%; height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem; }
+        .review-item { background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; border: 1px solid #333; }
         
         /* FOOTER */
         .services-section { background: linear-gradient(to bottom, #0f172a, #050505); padding: 4rem 3rem; border-top: 1px solid var(--border); text-align: center; }
@@ -119,18 +132,13 @@
 
         const app = {
             init: async () => {
-                // 1. Remove Loader
                 const loader = document.getElementById('loading-overlay');
                 if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
 
-                // 2. Setup
                 app.updateNav();
-                
-                // 3. CHANGE: Always Show Shop First
                 app.showShop();
             },
 
-            /* --- UI HELPERS --- */
             showToast: (msg) => {
                 const div = document.createElement('div');
                 div.style.cssText = "background:var(--bg-panel); color:white; padding:1rem; border-left:4px solid var(--primary); border-radius:4px; animation: slideUp 0.3s;";
@@ -241,7 +249,6 @@
                 const products = await res.json();
                 
                 document.getElementById('app-root').innerHTML = `
-                    <!-- HERO SECTION -->
                     <div class="hero-banner animate-up">
                         <div class="hero-content">
                             <h1 class="hero-title">BNG <span class="text-gradient">Surveillance</span></h1>
@@ -260,7 +267,6 @@
                     <div class="product-grid" id="shop-grid">
                         ${products.map(p => `
                             <div class="product-card">
-                                <!-- CHANGE: Use ${p.image} directly as it is now a full URL from Cloudinary -->
                                 <img src="${p.image}" class="product-img">
                                 <div class="product-info">
                                     <div class="product-cat">${p.category}</div>
@@ -272,7 +278,6 @@
                         `).join('')}
                     </div>
 
-                    <!-- FOOTER -->
                     <div class="services-section">
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 2rem; border-radius: 16px; max-width: 800px; margin: 0 auto;">
                             <h2 style="margin-bottom:1.5rem; color:var(--primary);">Our Services</h2>
@@ -288,18 +293,91 @@
                 `;
             },
 
-            /* --- CHECKOUT LOGIC (LOGIN TRIGGER) --- */
+            /* --- VIEW PRODUCT DETAILS (FIXED) --- */
+            viewProduct: async (id) => {
+                const res = await fetch(`${API_URL}/products`);
+                if(!res.ok) return alert("Error fetching product data");
+                
+                const products = await res.json();
+                const product = products.find(p => p._id === id);
+
+                if(!product) return;
+
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <div style="text-align:right; margin-bottom:1rem;">
+                            <button onclick="this.closest('.modal-overlay').remove()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+                        </div>
+                        <img src="${product.image}" class="detail-img">
+                        <h2 style="font-size:2rem; margin-bottom:0.5rem;">${product.name}</h2>
+                        <div style="color:var(--primary); font-size:1.5rem; font-weight:bold; margin-bottom:1rem;">₹${product.price.toLocaleString('en-IN')}</div>
+                        
+                        <h4 style="margin-bottom:0.5rem; color:var(--text-muted);">Description</h4>
+                        <p style="line-height:1.6; margin-bottom:2rem;">${product.desc}</p>
+                        
+                        <!-- REVIEWS SECTION -->
+                        <div style="background:#111; padding:1.5rem; border-radius:12px; margin-bottom:2rem;">
+                            <h3 style="margin-bottom:1rem;">User Reviews</h3>
+                            ${product.reviews && product.reviews.length > 0 ? '' : '<p style="color:#888; font-style:italic;">No reviews yet. Be the first!</p>'}
+                            
+                            ${product.reviews ? product.reviews.map(r => `
+                                <div class="review-item">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                                        <strong style="color:white;">${r.user}</strong>
+                                        <span style="font-size:0.8rem; color:#666;">${new Date(r.date).toLocaleDateString()}</span>
+                                    </div>
+                                    <p style="color:#ddd; font-size:0.9rem;">${r.comment}</p>
+                                </div>
+                            `).join('') : ''}
+
+                            <!-- ADD REVIEW FORM -->
+                            <form style="margin-top:1.5rem;" onsubmit="app.addReview(event, '${product._id}')">
+                                <textarea name="comment" placeholder="Write a review..." rows="2" required style="background:#000; border:1px solid #333;"></textarea>
+                                <div class="flex" style="gap:10px;">
+                                    <button type="submit" class="btn btn-secondary" style="flex:1;">Submit Review</button>
+                                    <button type="button" class="btn btn-primary" style="flex:1;" onclick="app.addToCart('${product._id}', '${product.name}', ${product.price})">Add to Cart</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            },
+
+            addReview: async (e, productId) => {
+                e.preventDefault();
+                if(!state.user) return alert("Please login to review");
+                
+                const comment = e.target.comment.value;
+                const res = await fetch(`${API_URL}/review/${productId}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user: state.user.name, comment })
+                });
+                if(res.ok) {
+                    alert("Review Submitted!");
+                    app.viewProduct(productId);
+                }
+            },
+
+            addToCart: (id, name, price) => {
+                state.cart.push({ _id: id, name, price });
+                app.showToast(`${name} added to cart`);
+                app.updateNav();
+                document.querySelector('.modal-overlay').remove();
+            },
+
+            /* --- CHECKOUT LOGIC --- */
             toggleCart: () => {
                 const total = state.cart.reduce((a, b) => a + b.price, 0);
                 const html = `
                     <div class="cart-overlay" onclick="if(event.target === this) this.remove()">
                         <div class="cart-panel animate-up">
                             <div class="flex justify-between"><h2>Cart</h2><button onclick="this.closest('.cart-overlay').remove()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button></div>
-                            <div class="flex-col gap-2" style="margin:1.5rem 0; overflow-y:auto; flex:1;">
+                            <div class="flex-col" style="margin:1.5rem 0; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px;">
                                 ${state.cart.map(i => `<div class="flex justify-between" style="background:#222; padding:10px; border-radius:8px; border:1px solid var(--border);"><span>${i.name}</span><span>₹${i.price}</span></div>`).join('')}
                             </div>
                             <div class="flex justify-between" style="font-weight:bold; font-size:1.2rem; margin-bottom:1rem">Total: ₹${total.toLocaleString('en-IN')}</div>
-                            <!-- CHANGE: Call checkLoginBeforePay -->
                             <button class="btn btn-primary" style="width:100%" onclick="app.checkLoginBeforePay(${total})">Proceed to Pay</button>
                         </div>
                     </div>
@@ -337,7 +415,6 @@
                 `; document.body.appendChild(modal);
             },
 
-            /* --- PAYMENT & SUCCESS --- */
             initiatePayment: async (amount) => {
                 const phone = document.getElementById('ship-phone').value;
                 const address = document.getElementById('ship-address').value;
@@ -400,19 +477,91 @@
                 `;
             },
 
-            /* --- OTHER ROUTES (PLACEHOLDERS) --- */
+            /* --- ADMIN DASHBOARD (RESTORED) --- */
             showAdmin: async () => {
-                 // Admin code goes here (omitted for brevity in this specific context)
-                 document.getElementById('app-root').innerHTML = `<div style="text-align:center; padding:2rem;"><h1>Admin Dashboard</h1><p>Functionality preserved from previous version.</p></div>`;
+                const orders = await fetch(`${API_URL}/orders`).then(r => r.json());
+                const products = await fetch(`${API_URL}/products`).then(r => r.json());
+                const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
+
+                document.getElementById('app-root').innerHTML = `
+                    <div class="animate-up">
+                        <div class="flex justify-between items-center" style="margin-bottom:2rem">
+                            <h1 style="font-size:2.5rem; font-family:'Space Grotesk'">Command Center</h1>
+                            <button class="btn btn-primary" onclick="app.openProductModal()">+ New Unit</button>
+                        </div>
+
+                        <div class="flex" style="margin-bottom:2rem; gap:2rem; flex-wrap:wrap;">
+                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Revenue</div><div class="stat-val text-gradient">₹${totalSales.toLocaleString('en-IN')}</div></div>
+                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Orders</div><div class="stat-val">${orders.length}</div></div>
+                        </div>
+
+                        <div class="stat-card" style="margin-bottom:2rem">
+                            <h3 style="margin-bottom:1rem;">Recent Orders</h3>
+                            <div style="overflow-x:auto;">
+                                <table>
+                                    <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th></tr></thead>
+                                    <tbody>
+                                        ${orders.map(o => `
+                                            <tr>
+                                                <td>${o.customer}</td>
+                                                <td>${o.phone}</td>
+                                                <td style="font-size:0.8rem; color:#ccc; max-width:200px;">${o.address}</td>
+                                                <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-bottom:1rem">Inventory</h3>
+                        <div class="product-grid">
+                            ${products.map(p => `
+                                <div class="product-card">
+                                    <img src="${p.image}" class="product-img">
+                                    <div class="product-info">
+                                        <div class="product-cat">${p.category}</div>
+                                        <h3 style="margin:5px 0">${p.name}</h3>
+                                        <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
+                                        <button class="btn btn-danger" style="margin-top:1rem; width:100%" onclick="app.deleteProduct('${p._id}')">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             },
-            viewProduct: (id) => {
-                // View Product code goes here
-                console.log("Viewing product:", id);
+            deleteProduct: async (id) => {
+                if(confirm("Delete?")) { await fetch(`${API_URL}/products/${id}`, {method:'DELETE'}); app.showAdmin(); }
             },
-            addToCart: (id, name, price) => {
-                state.cart.push({ _id: id, name, price });
-                app.showToast(`${name} added to cart`);
-                app.updateNav();
+            openProductModal: () => {
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <h2 style="margin-bottom:1.5rem">Add Hardware</h2>
+                        <form onsubmit="app.addProduct(event)">
+                            <input type="text" name="name" placeholder="Name" required>
+                            <input type="number" name="price" placeholder="Price" required>
+                            <input type="text" name="category" placeholder="Category" required>
+                            <textarea name="desc" placeholder="Description" required></textarea>
+                            <input type="file" name="image" required>
+                            <div class="flex" style="gap:10px;">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>`; document.body.appendChild(modal);
+            },
+            addProduct: async (e) => {
+                e.preventDefault(); 
+                const formData = new FormData(e.target);
+                await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                document.querySelector('.modal-overlay').remove(); 
+                app.showAdmin();
+            },
+            /* --- PROFILE (PLACEHOLDER) --- */
+            showProfile: async () => {
+                alert("My Orders functionality is the same as before.");
             }
         };
 
