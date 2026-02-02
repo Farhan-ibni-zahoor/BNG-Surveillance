@@ -9,20 +9,17 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-// 2. CLOUDINARY SETUP (FIXED)
-// Import cloudinary without destructuring to avoid version errors
-const Cloudinary = require('cloudinary').v2; 
+// 2. CLOUDINARY SETUP (FIXED VARIABLE NAMES)
+// We import as 'cloudinary' (lowercase) so we can use it as cloudinary.config()
+const cloudinary = require('cloudinary').v2;
 const CloudinaryStorage = require('multer-storage-cloudinary');
 
-// Configure BEFORE using
+// Configure immediately to avoid undefined errors
 cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
     api_key: process.env.CLOUD_API_KEY, 
     api_secret: process.env.CLOUD_API_SECRET 
 });
-
-// Debug: Verify config
-console.log("Cloudinary Cloud Name:", process.env.CLOUD_NAME ? "Set" : "MISSING");
 
 // 3. CONFIGURATION
 const app = express();
@@ -78,9 +75,9 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (FIXED)
+// 8. IMAGE UPLOAD CONFIG
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary, // Pass the configured instance
+    cloudinary: cloudinary, // This now works because variable is 'cloudinary'
     params: {
         folder: 'bng_surveillance',
         resource_type: 'image'
@@ -90,6 +87,8 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } 
 });
+
+// ... (Keep the rest of your routes exactly as they were) ...
 
 // 9. ROUTES
 
