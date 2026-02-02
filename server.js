@@ -8,22 +8,21 @@ const multer = require('multer');
 const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-
-// 2. CLOUDINARY SETUP (FIXED VARIABLE NAMES)
-// We import as 'cloudinary' (lowercase) so we can use it as cloudinary.config()
 const cloudinary = require('cloudinary').v2;
-const CloudinaryStorage = require('multer-storage-cloudinary');
+const streamifier = require('streamifier'); // New: Helps send file to cloud
 
-// Configure immediately to avoid undefined errors
+// 2. CONFIGURATION
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// 3. CLOUDINARY CONFIGURATION
 cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
     api_key: process.env.CLOUD_API_KEY, 
     api_secret: process.env.CLOUD_API_SECRET 
 });
 
-// 3. CONFIGURATION
-const app = express();
-const PORT = process.env.PORT || 5000;
+console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
 
 // 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
@@ -75,20 +74,13 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary, // This now works because variable is 'cloudinary'
-    params: {
-        folder: 'bng_surveillance',
-        resource_type: 'image'
-    },
-});
+// 8. IMAGE UPLOAD CONFIG (MANUAL METHOD - NO MORE CRASHES)
+// We use memoryStorage so the file is in RAM, then we stream it to Cloudinary
+const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } 
 });
-
-// ... (Keep the rest of your routes exactly as they were) ...
 
 // 9. ROUTES
 
@@ -100,7 +92,7 @@ app.post('/api/register', async (req, res) => {
         await newUser.save();
         res.json(newUser);
     } catch (err) {
-        res.status(500).json({ error: "Registration Failed: " + err.message });
+        res.status(500).json({ error: "Registration Failed" });
     }
 });
 
@@ -120,23 +112,42 @@ app.get('/api/products', async (req, res) => {
     res.json(products);
 });
 
+// --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
-        // Debugging: Check if file exists
         if (!req.file) {
             return res.status(400).json({ error: "No image file uploaded" });
         }
 
-        const { name, category, price, desc } = req.body;
-        const image = req.file.path; 
-        
-        console.log("Uploading product:", name, "Image:", image); // Log to console
-        
-        const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
-        await newProduct.save();
-        res.json(newProduct);
+        console.log("File received:", req.file.originalname);
+
+        // Upload stream to Cloudinary
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'bng_surveillance',
+                resource_type: 'image'
+            },
+            async (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
+                }
+
+                // If successful, save to DB
+                const { name, category, price, desc } = req.body;
+                const image = result.secure_url; // Get the URL from Cloudinary result
+                
+                const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
+                await newProduct.save();
+                res.json(newProduct);
+            }
+        );
+
+        // Pipe the file buffer (from memory) to Cloudinary stream
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+
     } catch (err) {
-        console.error("UPLOAD CRASH ERROR:", err); // Log specific error to Render Logs
+        console.error("Server Upload Error:", err);
         res.status(500).json({ error: "Server Error: " + err.message });
     }
 });
@@ -173,13 +184,15 @@ app.post('/api/create-order', async (req, res) => {
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {
-        res.status(500).json({ error: "Razorpay Error" });
+        res.status(500).json({ error: "Something went wrong creating Razorpay order" });
     }
 });
 
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
+
     const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
+    
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
     const digest = shasum.digest("hex");
@@ -215,20 +228,10 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// 10. ERROR HANDLER (PREVENTS 502 HTML ERRORS)
+// 10. ERROR HANDLER
 app.use((err, req, res, next) => {
     console.error("Express Error Handler:", err);
     res.status(500).json({ error: err.message || "Something went wrong" });
-});
-
-// --- DIAGNOSTIC ROUTE (Check Env Vars) ---
-app.get('/api/check-env', (req, res) => {
-    res.json({
-        cloud_name: process.env.CLOUD_NAME ? process.env.CLOUD_NAME : "MISSING",
-        api_key_set: process.env.CLOUD_API_KEY ? "SET" : "MISSING",
-        secret_set: process.env.CLOUD_API_SECRET ? "SET" : "MISSING",
-        mongo: process.env.MONGO_URI ? "SET" : "MISSING"
-    });
 });
 
 // 11. START SERVER
