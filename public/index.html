@@ -261,7 +261,7 @@
 
                     <div class="animate-up" style="text-align:center; margin-bottom:2rem;">
                         <h2 style="font-size:2rem;">Premium Equipment</h2>
-                        <p style="color:var(--text-muted);">Professional surveillance technology for the modern era.</p>
+                        <p style="color:var(--text-muted);">Professional surveillance technology for modern era.</p>
                     </div>
                     
                     <div class="product-grid" id="shop-grid">
@@ -293,7 +293,7 @@
                 `;
             },
 
-            /* --- VIEW PRODUCT DETAILS (FIXED) --- */
+            /* --- VIEW PRODUCT & REVIEWS (REVIEWS BELOW BUY BUTTON) --- */
             viewProduct: async (id) => {
                 const res = await fetch(`${API_URL}/products`);
                 if(!res.ok) return alert("Error fetching product data");
@@ -314,14 +314,17 @@
                         <div style="color:var(--primary); font-size:1.5rem; font-weight:bold; margin-bottom:1rem;">₹${product.price.toLocaleString('en-IN')}</div>
                         
                         <h4 style="margin-bottom:0.5rem; color:var(--text-muted);">Description</h4>
-                        <p style="line-height:1.6; margin-bottom:2rem;">${product.desc}</p>
+                        <p style="line-height:1.6; margin-bottom:1.5rem;">${product.desc}</p>
                         
-                        <!-- REVIEWS SECTION -->
-                        <div style="background:#111; padding:1.5rem; border-radius:12px; margin-bottom:2rem;">
-                            <h3 style="margin-bottom:1rem;">User Reviews</h3>
-                            ${product.reviews && product.reviews.length > 0 ? '' : '<p style="color:#888; font-style:italic;">No reviews yet. Be the first!</p>'}
+                        <div class="flex" style="gap:10px;">
+                            <button type="button" class="btn btn-primary" style="flex:1;" onclick="app.addToCart('${product._id}', '${product.name}', ${product.price})">Add to Cart</button>
+                        </div>
+
+                        <!-- REVIEWS SECTION (MOVED BELOW BUY BUTTON) -->
+                        <div style="margin-top: 2.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                            <h3 style="margin-bottom:1rem;">Customer Reviews</h3>
                             
-                            ${product.reviews ? product.reviews.map(r => `
+                            ${product.reviews && product.reviews.length > 0 ? product.reviews.map(r => `
                                 <div class="review-item">
                                     <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                                         <strong style="color:white;">${r.user}</strong>
@@ -329,16 +332,16 @@
                                     </div>
                                     <p style="color:#ddd; font-size:0.9rem;">${r.comment}</p>
                                 </div>
-                            `).join('') : ''}
+                            `).join('') : '<p style="color:#888; font-style:italic;">No reviews yet.</p>'}
 
                             <!-- ADD REVIEW FORM -->
-                            <form style="margin-top:1.5rem;" onsubmit="app.addReview(event, '${product._id}')">
-                                <textarea name="comment" placeholder="Write a review..." rows="2" required style="background:#000; border:1px solid #333;"></textarea>
-                                <div class="flex" style="gap:10px;">
-                                    <button type="submit" class="btn btn-secondary" style="flex:1;">Submit Review</button>
-                                    <button type="button" class="btn btn-primary" style="flex:1;" onclick="app.addToCart('${product._id}', '${product.name}', ${product.price})">Add to Cart</button>
-                                </div>
-                            </form>
+                            ${state.user ? `
+                                <form style="margin-top:1.5rem;" onsubmit="app.addReview(event, '${product._id}')">
+                                    <div style="margin-bottom: 0.5rem; color:var(--text-muted);">Write a review:</div>
+                                    <textarea name="comment" placeholder="Share your experience..." rows="2" required style="background:#000; border:1px solid #333;"></textarea>
+                                    <button type="submit" class="btn btn-secondary" style="width:100%">Submit Review</button>
+                                </form>
+                            ` : `<div style="margin-top:1rem; text-align:center; color:var(--primary); background:rgba(245,158,11,0.1); padding:0.5rem; border-radius:4px; font-size:0.8rem;">Please Login to write a review</div>`}
                         </div>
                     </div>
                 `;
@@ -356,7 +359,9 @@
                 });
                 if(res.ok) {
                     alert("Review Submitted!");
-                    app.viewProduct(productId);
+                    app.viewProduct(productId); // Reload modal to show new review
+                } else {
+                    alert("Failed to submit review");
                 }
             },
 
@@ -365,6 +370,116 @@
                 app.showToast(`${name} added to cart`);
                 app.updateNav();
                 document.querySelector('.modal-overlay').remove();
+            },
+
+            /* --- ADMIN DASHBOARD (FIXED & ADDED ERROR HANDLING) --- */
+            showAdmin: async () => {
+                try {
+                    // Fetch Data
+                    const [orders, products] = await Promise.all([
+                        fetch(`${API_URL}/orders`).then(r => r.json()).catch(() => []),
+                        fetch(`${API_URL}/products`).then(r => r.json()).catch(() => [])
+                    ]);
+                    
+                    // Safety Check: Ensure arrays
+                    const safeOrders = Array.isArray(orders) ? orders : [];
+                    const safeProducts = Array.isArray(products) ? products : [];
+                    const totalSales = safeOrders.reduce((acc, o) => acc + (o.total || 0), 0);
+
+                    document.getElementById('app-root').innerHTML = `
+                        <div class="animate-up">
+                            <div class="flex justify-between items-center" style="margin-bottom:2rem">
+                                <h1 style="font-size:2.5rem; font-family:'Space Grotesk'">Command Center</h1>
+                                <button class="btn btn-primary" onclick="app.openProductModal()">+ New Unit</button>
+                            </div>
+
+                            <div class="flex" style="margin-bottom:2rem; gap:2rem; flex-wrap:wrap;">
+                                <div class="stat-card" style="flex:1"><div class="stat-label">Total Revenue</div><div class="stat-val text-gradient">₹${totalSales.toLocaleString('en-IN')}</div></div>
+                                <div class="stat-card" style="flex:1"><div class="stat-label">Total Orders</div><div class="stat-val">${safeOrders.length}</div></div>
+                            </div>
+
+                            <div class="stat-card" style="margin-bottom:2rem">
+                                <h3 style="margin-bottom:1rem;">Recent Orders</h3>
+                                <div style="overflow-x:auto;">
+                                    ${safeOrders.length === 0 ? '<p style="color:#666">No orders yet.</p>' : `
+                                        <table>
+                                            <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th></tr></thead>
+                                            <tbody>
+                                                ${safeOrders.map(o => `
+                                                    <tr>
+                                                        <td>${o.customer}</td>
+                                                        <td>${o.phone}</td>
+                                                        <td style="font-size:0.8rem; color:#ccc; max-width:200px;">${o.address}</td>
+                                                        <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    `}
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin-bottom:1rem">Inventory</h3>
+                            <div class="product-grid">
+                                ${safeProducts.map(p => `
+                                    <div class="product-card">
+                                        <img src="${p.image}" class="product-img">
+                                        <div class="product-info">
+                                            <div class="product-cat">${p.category}</div>
+                                            <h3 style="margin:5px 0">${p.name}</h3>
+                                            <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
+                                            <button class="btn btn-danger" style="margin-top:1rem; width:100%" onclick="app.deleteProduct('${p._id}')">Delete</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } catch (err) {
+                    console.error(err);
+                    alert("Failed to load dashboard. Please check console.");
+                }
+            },
+
+            deleteProduct: async (id) => {
+                if(confirm("Delete?")) { 
+                    await fetch(`${API_URL}/products/${id}`, {method:'DELETE'}); 
+                    app.showAdmin(); 
+                }
+            },
+
+            openProductModal: () => {
+                const modal = document.createElement('div'); modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content animate-up">
+                        <h2 style="margin-bottom:1.5rem">Add Hardware</h2>
+                        <form onsubmit="app.addProduct(event)">
+                            <input type="text" name="name" placeholder="Name" required>
+                            <input type="number" name="price" placeholder="Price" required>
+                            <input type="text" name="category" placeholder="Category" required>
+                            <textarea name="desc" placeholder="Description" required></textarea>
+                            <input type="file" name="image" required>
+                            <div class="flex" style="gap:10px;">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>`; document.body.appendChild(modal);
+            },
+
+            // FIXED: Added success/failure alert
+            addProduct: async (e) => {
+                e.preventDefault(); 
+                const formData = new FormData(e.target);
+                const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                
+                if(res.ok) {
+                    alert("✅ Product Added Successfully!");
+                    document.querySelector('.modal-overlay').remove(); 
+                    app.showAdmin();
+                } else {
+                    alert("❌ Failed to add product. Check image size or format.");
+                }
             },
 
             /* --- CHECKOUT LOGIC --- */
@@ -475,89 +590,6 @@
                         </div>
                     </div>
                 `;
-            },
-
-            /* --- ADMIN DASHBOARD (RESTORED) --- */
-            showAdmin: async () => {
-                const orders = await fetch(`${API_URL}/orders`).then(r => r.json());
-                const products = await fetch(`${API_URL}/products`).then(r => r.json());
-                const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
-
-                document.getElementById('app-root').innerHTML = `
-                    <div class="animate-up">
-                        <div class="flex justify-between items-center" style="margin-bottom:2rem">
-                            <h1 style="font-size:2.5rem; font-family:'Space Grotesk'">Command Center</h1>
-                            <button class="btn btn-primary" onclick="app.openProductModal()">+ New Unit</button>
-                        </div>
-
-                        <div class="flex" style="margin-bottom:2rem; gap:2rem; flex-wrap:wrap;">
-                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Revenue</div><div class="stat-val text-gradient">₹${totalSales.toLocaleString('en-IN')}</div></div>
-                            <div class="stat-card" style="flex:1"><div class="stat-label">Total Orders</div><div class="stat-val">${orders.length}</div></div>
-                        </div>
-
-                        <div class="stat-card" style="margin-bottom:2rem">
-                            <h3 style="margin-bottom:1rem;">Recent Orders</h3>
-                            <div style="overflow-x:auto;">
-                                <table>
-                                    <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th></tr></thead>
-                                    <tbody>
-                                        ${orders.map(o => `
-                                            <tr>
-                                                <td>${o.customer}</td>
-                                                <td>${o.phone}</td>
-                                                <td style="font-size:0.8rem; color:#ccc; max-width:200px;">${o.address}</td>
-                                                <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <h3 style="margin-bottom:1rem">Inventory</h3>
-                        <div class="product-grid">
-                            ${products.map(p => `
-                                <div class="product-card">
-                                    <img src="${p.image}" class="product-img">
-                                    <div class="product-info">
-                                        <div class="product-cat">${p.category}</div>
-                                        <h3 style="margin:5px 0">${p.name}</h3>
-                                        <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
-                                        <button class="btn btn-danger" style="margin-top:1rem; width:100%" onclick="app.deleteProduct('${p._id}')">Delete</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            },
-            deleteProduct: async (id) => {
-                if(confirm("Delete?")) { await fetch(`${API_URL}/products/${id}`, {method:'DELETE'}); app.showAdmin(); }
-            },
-            openProductModal: () => {
-                const modal = document.createElement('div'); modal.className = 'modal-overlay';
-                modal.innerHTML = `
-                    <div class="modal-content animate-up">
-                        <h2 style="margin-bottom:1.5rem">Add Hardware</h2>
-                        <form onsubmit="app.addProduct(event)">
-                            <input type="text" name="name" placeholder="Name" required>
-                            <input type="number" name="price" placeholder="Price" required>
-                            <input type="text" name="category" placeholder="Category" required>
-                            <textarea name="desc" placeholder="Description" required></textarea>
-                            <input type="file" name="image" required>
-                            <div class="flex" style="gap:10px;">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>`; document.body.appendChild(modal);
-            },
-            addProduct: async (e) => {
-                e.preventDefault(); 
-                const formData = new FormData(e.target);
-                await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
-                document.querySelector('.modal-overlay').remove(); 
-                app.showAdmin();
             },
             /* --- PROFILE (PLACEHOLDER) --- */
             showProfile: async () => {
