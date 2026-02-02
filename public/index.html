@@ -74,6 +74,8 @@
         th { text-align: left; padding: 1rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 0.85rem; text-transform: uppercase; }
         td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.02); }
+        .item-list { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #ccc; }
+        .item-list li { margin-bottom: 4px; }
 
         /* CART & FORMS */
         input, select, textarea { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 1rem; font-family: 'Outfit', sans-serif; transition: 0.3s; }
@@ -136,7 +138,6 @@
                 if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
 
                 app.updateNav();
-                // SHOW SHOP FIRST
                 app.showShop();
             },
 
@@ -159,7 +160,7 @@
                     } else {
                         actions.innerHTML = `
                             <button class="btn btn-secondary" onclick="app.showShop()">Shop</button>
-                            <button class="btn btn-secondary" onclick="app.showProfile()"><i class="fa-solid fa-user"></i> Orders</button>
+                            <button class="btn btn-secondary" onclick="app.showProfile()"><i class="fa-solid fa-user"></i> My Orders</button>
                             <button class="btn btn-primary" onclick="app.toggleCart()"><i class="fa-solid fa-cart-shopping"></i> Cart (${state.cart.length})</button>
                             <button class="btn btn-danger" onclick="app.logout()">Logout</button>
                         `;
@@ -367,22 +368,77 @@
             },
 
             addToCart: (id, name, price) => {
+                // FIX: Guests cannot add to cart
+                if (!state.user) {
+                    alert("⚠️ You must login to add items to cart.");
+                    app.showAuth();
+                    return;
+                }
                 state.cart.push({ _id: id, name, price });
                 app.showToast(`${name} added to cart`);
                 app.updateNav();
                 document.querySelector('.modal-overlay').remove();
             },
 
-            /* --- ADMIN DASHBOARD (FIXED & ADDED ERROR HANDLING) --- */
+            /* --- MY ORDERS (FULL IMPLEMENTATION) --- */
+            showProfile: async () => {
+                const res = await fetch(`${API_URL}/my-orders?email=${state.user.email}`);
+                if (!res.ok) { return alert("Failed to load orders"); }
+                
+                const orders = await res.json();
+
+                document.getElementById('app-root').innerHTML = `
+                    <div class="animate-up" style="max-width: 900px; margin: 0 auto;">
+                        <h1 style="margin-bottom:2rem; font-size:2rem;">My Order History</h1>
+                        
+                        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--primary); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-truck-fast" style="color:var(--primary); font-size:1.5rem;"></i>
+                            <div>
+                                <h4 style="color:var(--primary); font-size:1rem; margin-bottom:2px;">Delivery Policy</h4>
+                                <p style="font-size:0.9rem; color:#ccc; margin:0;">All orders are delivered to you within <strong>7 days</strong> with service.</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card" style="background: var(--bg-panel);">
+                            ${orders.length === 0 ? 
+                                `<div style="text-align:center; padding: 3rem 0; color:var(--text-muted);">
+                                    <i class="fa-solid fa-box-open" style="font-size:3rem; margin-bottom:1rem; opacity:0.5;"></i>
+                                    <p>You haven't placed any orders yet.</p>
+                                </div>` 
+                                : 
+                                `<div style="overflow-x:auto;">
+                                    <table>
+                                        <thead><tr><th>Date</th><th>Order ID</th><th>Items Bought</th><th style="text-align:right">Total</th></tr></thead>
+                                        <tbody>
+                                            ${orders.map(o => `
+                                                <tr style="vertical-align:top;">
+                                                    <td style="padding-top:1.5rem; color:var(--text-muted);">${new Date(o.date).toLocaleDateString()}</td>
+                                                    <td style="padding-top:1.5rem; font-family:'Space Grotesk'">#${o._id.toString().substring(o._id.length-6)}</td>
+                                                    <td style="padding-top:1.5rem; padding-bottom:1.5rem;">
+                                                        <ul class="item-list">
+                                                            ${o.items.map(i => `<li>${i.name} (₹${i.price})</li>`).join('')}
+                                                        </ul>
+                                                    </td>
+                                                    <td style="padding-top:1.5rem; text-align:right; font-weight:bold; color:var(--primary);">₹${o.total.toLocaleString('en-IN')}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                `;
+            },
+
+            /* --- ADMIN DASHBOARD (UPDATED WITH ITEMS & ADDRESS) --- */
             showAdmin: async () => {
                 try {
-                    // Fetch Data
                     const [orders, products] = await Promise.all([
                         fetch(`${API_URL}/orders`).then(r => r.json()).catch(() => []),
                         fetch(`${API_URL}/products`).then(r => r.json()).catch(() => [])
                     ]);
                     
-                    // Safety Check: Ensure arrays
                     const safeOrders = Array.isArray(orders) ? orders : [];
                     const safeProducts = Array.isArray(products) ? products : [];
                     const totalSales = safeOrders.reduce((acc, o) => acc + (o.total || 0), 0);
@@ -404,17 +460,22 @@
                                 <div style="overflow-x:auto;">
                                     ${safeOrders.length === 0 ? '<p style="color:#666">No orders yet.</p>' : `
                                         <table>
-                                            <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th></tr></thead>
-                                            <tbody>
-                                                ${safeOrders.map(o => `
-                                                    <tr>
-                                                        <td>${o.customer}</td>
-                                                        <td>${o.phone}</td>
-                                                        <td style="font-size:0.8rem; color:#ccc; max-width:200px;">${o.address}</td>
-                                                        <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
-                                                    </tr>
-                                                `).join('')}
-                                            </tbody>
+                                                <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Items Bought</th><th>Total</th></tr></thead>
+                                                <tbody>
+                                                    ${safeOrders.map(o => `
+                                                        <tr>
+                                                                <td>${o.customer}</td>
+                                                                <td>${o.phone}</td>
+                                                                <td style="font-size:0.8rem; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;" title="${o.address}">${o.address}</td>
+                                                                <td style="font-size:0.8rem; color:#ccc;">
+                                                                    <ul class="item-list">
+                                                                        ${o.items.map(i => `<li>${i.name}</li>`).join('')}
+                                                                    </ul>
+                                                                </td>
+                                                                <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
+                                                            </tr>
+                                                        `).join('')}
+                                                </tbody>
                                         </table>
                                     `}
                                 </div>
@@ -459,7 +520,6 @@
                             <input type="number" name="price" placeholder="Price" required>
                             <input type="text" name="category" placeholder="Category" required>
                             <textarea name="desc" placeholder="Description" required></textarea>
-                            <!-- ACCEPT IMAGE FILES ONLY -->
                             <input type="file" name="image" accept="image/*" required>
                             <div class="flex" style="gap:10px;">
                                 <button type="submit" class="btn btn-primary">Save</button>
@@ -469,9 +529,6 @@
                     </div>`; document.body.appendChild(modal);
             },
 
-            // FIXED: Added success/failure alert with error details
-                        // UPDATED: Robust Error Handling for 502 / JSON Errors
-                        // UPDATED: Show Full Error
             addProduct: async (e) => {
                 e.preventDefault(); 
                 const btn = e.target.querySelector('button[type="submit"]');
@@ -479,33 +536,27 @@
                 
                 btn.innerText = "Uploading...";
                 btn.disabled = true;
+                btn.style.opacity = "0.7";
 
                 try {
                     const formData = new FormData(e.target);
                     const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                    const data = await res.json();
                     
-                    // If response is NOT OK (Status 400, 500, 502), read text
-                    if (!res.ok) {
-                        const errorText = await res.text();
-                        console.error("Server Error Details:", errorText);
-                        alert("❌ Upload Failed:\n\n" + errorText);
+                    if(res.ok) {
+                        alert("✅ Product Added Successfully!");
+                        document.querySelector('.modal-overlay').remove(); 
+                        app.showAdmin();
                     } else {
-                        // If OK, parse JSON
-                        try {
-                            const data = await res.json();
-                            alert("✅ Product Added Successfully!");
-                            document.querySelector('.modal-overlay').remove(); 
-                            app.showAdmin();
-                        } catch (jsonErr) {
-                            alert("❌ Success, but response format error: " + jsonErr.message);
-                        }
+                        alert("❌ Upload Failed: " + (data.error || "Unknown error"));
                     }
                 } catch (err) {
-                    console.error("Network Error:", err);
-                    alert("❌ Network Error: " + err.message);
+                    console.error("Frontend Error:", err);
+                    alert("❌ Network Error: Could not connect to server.");
                 } finally {
                     btn.innerText = originalText;
                     btn.disabled = false;
+                    btn.style.opacity = "1";
                 }
             },
 
@@ -598,7 +649,7 @@
                 } else { alert("Payment Verification Failed"); }
             },
 
-            // UPDATED: Clear WhatsApp Template with Order ID & Product Names
+            // UPDATED: Clear WhatsApp Template with Address & Items
             showSuccessScreen: (orderId, total, phone, address, items) => {
                 let itemListString = "";
                 items.forEach(item => {
@@ -610,7 +661,8 @@
 %0A🆔 *Order ID:* #${orderId}
 %0A👤 *Customer:* ${state.user.name}
 %0A📞 *Phone:* ${phone}
-%0A📍 *Address:* ${address}
+%0A📍 *Delivery Address:*
+ ${address}
 %0A----------------------------
 %0A💰 *Total:* ₹${total.toLocaleString('en-IN')}
 %0A----------------------------
@@ -633,10 +685,6 @@
                         </div>
                     </div>
                 `;
-            },
-            /* --- PROFILE (PLACEHOLDER) --- */
-            showProfile: async () => {
-                alert("My Orders functionality is the same as before.");
             }
         };
 
