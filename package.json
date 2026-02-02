@@ -15,6 +15,6 @@
     "multer": "^1.4.4",
     "razorpay": "^2.8.6",
     "cloudinary": "^1.41.0",
-    "streamifier": "^1.0.2"
+    "streamifier": "*"    
   }
 }
