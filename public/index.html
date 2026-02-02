@@ -470,18 +470,47 @@
             },
 
             // FIXED: Added success/failure alert with error details
+                        // UPDATED: Robust Error Handling for 502 / JSON Errors
             addProduct: async (e) => {
                 e.preventDefault(); 
-                const formData = new FormData(e.target);
-                const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
-                const data = await res.json();
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.innerText;
                 
-                if(res.ok) {
-                    alert("✅ Product Added Successfully!");
-                    document.querySelector('.modal-overlay').remove(); 
-                    app.showAdmin();
-                } else {
-                    alert("❌ Upload Failed: " + (data.error || "Unknown error"));
+                btn.innerText = "Uploading...";
+                btn.disabled = true;
+
+                try {
+                    const formData = new FormData(e.target);
+                    const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                    
+                    // FIX: If response is not JSON (HTML Error page), handle it
+                    const contentType = res.headers.get("content-type");
+                    let data;
+                    
+                    if (contentType && contentType.includes("application/json")) {
+                        data = await res.json();
+                    } else {
+                        const text = await res.text();
+                        console.error("Server returned HTML instead of JSON:", text);
+                        alert("❌ Server Error: " + text.substring(0, 100) + "...");
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        return; // Stop here
+                    }
+
+                    if(res.ok) {
+                        alert("✅ Product Added Successfully!");
+                        document.querySelector('.modal-overlay').remove(); 
+                        app.showAdmin();
+                    } else {
+                        alert("❌ Upload Failed: " + (data.error || "Unknown error"));
+                    }
+                } catch (err) {
+                    console.error("Frontend Error:", err);
+                    alert("Network Error: Could not connect to server.");
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                 }
             },
 

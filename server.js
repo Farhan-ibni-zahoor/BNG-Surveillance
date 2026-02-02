@@ -72,19 +72,18 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (CLOUDINARY)
-// Converts all uploads to JPG automatically. Accepts almost any image type.
+// 8. IMAGE UPLOAD CONFIG (SIMPLIFIED & STABLE)
+// We removed format conversion to prevent crashes. Let Cloudinary handle native types.
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'bng_surveillance',
-        resource_type: 'image',
-        format: async (req, file) => 'jpg' 
+        resource_type: 'image'
     },
 });
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB Limit
+    limits: { fileSize: 10 * 1024 * 1024 } 
 });
 
 // 9. ROUTES
@@ -97,13 +96,12 @@ app.post('/api/register', async (req, res) => {
         await newUser.save();
         res.json(newUser);
     } catch (err) {
-        res.status(500).json({ error: "Registration Failed" });
+        res.status(500).json({ error: "Registration Failed: " + err.message });
     }
 });
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    // Hardcoded Admin Check
     if(email === "farhanzahoor03@gmail.com" && password === "farhan@coder") {
         return res.json({ name: "Farhan (Admin)", email, role: "author" });
     }
@@ -120,15 +118,22 @@ app.get('/api/products', async (req, res) => {
 
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
+        // Debugging: Check if file exists
+        if (!req.file) {
+            return res.status(400).json({ error: "No image file uploaded" });
+        }
+
         const { name, category, price, desc } = req.body;
-        const image = req.file ? req.file.path : "default.jpg"; 
+        const image = req.file.path; 
+        
+        console.log("Uploading product:", name, "Image:", image); // Log to console
         
         const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
         await newProduct.save();
         res.json(newProduct);
     } catch (err) {
-        console.error("Upload Error:", err);
-        res.status(500).json({ error: "Upload Failed: " + err.message });
+        console.error("UPLOAD CRASH ERROR:", err); // Log specific error to Render Logs
+        res.status(500).json({ error: "Server Error: " + err.message });
     }
 });
 
@@ -164,15 +169,13 @@ app.post('/api/create-order', async (req, res) => {
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {
-        res.status(500).json({ error: "Something went wrong creating Razorpay order" });
+        res.status(500).json({ error: "Razorpay Error" });
     }
 });
 
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
-
     const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
-    
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
     const digest = shasum.digest("hex");
@@ -192,7 +195,6 @@ app.post('/api/verify-payment', async (req, res) => {
         total: customerDetails.total
     });
     await newOrder.save();
-    
     res.json({ message: "Payment Successful", orderId: newOrder._id });
 });
 
@@ -209,7 +211,13 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// 10. START SERVER
+// 10. ERROR HANDLER (PREVENTS 502 HTML ERRORS)
+app.use((err, req, res, next) => {
+    console.error("Express Error Handler:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
+});
+
+// 11. START SERVER
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
