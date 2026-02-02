@@ -471,6 +471,7 @@
 
             // FIXED: Added success/failure alert with error details
                         // UPDATED: Robust Error Handling for 502 / JSON Errors
+                        // UPDATED: Show Full Error
             addProduct: async (e) => {
                 e.preventDefault(); 
                 const btn = e.target.querySelector('button[type="submit"]');
@@ -483,31 +484,25 @@
                     const formData = new FormData(e.target);
                     const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
                     
-                    // FIX: If response is not JSON (HTML Error page), handle it
-                    const contentType = res.headers.get("content-type");
-                    let data;
-                    
-                    if (contentType && contentType.includes("application/json")) {
-                        data = await res.json();
+                    // If response is NOT OK (Status 400, 500, 502), read text
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        console.error("Server Error Details:", errorText);
+                        alert("❌ Upload Failed:\n\n" + errorText);
                     } else {
-                        const text = await res.text();
-                        console.error("Server returned HTML instead of JSON:", text);
-                        alert("❌ Server Error: " + text.substring(0, 100) + "...");
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                        return; // Stop here
-                    }
-
-                    if(res.ok) {
-                        alert("✅ Product Added Successfully!");
-                        document.querySelector('.modal-overlay').remove(); 
-                        app.showAdmin();
-                    } else {
-                        alert("❌ Upload Failed: " + (data.error || "Unknown error"));
+                        // If OK, parse JSON
+                        try {
+                            const data = await res.json();
+                            alert("✅ Product Added Successfully!");
+                            document.querySelector('.modal-overlay').remove(); 
+                            app.showAdmin();
+                        } catch (jsonErr) {
+                            alert("❌ Success, but response format error: " + jsonErr.message);
+                        }
                     }
                 } catch (err) {
-                    console.error("Frontend Error:", err);
-                    alert("Network Error: Could not connect to server.");
+                    console.error("Network Error:", err);
+                    alert("❌ Network Error: " + err.message);
                 } finally {
                     btn.innerText = originalText;
                     btn.disabled = false;

@@ -8,19 +8,25 @@ const multer = require('multer');
 const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const cloudinary = require('cloudinary').v2;
+
+// 2. CLOUDINARY SETUP (FIXED)
+// Import cloudinary without destructuring to avoid version errors
+const Cloudinary = require('cloudinary').v2; 
 const CloudinaryStorage = require('multer-storage-cloudinary');
 
-// 2. CONFIGURATION
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// 3. CLOUDINARY CONFIGURATION
+// Configure BEFORE using
 cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
     api_key: process.env.CLOUD_API_KEY, 
     api_secret: process.env.CLOUD_API_SECRET 
 });
+
+// Debug: Verify config
+console.log("Cloudinary Cloud Name:", process.env.CLOUD_NAME ? "Set" : "MISSING");
+
+// 3. CONFIGURATION
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 // 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
@@ -72,10 +78,9 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (SIMPLIFIED & STABLE)
-// We removed format conversion to prevent crashes. Let Cloudinary handle native types.
+// 8. IMAGE UPLOAD CONFIG (FIXED)
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
+    cloudinary: cloudinary, // Pass the configured instance
     params: {
         folder: 'bng_surveillance',
         resource_type: 'image'
@@ -215,6 +220,16 @@ app.get('/api/my-orders', async (req, res) => {
 app.use((err, req, res, next) => {
     console.error("Express Error Handler:", err);
     res.status(500).json({ error: err.message || "Something went wrong" });
+});
+
+// --- DIAGNOSTIC ROUTE (Check Env Vars) ---
+app.get('/api/check-env', (req, res) => {
+    res.json({
+        cloud_name: process.env.CLOUD_NAME ? process.env.CLOUD_NAME : "MISSING",
+        api_key_set: process.env.CLOUD_API_KEY ? "SET" : "MISSING",
+        secret_set: process.env.CLOUD_API_SECRET ? "SET" : "MISSING",
+        mongo: process.env.MONGO_URI ? "SET" : "MISSING"
+    });
 });
 
 // 11. START SERVER
