@@ -16,31 +16,28 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 3. CLOUDINARY CONFIGURATION
-// REPLACE THESE WITH YOUR KEYS FROM CLOUDINARY.COM DASHBOARD
-// 3. CLOUDINARY CONFIGURATION (READS FROM ENV VARS)
 cloudinary.config({ 
     cloud_name: process.env.CLOUD_NAME, 
     api_key: process.env.CLOUD_API_KEY, 
     api_secret: process.env.CLOUD_API_SECRET 
 });
 
-// 4. MONGOOSE & RAZORPAY
+// 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_S6anGX8BwOZEL8', 
     key_secret: process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'
 });
 
+// 5. DATABASE CONNECTION
 const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/bng-surveillance';
-
-// 5. MIDDLEWARE & CORS
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public')); // Serve frontend
-
-// 6. DATABASE CONNECTION
 mongoose.connect(DB_URI)
     .then(() => console.log("✅ MongoDB Connected (Atlas)"))
     .catch(err => console.error("❌ Database Connection Failed!", err));
+
+// 6. MIDDLEWARE & CORS
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
 
 // 7. SCHEMAS
 const UserSchema = new mongoose.Schema({
@@ -54,7 +51,7 @@ const ProductSchema = new mongoose.Schema({
     name: String,
     category: String,
     price: Number,
-    image: String, // Will store full Cloudinary URL now
+    image: String,
     desc: String,
     reviews: [{ user: String, comment: String, date: { type: Date, default: Date.now } }]
 });
@@ -75,15 +72,20 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD (CLOUDINARY)
+// 8. IMAGE UPLOAD CONFIG (CLOUDINARY)
+// Converts all uploads to JPG automatically. Accepts almost any image type.
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'bng_surveillance',
-        allowed_formats: ['jpg', 'png', 'jpeg']
+        resource_type: 'image',
+        format: async (req, file) => 'jpg' 
     },
 });
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB Limit
+});
 
 // 9. ROUTES
 
@@ -101,6 +103,7 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+    // Hardcoded Admin Check
     if(email === "farhanzahoor03@gmail.com" && password === "farhan@coder") {
         return res.json({ name: "Farhan (Admin)", email, role: "author" });
     }
@@ -116,13 +119,17 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', upload.single('image'), async (req, res) => {
-    const { name, category, price, desc } = req.body;
-    // Cloudinary automatically sends the file URL in req.file.path
-    const image = req.file ? req.file.path : "default.jpg"; 
-    
-    const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
-    await newProduct.save();
-    res.json(newProduct);
+    try {
+        const { name, category, price, desc } = req.body;
+        const image = req.file ? req.file.path : "default.jpg"; 
+        
+        const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
+        await newProduct.save();
+        res.json(newProduct);
+    } catch (err) {
+        console.error("Upload Error:", err);
+        res.status(500).json({ error: "Upload Failed: " + err.message });
+    }
 });
 
 app.delete('/api/products/:id', async (req, res) => {
@@ -145,26 +152,34 @@ app.post('/api/review/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- RAZORPAY ---
+// --- RAZORPAY PAYMENT ROUTES ---
 app.post('/api/create-order', async (req, res) => {
     const { amount } = req.body; 
     try {
-        const options = { amount: amount * 100, currency: "INR", receipt: "receipt_" + Date.now() };
+        const options = {
+            amount: amount * 100, 
+            currency: "INR",
+            receipt: "receipt_" + Date.now()
+        };
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {
-        res.status(500).json({ error: "Razorpay Error" });
+        res.status(500).json({ error: "Something went wrong creating Razorpay order" });
     }
 });
 
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
+
     const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
+    
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
     const digest = shasum.digest("hex");
 
-    if (digest !== razorpaySignature) return res.status(400).json({ message: "Invalid Transaction" });
+    if (digest !== razorpaySignature) {
+        return res.status(400).json({ message: "Invalid Transaction" });
+    }
 
     const newOrder = new Order({
         razorpay_order_id: orderCreationId,
@@ -177,6 +192,7 @@ app.post('/api/verify-payment', async (req, res) => {
         total: customerDetails.total
     });
     await newOrder.save();
+    
     res.json({ message: "Payment Successful", orderId: newOrder._id });
 });
 

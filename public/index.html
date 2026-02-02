@@ -136,6 +136,7 @@
                 if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
 
                 app.updateNav();
+                // SHOW SHOP FIRST
                 app.showShop();
             },
 
@@ -359,7 +360,7 @@
                 });
                 if(res.ok) {
                     alert("Review Submitted!");
-                    app.viewProduct(productId); // Reload modal to show new review
+                    app.viewProduct(productId);
                 } else {
                     alert("Failed to submit review");
                 }
@@ -458,7 +459,8 @@
                             <input type="number" name="price" placeholder="Price" required>
                             <input type="text" name="category" placeholder="Category" required>
                             <textarea name="desc" placeholder="Description" required></textarea>
-                            <input type="file" name="image" required>
+                            <!-- ACCEPT IMAGE FILES ONLY -->
+                            <input type="file" name="image" accept="image/*" required>
                             <div class="flex" style="gap:10px;">
                                 <button type="submit" class="btn btn-primary">Save</button>
                                 <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
@@ -467,18 +469,19 @@
                     </div>`; document.body.appendChild(modal);
             },
 
-            // FIXED: Added success/failure alert
+            // FIXED: Added success/failure alert with error details
             addProduct: async (e) => {
                 e.preventDefault(); 
                 const formData = new FormData(e.target);
                 const res = await fetch(`${API_URL}/products`, { method: 'POST', body: formData });
+                const data = await res.json();
                 
                 if(res.ok) {
                     alert("✅ Product Added Successfully!");
                     document.querySelector('.modal-overlay').remove(); 
                     app.showAdmin();
                 } else {
-                    alert("❌ Failed to add product. Check image size or format.");
+                    alert("❌ Upload Failed: " + (data.error || "Unknown error"));
                 }
             },
 
@@ -571,9 +574,25 @@
                 } else { alert("Payment Verification Failed"); }
             },
 
+            // UPDATED: Clear WhatsApp Template with Order ID & Product Names
             showSuccessScreen: (orderId, total, phone, address, items) => {
-                const itemsList = items.map(i => `• ${i.name} (₹${i.price})`).join('%0A');
-                const waText = `*NEW ORDER ALERT*%0A%0AOrder ID: #${orderId}%0ACustomer: ${state.user.name}%0APhone: ${phone}%0A*Address:* ${address}%0A%0ATotal: ₹${total.toLocaleString('en-IN')}%0A%0A*Items:*%0A${itemsList}`;
+                let itemListString = "";
+                items.forEach(item => {
+                    itemListString += `• ${item.name} (₹${item.price})%0A`;
+                });
+
+                const waText = `🆕 *NEW ORDER ALERT* 🆕
+%0A----------------------------
+%0A🆔 *Order ID:* #${orderId}
+%0A👤 *Customer:* ${state.user.name}
+%0A📞 *Phone:* ${phone}
+%0A📍 *Address:* ${address}
+%0A----------------------------
+%0A💰 *Total:* ₹${total.toLocaleString('en-IN')}
+%0A----------------------------
+%0A📦 *Ordered Items:*
+%0A${itemListString}`;
+                
                 const waLink = `https://wa.me/${ADMIN_PHONE_NUMBER}?text=${waText}`;
 
                 document.getElementById('app-root').innerHTML = `
