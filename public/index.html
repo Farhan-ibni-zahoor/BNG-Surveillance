@@ -133,9 +133,25 @@
         const state = { user: JSON.parse(sessionStorage.getItem('user')) || null, cart: [] };
 
         const app = {
+                        // SMARTER LOADING LOGIC
             init: async () => {
                 const loader = document.getElementById('loading-overlay');
-                if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
+                
+                // CHECK: Is the shop already loaded? (e.g., from a refresh)
+                // If yes, don't show the loader. 
+                const isAppRunning = !!document.getElementById('shop-grid');
+                
+                if (!isAppRunning) {
+                    // Only show loader if app is NOT running (e.g. cold start / wake up)
+                    // This hides the "Render Something" page for ~3 seconds
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.remove(), 500);
+                    }, 3000); // Wait 3 seconds
+                } else {
+                    // If app is already running, remove loader instantly
+                    loader.remove();
+                }
 
                 app.updateNav();
                 app.showShop();
