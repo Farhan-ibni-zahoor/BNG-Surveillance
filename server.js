@@ -9,6 +9,7 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
+const sharp = require('sharp');
 const streamifier = require('streamifier'); // New: Helps send file to cloud
 
 // 2. CONFIGURATION
@@ -113,19 +114,29 @@ app.get('/api/products', async (req, res) => {
 });
 
 // --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
+// --- UPLOAD ROUTE (OPTIMIZED WITH SHARP) ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No image file uploaded" });
         }
 
-        console.log("File received:", req.file.originalname);
+        console.log("Processing image with Sharp...");
 
-        // Upload stream to Cloudinary
+        // 1. Resize & Optimize using Sharp
+        // We fix width to 800px. Height adjusts automatically.
+        // We use format 'jpeg' with quality 80 to save space and look good.
+        const optimizedImage = await sharp(req.file.buffer)
+            .resize(800) 
+            .jpeg({ quality: 80 }) 
+            .toBuffer();
+
+        // 2. Upload OPTIMIZED buffer to Cloudinary
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 folder: 'bng_surveillance',
-                resource_type: 'image'
+                resource_type: 'image',
+                format: 'jpg' // Force JPG format
             },
             async (error, result) => {
                 if (error) {
@@ -133,9 +144,8 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
                     return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
                 }
 
-                // If successful, save to DB
                 const { name, category, price, desc } = req.body;
-                const image = result.secure_url; // Get the URL from Cloudinary result
+                const image = result.secure_url; 
                 
                 const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
                 await newProduct.save();
@@ -143,8 +153,8 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
             }
         );
 
-        // Pipe the file buffer (from memory) to Cloudinary stream
-        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+        // Pipe optimized buffer to upload stream
+        streamifier.createReadStream(optimizedImage.buffer).pipe(uploadStream);
 
     } catch (err) {
         console.error("Server Upload Error:", err);
