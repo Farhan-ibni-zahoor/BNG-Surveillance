@@ -234,7 +234,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
-// 11. START SERVER
+// 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
+app.get('/', (req, res) => {
+    // If a request comes to the root URL, send the splash screen
+    res.sendFile(path.join(__dirname, '_render.html'));
+});
+
+// 12. START SERVER
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
