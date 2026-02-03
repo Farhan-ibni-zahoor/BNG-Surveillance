@@ -97,14 +97,33 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// --- AUTH ---
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    if(email === "farhanzahoor03@gmail.com" && password === "farhan@coder") {
-        return res.json({ name: "Farhan (Admin)", email, role: "author" });
+    
+    // UPDATED: New Admin Credentials
+    if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
+        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "919797122805" }); 
     }
+    
     const user = await User.findOne({ email, password });
     if(user) res.json(user);
     else res.status(401).json({ error: "Invalid Credentials" });
+});
+
+// --- REVIEWS ---
+app.post('/api/review/:id', async (req, res) => {
+    try {
+        const { user, comment, rating } = req.body; // Added rating capture if needed
+        const product = await Product.findById(req.params.id);
+        if(product) {
+            product.reviews.push({ user, comment });
+            await product.save();
+            res.json({ message: "Review Added" });
+        } else {
+            res.status(404).json({ error: "Product not found" });
+        }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- PRODUCTS ---
@@ -168,19 +187,7 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // --- REVIEWS ---
-app.post('/api/review/:id', async (req, res) => {
-    try {
-        const { user, comment } = req.body;
-        const product = await Product.findById(req.params.id);
-        if(product) {
-            product.reviews.push({ user, comment });
-            await product.save();
-            res.json({ message: "Review Added" });
-        } else {
-            res.status(404).json({ error: "Product not found" });
-        }
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
+
 
 // --- RAZORPAY PAYMENT ROUTES ---
 app.post('/api/create-order', async (req, res) => {
