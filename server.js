@@ -103,7 +103,7 @@ app.post('/api/login', async (req, res) => {
     
     // UPDATED: New Admin Credentials
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
-        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "919797122805" }); 
+        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
     }
     
     const user = await User.findOne({ email, password });

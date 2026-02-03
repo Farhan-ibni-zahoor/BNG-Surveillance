@@ -680,15 +680,23 @@
             },
 
             // UPDATED: Clear WhatsApp Template with Address & Items
+                        // UPDATED: Robust WhatsApp Message
             showSuccessScreen: (orderId, total, phone, address, items) => {
+                // Safety Check: Ensure we have valid data
+                const safeOrderId = orderId ? `#${orderId}` : "Processing...";
+                const safeItems = Array.isArray(items) ? items : [];
+
+                // Build the item list string (Ensures Product Names are there)
                 let itemListString = "";
-                items.forEach(item => {
-                    itemListString += `• ${item.name} (₹${item.price})%0A`;
+                safeItems.forEach(item => {
+                    const itemName = item.name || "Unknown Item"; // Fallback
+                    const itemPrice = item.price || 0;
+                    itemListString += `• ${itemName} (₹${itemPrice})%0A`;
                 });
 
                 const waText = `🆕 *NEW ORDER ALERT* 🆕
 %0A----------------------------
-%0A🆔 *Order ID:* #${orderId}
+%0A🆔 *Order ID:* ${safeOrderId}
 %0A👤 *Customer:* ${state.user.name}
 %0A📞 *Phone:* ${phone}
 %0A📍 *Delivery Address:*
