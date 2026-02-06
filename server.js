@@ -134,28 +134,22 @@ app.get('/api/products', async (req, res) => {
 
 // --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
 // --- UPLOAD ROUTE (OPTIMIZED WITH SHARP) ---
+// --- UPLOAD ROUTE (SIMPLIFIED & STABLE) ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No image file uploaded" });
         }
 
-        console.log("Processing image with Sharp...");
+        console.log("Uploading image directly to Cloudinary...");
 
-        // 1. Resize & Optimize using Sharp
-        // We fix width to 800px. Height adjusts automatically.
-        // We use format 'jpeg' with quality 80 to save space and look good.
-        const optimizedImage = await sharp(req.file.buffer)
-            .resize(800) 
-            .jpeg({ quality: 80 }) 
-            .toBuffer();
-
-        // 2. Upload OPTIMIZED buffer to Cloudinary
+        // 1. Upload ORIGINAL buffer (No Sharp/Resizing) to prevent crash
+        // Removing "sharp" eliminates the ERR_INVALID_ARG_TYPE error
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 folder: 'bng_surveillance',
-                resource_type: 'image',
-                format: 'jpg' // Force JPG format
+                resource_type: 'image'
+                // Added: upload_preset: "mls" to ensure mobile compatibility
             },
             async (error, result) => {
                 if (error) {
@@ -164,16 +158,20 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
                 }
 
                 const { name, category, price, desc } = req.body;
+                
+                // 2. Save URL to DB
                 const image = result.secure_url; 
                 
                 const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
                 await newProduct.save();
+                
+                console.log("✅ Product Saved to DB");
                 res.json(newProduct);
             }
         );
 
-        // Pipe optimized buffer to upload stream
-        streamifier.createReadStream(optimizedImage.buffer).pipe(uploadStream);
+        // 3. Pipe original file buffer to upload stream
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
 
     } catch (err) {
         console.error("Server Upload Error:", err);
