@@ -9,7 +9,8 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
-const streamifier = require('streamifier'); // Helps send file to cloud
+const sharp = require('sharp');
+const streamifier = require('streamifier'); // New: Helps send file to cloud
 
 // 2. CONFIGURATION
 const app = express();
@@ -22,7 +23,9 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET 
 });
 
-// 4. RAZORPAY KEYS (UPDATED LOGIN)
+console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
+
+// 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_S6anGX8BwOZEL8', 
     key_secret: process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'
@@ -72,15 +75,9 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (STABLE)
-// Using diskStorage is most stable.
-const storage = multer.diskStorage({
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
-    limits: { fileSize: 10 * 1024 * 1024 } 
-});
+// 8. IMAGE UPLOAD CONFIG (MANUAL METHOD - NO MORE CRASHES)
+// We use memoryStorage so the file is in RAM, then we stream it to Cloudinary
+const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } 
@@ -100,12 +97,13 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// --- AUTH ---
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // UPDATED: New Admin Login
+    // UPDATED: New Admin Credentials
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
-        return res.json({ name: "Farhan (Admin)", email, role: "author" }); 
+        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
     }
     
     const user = await User.findOne({ email, password });
@@ -113,78 +111,10 @@ app.post('/api/login', async (req, res) => {
     else res.status(401).json({ error: "Invalid Credentials" });
 });
 
-// --- PRODUCTS ---
-app.get('/api/products', async (req, res) => {
-    const products = await Product.find();
-    res.json(products);
-});
-
-// --- UPLOAD ROUTE (UPDATED WITH LOGS TO FIX "FAILED" ERROR) ---
-app.post('/api/products', upload.single('image'), async (req, res) => {
-    try {
-        // DETAIL 1: Check if file exists
-        if (!req.file) {
-            console.error("❌ Upload Error: No file received from Multer");
-            return res.status(400).json({ error: "No image file uploaded" });
-        }
-
-        // DETAIL 2: Check file name matches 'image'
-        if (req.file.fieldname !== 'image') {
-            console.error("❌ Upload Error: Form field name must be 'image', got:", req.file.fieldname);
-            return res.status(400).json({ error: "Form field name mismatch" });
-        }
-
-        console.log("✅ File received:", req.file.originalname);
-
-        // DETAIL 3: Attempt Cloudinary Upload (Original Buffer)
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: 'bng_surveillance',
-                resource_type: 'image'
-            },
-            async (error, result) => {
-                if (error) {
-                    console.error("❌ Cloudinary Upload Error:", error);
-                    // This is usually the issue. 
-                    // Common causes:
-                    // 1. 'streamifier' not installed or version wrong.
-                    // 2. Cloudinary Config invalid (Wrong Keys).
-                    console.log("Cloudinary Debug Info:", {
-                        cloud_name: process.env.CLOUD_NAME ? "SET" : "MISSING",
-                        api_key: process.env.CLOUD_API_KEY ? "SET" : "MISSING"
-                    });
-                    return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
-                }
-
-                // DETAIL 4: Save to DB
-                const { name, category, price, desc } = req.body;
-                const image = result.secure_url; 
-                
-                const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
-                await newProduct.save();
-                console.log("✅ Product Saved to DB:", name);
-                res.json(newProduct);
-            }
-        );
-
-        // Pipe file buffer to upload stream
-        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-
-    } catch (err) {
-        console.error("❌ Server Upload Error:", err);
-        res.status(500).json({ error: "Server Error: " + err.message });
-    }
-});
-
-app.delete('/api/products/:id', async (req, res) => {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
-});
-
 // --- REVIEWS ---
 app.post('/api/review/:id', async (req, res) => {
     try {
-        const { user, comment } = req.body;
+        const { user, comment, rating } = req.body; // Added rating capture if needed
         const product = await Product.findById(req.params.id);
         if(product) {
             product.reviews.push({ user, comment });
@@ -195,6 +125,67 @@ app.post('/api/review/:id', async (req, res) => {
         }
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
+// --- PRODUCTS ---
+app.get('/api/products', async (req, res) => {
+    const products = await Product.find();
+    res.json(products);
+});
+
+// --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
+// --- UPLOAD ROUTE (OPTIMIZED WITH SHARP) ---
+// --- UPLOAD ROUTE (SIMPLIFIED & STABLE) ---
+app.post('/api/products', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No image file uploaded" });
+        }
+
+        console.log("Uploading image directly to Cloudinary...");
+
+        // 1. Upload ORIGINAL buffer (No Sharp/Resizing) to prevent crash
+        // Removing "sharp" eliminates the ERR_INVALID_ARG_TYPE error
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'bng_surveillance',
+                resource_type: 'image'
+                // Added: upload_preset: "mls" to ensure mobile compatibility
+            },
+            async (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
+                }
+
+                const { name, category, price, desc } = req.body;
+                
+                // 2. Save URL to DB
+                const image = result.secure_url; 
+                
+                const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
+                await newProduct.save();
+                
+                console.log("✅ Product Saved to DB");
+                res.json(newProduct);
+            }
+        );
+
+        // 3. Pipe original file buffer to upload stream
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+
+    } catch (err) {
+        console.error("Server Upload Error:", err);
+        res.status(500).json({ error: "Server Error: " + err.message });
+    }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+});
+
+// --- REVIEWS ---
+
 
 // --- RAZORPAY PAYMENT ROUTES ---
 app.post('/api/create-order', async (req, res) => {
@@ -258,7 +249,16 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
-// 11. START SERVER
+// 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
+// --- FORCE MAIN SHOP (DISABLES SPLASH SCREENS) ---
+// 11. FORCE SPLASH SCREEN (FIXES "Render Something" Page)
+app.get('/', (req, res) => {
+    // If a request comes to root URL, send -> splash screen
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 12. START SERVER
+
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
