@@ -242,6 +242,12 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
+app.get('/sw.js', (req, res) => {
+    console.log("Requested /sw.js");
+    // Add logic here if you want to show a specific page or file
+    res.sendFile(path.join(__dirname, 'public', 'sw.js')); 
+});
+
 // 11. START SERVER
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
