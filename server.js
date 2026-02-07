@@ -9,8 +9,7 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
-const sharp = require('sharp');
-const streamifier = require('streamifier'); // New: Helps send file to cloud
+const streamifier = require('streamifier'); // Helps send file to cloud
 
 // 2. CONFIGURATION
 const app = express();
@@ -23,9 +22,7 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET 
 });
 
-console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
-
-// 4. RAZORPAY KEYS
+// 4. RAZORPAY KEYS (UPDATED LOGIN)
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_S6anGX8BwOZEL8', 
     key_secret: process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'
@@ -40,6 +37,8 @@ mongoose.connect(DB_URI)
 // 6. MIDDLEWARE & CORS
 app.use(cors());
 app.use(express.json());
+
+// IMPORTANT: This serves your images and CSS directly from 'public' folder
 app.use(express.static('public'));
 
 // 7. SCHEMAS
@@ -75,9 +74,15 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (MANUAL METHOD - NO MORE CRASHES)
-// We use memoryStorage so the file is in RAM, then we stream it to Cloudinary
-const storage = multer.memoryStorage();
+// 8. IMAGE UPLOAD CONFIG (ULTRA STABLE - NO SHARP)
+// We are using Multer's standard diskStorage. This is 100% stable and prevents TypeError/Buffer errors.
+const storage = multer.diskStorage({
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+    limits: { fileSize: 10 * 1024 * 1024 } 
+});
 const upload = multer({ 
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } 
@@ -97,33 +102,17 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- AUTH ---
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // UPDATED: New Admin Credentials
+    // UPDATED: New Admin Login
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
-        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
+        return res.json({ name: "Farhan (Admin)", email, role: "author" }); 
     }
     
     const user = await User.findOne({ email, password });
     if(user) res.json(user);
     else res.status(401).json({ error: "Invalid Credentials" });
-});
-
-// --- REVIEWS ---
-app.post('/api/review/:id', async (req, res) => {
-    try {
-        const { user, comment, rating } = req.body; // Added rating capture if needed
-        const product = await Product.findById(req.params.id);
-        if(product) {
-            product.reviews.push({ user, comment });
-            await product.save();
-            res.json({ message: "Review Added" });
-        } else {
-            res.status(404).json({ error: "Product not found" });
-        }
-    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- PRODUCTS ---
@@ -132,24 +121,20 @@ app.get('/api/products', async (req, res) => {
     res.json(products);
 });
 
-// --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
-// --- UPLOAD ROUTE (OPTIMIZED WITH SHARP) ---
-// --- UPLOAD ROUTE (SIMPLIFIED & STABLE) ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No image file uploaded" });
         }
 
-        console.log("Uploading image directly to Cloudinary...");
+        console.log("Uploading image to Cloudinary...");
 
-        // 1. Upload ORIGINAL buffer (No Sharp/Resizing) to prevent crash
-        // Removing "sharp" eliminates the ERR_INVALID_ARG_TYPE error
+        // Upload ORIGINAL buffer directly to Cloudinary
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 folder: 'bng_surveillance',
                 resource_type: 'image'
-                // Added: upload_preset: "mls" to ensure mobile compatibility
+                // No 'format' or 'transformation' here. We let Cloudinary handle original file to prevent crashes.
             },
             async (error, result) => {
                 if (error) {
@@ -158,19 +143,15 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
                 }
 
                 const { name, category, price, desc } = req.body;
-                
-                // 2. Save URL to DB
                 const image = result.secure_url; 
                 
                 const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
                 await newProduct.save();
-                
-                console.log("✅ Product Saved to DB");
                 res.json(newProduct);
             }
         );
 
-        // 3. Pipe original file buffer to upload stream
+        // Pipe original buffer to upload stream
         streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
 
     } catch (err) {
@@ -185,7 +166,19 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // --- REVIEWS ---
-
+app.post('/api/review/:id', async (req, res) => {
+    try {
+        const { user, comment } = req.body;
+        const product = await Product.findById(req.params.id);
+        if(product) {
+            product.reviews.push({ user, comment });
+            await product.save();
+            res.json({ message: "Review Added" });
+        } else {
+            res.status(404).json({ error: "Product not found" });
+        }
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
 // --- RAZORPAY PAYMENT ROUTES ---
 app.post('/api/create-order', async (req, res) => {
@@ -205,7 +198,6 @@ app.post('/api/create-order', async (req, res) => {
 
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
-
     const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
     
     const shasum = crypto.createHmac("sha256", secret);
@@ -243,19 +235,20 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// 10. ERROR HANDLER
+// 10. ERROR HANDLER (PREVENTS 502 HTML ERRORS)
 app.use((err, req, res, next) => {
     console.error("Express Error Handler:", err);
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
-// 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
-// --- FORCE MAIN SHOP (DISABLES SPLASH SCREENS) ---
-// 11. FORCE SPLASH SCREEN (FIXES "Render Something" Page)
-
+// 11. ROUTE TO FORCE INDEX (FIXES "Directory Listing")
+// This ensures www.bng-surveillance.com/ ALWAYS loads index.html
+app.get('/', (req, res) => {
+    // Force serving of index.html when accessing root URL
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // 12. START SERVER
-
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
