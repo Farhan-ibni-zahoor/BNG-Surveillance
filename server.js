@@ -37,8 +37,6 @@ mongoose.connect(DB_URI)
 // 6. MIDDLEWARE & CORS
 app.use(cors());
 app.use(express.json());
-
-// IMPORTANT: This serves your images and CSS directly from 'public' folder
 app.use(express.static('public'));
 
 // 7. SCHEMAS
@@ -74,8 +72,8 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (ULTRA STABLE - NO SHARP)
-// We are using Multer's standard diskStorage. This is 100% stable and prevents TypeError/Buffer errors.
+// 8. IMAGE UPLOAD CONFIG (STABLE)
+// Using diskStorage is most stable.
 const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -121,41 +119,59 @@ app.get('/api/products', async (req, res) => {
     res.json(products);
 });
 
+// --- UPLOAD ROUTE (UPDATED WITH LOGS TO FIX "FAILED" ERROR) ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
+        // DETAIL 1: Check if file exists
         if (!req.file) {
+            console.error("❌ Upload Error: No file received from Multer");
             return res.status(400).json({ error: "No image file uploaded" });
         }
 
-        console.log("Uploading image to Cloudinary...");
+        // DETAIL 2: Check file name matches 'image'
+        if (req.file.fieldname !== 'image') {
+            console.error("❌ Upload Error: Form field name must be 'image', got:", req.file.fieldname);
+            return res.status(400).json({ error: "Form field name mismatch" });
+        }
 
-        // Upload ORIGINAL buffer directly to Cloudinary
+        console.log("✅ File received:", req.file.originalname);
+
+        // DETAIL 3: Attempt Cloudinary Upload (Original Buffer)
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 folder: 'bng_surveillance',
                 resource_type: 'image'
-                // No 'format' or 'transformation' here. We let Cloudinary handle original file to prevent crashes.
             },
             async (error, result) => {
                 if (error) {
-                    console.error("Cloudinary Upload Error:", error);
+                    console.error("❌ Cloudinary Upload Error:", error);
+                    // This is usually the issue. 
+                    // Common causes:
+                    // 1. 'streamifier' not installed or version wrong.
+                    // 2. Cloudinary Config invalid (Wrong Keys).
+                    console.log("Cloudinary Debug Info:", {
+                        cloud_name: process.env.CLOUD_NAME ? "SET" : "MISSING",
+                        api_key: process.env.CLOUD_API_KEY ? "SET" : "MISSING"
+                    });
                     return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
                 }
 
+                // DETAIL 4: Save to DB
                 const { name, category, price, desc } = req.body;
                 const image = result.secure_url; 
                 
                 const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
                 await newProduct.save();
+                console.log("✅ Product Saved to DB:", name);
                 res.json(newProduct);
             }
         );
 
-        // Pipe original buffer to upload stream
+        // Pipe file buffer to upload stream
         streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
 
     } catch (err) {
-        console.error("Server Upload Error:", err);
+        console.error("❌ Server Upload Error:", err);
         res.status(500).json({ error: "Server Error: " + err.message });
     }
 });
@@ -198,6 +214,7 @@ app.post('/api/create-order', async (req, res) => {
 
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
+
     const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
     
     const shasum = crypto.createHmac("sha256", secret);
@@ -235,20 +252,13 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// 10. ERROR HANDLER (PREVENTS 502 HTML ERRORS)
+// 10. ERROR HANDLER
 app.use((err, req, res, next) => {
     console.error("Express Error Handler:", err);
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
-// 11. ROUTE TO FORCE INDEX (FIXES "Directory Listing")
-// This ensures www.bng-surveillance.com/ ALWAYS loads index.html
-app.get('/', (req, res) => {
-    // Force serving of index.html when accessing root URL
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// 12. START SERVER
+// 11. START SERVER
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
