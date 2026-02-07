@@ -252,7 +252,10 @@ app.use((err, req, res, next) => {
 // 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
 // --- FORCE MAIN SHOP (DISABLES SPLASH SCREENS) ---
 // 11. FORCE SPLASH SCREEN (FIXES "Render Something" Page)
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// NO app.get('/')
+
 
 
 // 12. START SERVER
