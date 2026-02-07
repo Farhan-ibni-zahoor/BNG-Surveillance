@@ -252,10 +252,7 @@ app.use((err, req, res, next) => {
 // 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
 // --- FORCE MAIN SHOP (DISABLES SPLASH SCREENS) ---
 // 11. FORCE SPLASH SCREEN (FIXES "Render Something" Page)
-app.get('/', (req, res) => {
-    // If a request comes to root URL, send -> splash screen
-    res.sendFile(path.join(__dirname, '_render.html'));
-});
+
 
 // 12. START SERVER
 
