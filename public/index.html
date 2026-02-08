@@ -60,12 +60,12 @@
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
         .product-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.4s ease; position: relative; }
         .product-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.5); }
-                .product-img { 
+        .product-img { 
             width: 100%; 
             height: 260px; 
-            object-fit: contain; /* CHANGED: Show full image, no cropping */
-            background-color: #000; /* CHANGED: Black background for clean look */
-            border-bottom: 1px solid var(--border); /* Optional: Adds a separator */
+            object-fit: contain; /* Show full image, no cropping */
+            background-color: #000; /* Black background for clean look */
+            border-bottom: 1px solid var(--border);
         }
         .product-card:hover .product-img { transform: scale(1.05); }
         .product-info { padding: 1.5rem; position: relative; z-index: 2; background: var(--bg-panel); }
@@ -90,7 +90,7 @@
         .cart-panel { background: #121212; width: 420px; padding: 2rem; display: flex; flex-direction: column; border-left: 1px solid var(--border); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
         .modal-content { background: #1a1a1a; padding: 2.5rem; border-radius: 20px; width: 550px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
-        .detail-img { width: 100%; height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem; }
+        .detail-img { width: 100%; height: 300px; object-fit: contain; background: #000; border-radius: 12px; margin-bottom: 1.5rem; }
         .review-item { background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; border: 1px solid #333; }
         
         /* FOOTER */
@@ -132,32 +132,25 @@
     <script>
         // CONFIGURATION
         const API_URL = '/api'; 
-        const RAZORPAY_KEY_ID = 'rzp_live_SDiqNk2jPMuXQQ';
+        
+        // ⚠️ IMPORTANT: PASTE YOUR NEW RAZORPAY LIVE KEY ID HERE
+        const RAZORPAY_KEY_ID = 'PASTE_YOUR_NEW_RAZORPAY_KEY_ID_HERE'; 
+
         const ADMIN_PHONE_NUMBER = '916006750581';
 
         let myChart = null;
         const state = { user: JSON.parse(sessionStorage.getItem('user')) || null, cart: [] };
 
         const app = {
-                        // SMARTER LOADING LOGIC
+            // SMARTER LOADING LOGIC
             init: async () => {
                 const loader = document.getElementById('loading-overlay');
                 
-                // CHECK: Is the shop already loaded? (e.g., from a refresh)
-                // If yes, don't show the loader. 
-                const isAppRunning = !!document.getElementById('shop-grid');
-                
-                if (!isAppRunning) {
-                    // Only show loader if app is NOT running (e.g. cold start / wake up)
-                    // This hides the "Render Something" page for ~3 seconds
-                    setTimeout(() => {
-                        loader.style.opacity = '0';
-                        setTimeout(() => loader.remove(), 500);
-                    }, 3000); // Wait 3 seconds
-                } else {
-                    // If app is already running, remove loader instantly
-                    loader.remove();
-                }
+                // Reduced loading time for better UX
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 500);
+                }, 1500); // 1.5 seconds
 
                 app.updateNav();
                 app.showShop();
@@ -680,7 +673,6 @@
             },
 
             // UPDATED: Clear WhatsApp Template with Address & Items
-                        // UPDATED: Robust WhatsApp Message
             showSuccessScreen: (orderId, total, phone, address, items) => {
                 // Safety Check: Ensure we have valid data
                 const safeOrderId = orderId ? `#${orderId}` : "Processing...";
