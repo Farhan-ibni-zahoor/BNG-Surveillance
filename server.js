@@ -9,8 +9,7 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
-
-const streamifier = require('streamifier'); // New: Helps send file to cloud
+const streamifier = require('streamifier'); 
 
 // 2. CONFIGURATION
 const app = express();
@@ -25,10 +24,10 @@ cloudinary.config({
 
 console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
 
-// 4. RAZORPAY KEYS
+// 4. RAZORPAY KEYS (SECURE VERSION - No Hardcoded Keys)
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_SDiqNk2jPMuXQQ', 
-    key_secret: process.env.RAZORPAY_KEY_SECRET || 'zSWhSJOU0APmPrHRt6UAO1Ct'
+    key_id: process.env.RAZORPAY_KEY_ID, 
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
 // 5. DATABASE CONNECTION
@@ -40,7 +39,8 @@ mongoose.connect(DB_URI)
 // 6. MIDDLEWARE & CORS
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+// Keep this one static serve
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 7. SCHEMAS
 const UserSchema = new mongoose.Schema({
@@ -75,8 +75,7 @@ const User = mongoose.model('User', UserSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
-// 8. IMAGE UPLOAD CONFIG (MANUAL METHOD - NO MORE CRASHES)
-// We use memoryStorage so the file is in RAM, then we stream it to Cloudinary
+// 8. IMAGE UPLOAD CONFIG
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage,
@@ -101,7 +100,7 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // UPDATED: New Admin Credentials
+    // Admin check
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
         return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
     }
@@ -114,7 +113,7 @@ app.post('/api/login', async (req, res) => {
 // --- REVIEWS ---
 app.post('/api/review/:id', async (req, res) => {
     try {
-        const { user, comment, rating } = req.body; // Added rating capture if needed
+        const { user, comment } = req.body;
         const product = await Product.findById(req.params.id);
         if(product) {
             product.reviews.push({ user, comment });
@@ -132,50 +131,25 @@ app.get('/api/products', async (req, res) => {
     res.json(products);
 });
 
-// --- UPLOAD ROUTE (FIXED - MANUAL CLOUDINARY UPLOAD) ---
-// --- UPLOAD ROUTE (OPTIMIZED WITH SHARP) ---
-// --- UPLOAD ROUTE (SIMPLIFIED & STABLE) ---
+// --- UPLOAD ROUTE ---
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No image file uploaded" });
-        }
+        if (!req.file) return res.status(400).json({ error: "No image file uploaded" });
 
-        console.log("Uploading image directly to Cloudinary...");
-
-        // 1. Upload ORIGINAL buffer (No Sharp/Resizing) to prevent crash
-        // Removing "sharp" eliminates the ERR_INVALID_ARG_TYPE error
         const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: 'bng_surveillance',
-                resource_type: 'image'
-                // Added: upload_preset: "mls" to ensure mobile compatibility
-            },
+            { folder: 'bng_surveillance', resource_type: 'image' },
             async (error, result) => {
-                if (error) {
-                    console.error("Cloudinary Upload Error:", error);
-                    return res.status(500).json({ error: "Cloudinary Upload Failed: " + error.message });
-                }
+                if (error) return res.status(500).json({ error: "Cloudinary Upload Failed" });
 
                 const { name, category, price, desc } = req.body;
-                
-                // 2. Save URL to DB
-                const image = result.secure_url; 
-                
-                const newProduct = new Product({ name, category, price, image, desc, reviews: [] });
+                const newProduct = new Product({ name, category, price, image: result.secure_url, desc, reviews: [] });
                 await newProduct.save();
-                
-                console.log("✅ Product Saved to DB");
                 res.json(newProduct);
             }
         );
-
-        // 3. Pipe original file buffer to upload stream
         streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-
     } catch (err) {
-        console.error("Server Upload Error:", err);
-        res.status(500).json({ error: "Server Error: " + err.message });
+        res.status(500).json({ error: "Server Error" });
     }
 });
 
@@ -183,9 +157,6 @@ app.delete('/api/products/:id', async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ message: "Deleted" });
 });
-
-// --- REVIEWS ---
-
 
 // --- RAZORPAY PAYMENT ROUTES ---
 app.post('/api/create-order', async (req, res) => {
@@ -206,7 +177,8 @@ app.post('/api/create-order', async (req, res) => {
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
 
-    const secret = process.env.RAZORPAY_KEY_SECRET || 'zSWhSJOU0APmPrHRt6UAO1Ct';
+    // Use .env ONLY
+    const secret = process.env.RAZORPAY_KEY_SECRET;
     
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
@@ -249,17 +221,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message || "Something went wrong" });
 });
 
-// 11. FORCE SPLASH SCREEN (Fixes "Render Something" Page)
-// --- FORCE MAIN SHOP (DISABLES SPLASH SCREENS) ---
-// 11. FORCE SPLASH SCREEN (FIXES "Render Something" Page)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// NO app.get('/')
-
-
-
-// 12. START SERVER
-
+// 11. START SERVER
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
