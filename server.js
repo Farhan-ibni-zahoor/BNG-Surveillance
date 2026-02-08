@@ -9,7 +9,7 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
-const sharp = require('sharp');
+
 const streamifier = require('streamifier'); // New: Helps send file to cloud
 
 // 2. CONFIGURATION
@@ -27,8 +27,8 @@ console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
 
 // 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_S6anGX8BwOZEL8', 
-    key_secret: process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf'
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_SDiqNk2jPMuXQQ', 
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'zSWhSJOU0APmPrHRt6UAO1Ct'
 });
 
 // 5. DATABASE CONNECTION
