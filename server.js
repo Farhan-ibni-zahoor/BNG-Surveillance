@@ -1,6 +1,7 @@
 // server.js
 
 // 1. IMPORTS
+require('dotenv').config(); // <--- ADD THIS LINE FIRST
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,6 +15,12 @@ const streamifier = require('streamifier');
 // 2. CONFIGURATION
 const app = express();
 const PORT = process.env.PORT || 5000;
+// --- ADD THIS DEBUG CODE ---
+console.log("🔍 DEBUGGING KEYS:");
+console.log("Key ID:", process.env.RAZORPAY_KEY_ID);
+console.log("Key Secret (Start):", process.env.RAZORPAY_KEY_SECRET ? process.env.RAZORPAY_KEY_SECRET.substring(0, 5) + "..." : "MISSING");
+console.log("Cloud Name:", process.env.CLOUD_NAME);
+// --------------------------
 
 // 3. CLOUDINARY CONFIGURATION
 cloudinary.config({ 
@@ -26,9 +33,10 @@ console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
 
 // 4. RAZORPAY KEYS (SECURE VERSION - No Hardcoded Keys)
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID, 
-    key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
+
 
 // 5. DATABASE CONNECTION
 const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/bng-surveillance';
