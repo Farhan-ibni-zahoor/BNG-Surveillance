@@ -206,7 +206,7 @@ app.post('/api/create-order', async (req, res) => {
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
 
-    const secret = process.env.RAZORPAY_KEY_SECRET || 'CHEK3LJgZHmCdhd2NyJg5DSf';
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'zSWhSJOU0APmPrHRt6UAO1Ct';
     
     const shasum = crypto.createHmac("sha256", secret);
     shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
