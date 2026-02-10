@@ -1814,7 +1814,7 @@
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Unit</th><th>Price</th><th>Reserve Stock</th><th>Category</th><th>Modify</th></tr>
+                                    <tr><th>Unit</th><th>Price</th><th>Reserve Stock</th><th>Category</th><th>Actions</th></tr>
                                 </thead>
                                 <tbody>
                                     ${APP_STATE.inventory.map(p => `
@@ -1824,9 +1824,14 @@
                                             <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--text-main)'}; font-weight: 800;">${p.stock}</td>
                                             <td>${p.category}</td>
                                             <td>
-                                                <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 5px 15px; font-size: 0.7rem;">
-                                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                                </button>
+                                                <div style="display: flex; gap: 10px;">
+                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 5px 15px; font-size: 0.7rem;">
+                                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                                    </button>
+                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger" style="padding: 5px 15px; font-size: 0.7rem;">
+                                                        <i class="fa-solid fa-trash-can"></i> Delete
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -1957,6 +1962,28 @@
                         app.renderAdminPortal();
                     }
                 } catch(err) { app.showToast("Update Failed"); }
+            },
+
+            executeDeleteProduct: async (id, name) => {
+                if(!confirm(`⚠️ CRITICAL WARNING\n\nPermanently delete "${name}" from the system?\n\nThis action cannot be undone and will remove:\n• Product listing\n• All reviews\n• Image data\n\nConfirm deletion?`)) {
+                    return;
+                }
+
+                try {
+                    app.showToast("Initiating Product Deletion...");
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'DELETE' });
+                    
+                    if(res.ok) {
+                        app.showToast("Hardware Unit Deleted Successfully");
+                        app.renderAdminPortal();
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error || "Deletion Failed");
+                    }
+                } catch(e) { 
+                    console.error('Delete Error:', e);
+                    app.showToast("System Error: Deletion Failed"); 
+                }
             },
 
             executeOrderDelivery: async (id) => {

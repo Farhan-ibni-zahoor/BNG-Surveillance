@@ -615,6 +615,41 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
     }
 });
 
+// Delete Product (Admin)
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Optional: Delete image from Cloudinary
+        // Extract public_id from image URL and delete
+        if (product.image) {
+            try {
+                const urlParts = product.image.split('/');
+                const publicIdWithExt = urlParts[urlParts.length - 1];
+                const publicId = `bng_surveillance/${publicIdWithExt.split('.')[0]}`;
+                await cloudinary.uploader.destroy(publicId);
+                console.log(`✅ Image deleted from Cloudinary: ${publicId}`);
+            } catch (cloudinaryError) {
+                console.error('Cloudinary deletion error:', cloudinaryError.message);
+                // Continue with product deletion even if image deletion fails
+            }
+        }
+
+        await Product.findByIdAndDelete(req.params.id);
+        
+        console.log(`✅ Product deleted: ${product.name} (ID: ${req.params.id})`);
+        res.json({ message: "Product deleted successfully" });
+        
+    } catch (e) {
+        console.error('Delete Product Error:', e);
+        res.status(500).json({ error: "Delete failed" });
+    }
+});
+
 // Add Review
 app.post('/api/review/:id', async (req, res) => {
     try {
