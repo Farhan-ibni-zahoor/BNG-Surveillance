@@ -1,7 +1,5 @@
-// server.js
-
 // 1. IMPORTS
-require('dotenv').config(); // <--- ADD THIS LINE FIRST
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,12 +13,6 @@ const streamifier = require('streamifier');
 // 2. CONFIGURATION
 const app = express();
 const PORT = process.env.PORT || 5000;
-// --- ADD THIS DEBUG CODE ---
-console.log("🔍 DEBUGGING KEYS:");
-console.log("Key ID:", process.env.RAZORPAY_KEY_ID);
-console.log("Key Secret (Start):", process.env.RAZORPAY_KEY_SECRET ? process.env.RAZORPAY_KEY_SECRET.substring(0, 5) + "..." : "MISSING");
-console.log("Cloud Name:", process.env.CLOUD_NAME);
-// --------------------------
 
 // 3. CLOUDINARY CONFIGURATION
 cloudinary.config({ 
@@ -29,31 +21,27 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET 
 });
 
-console.log("Cloudinary loaded:", process.env.CLOUD_NAME ? "YES" : "NO");
-
-// 4. RAZORPAY KEYS (SECURE VERSION - No Hardcoded Keys)
+// 4. RAZORPAY KEYS
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-
 // 5. DATABASE CONNECTION
 const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/bng-surveillance';
 mongoose.connect(DB_URI)
-    .then(() => console.log("✅ MongoDB Connected (Atlas)"))
-    .catch(err => console.error("❌ Database Connection Failed!", err));
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => console.error("❌ DB Error:", err));
 
-// 6. MIDDLEWARE & CORS
+// 6. MIDDLEWARE
 app.use(cors());
 app.use(express.json());
-// Keep this one static serve
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 7. SCHEMAS
 const UserSchema = new mongoose.Schema({
     name: String,
-    email: String,
+    email: { type: String, unique: true }, // Added unique constraint
     password: String,
     role: { type: String, default: 'customer' }
 });
@@ -85,17 +73,17 @@ const Order = mongoose.model('Order', OrderSchema);
 
 // 8. IMAGE UPLOAD CONFIG
 const storage = multer.memoryStorage();
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } 
-});
+const upload = multer({ storage: storage });
 
-// 9. ROUTES
+// --- ROUTES ---
 
-// --- AUTH ---
+// AUTH: REGISTER (Fixed Duplicate Issue)
 app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
     try {
+        const existing = await User.findOne({ email });
+        if (existing) return res.status(400).json({ error: "Email already registered" });
+
         const newUser = new User({ name, email, password });
         await newUser.save();
         res.json(newUser);
@@ -104,42 +92,31 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- AUTH ---
+// AUTH: LOGIN
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // Admin check
+    // Hardcoded Admin Access
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
         return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
     }
     
-    const user = await User.findOne({ email, password });
-    if(user) res.json(user);
-    else res.status(401).json({ error: "Invalid Credentials" });
-});
-
-// --- REVIEWS ---
-app.post('/api/review/:id', async (req, res) => {
     try {
-        const { user, comment } = req.body;
-        const product = await Product.findById(req.params.id);
-        if(product) {
-            product.reviews.push({ user, comment });
-            await product.save();
-            res.json({ message: "Review Added" });
-        } else {
-            res.status(404).json({ error: "Product not found" });
-        }
-    } catch (err) { res.status(500).json({ error: err.message }); }
+        const user = await User.findOne({ email, password });
+        if(user) res.json(user);
+        else res.status(401).json({ error: "Invalid Credentials" });
+    } catch (e) { res.status(500).json({ error: "Server Error" }); }
 });
 
-// --- PRODUCTS ---
+// PRODUCTS: GET ALL
 app.get('/api/products', async (req, res) => {
-    const products = await Product.find();
-    res.json(products);
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// --- UPLOAD ROUTE ---
+// PRODUCTS: ADD NEW (Admin)
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: "No image file uploaded" });
@@ -150,7 +127,14 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
                 if (error) return res.status(500).json({ error: "Cloudinary Upload Failed" });
 
                 const { name, category, price, desc } = req.body;
-                const newProduct = new Product({ name, category, price, image: result.secure_url, desc, reviews: [] });
+                const newProduct = new Product({ 
+                    name, 
+                    category, 
+                    price: Number(price), // Ensure number
+                    image: result.secure_url, 
+                    desc, 
+                    reviews: [] 
+                });
                 await newProduct.save();
                 res.json(newProduct);
             }
@@ -161,61 +145,73 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+// REVIEWS
+app.post('/api/review/:id', async (req, res) => {
+    try {
+        const { user, comment } = req.body;
+        const product = await Product.findById(req.params.id);
+        if(!product) return res.status(404).json({ error: "Product not found" });
+
+        product.reviews.push({ user, comment });
+        await product.save();
+        res.json({ message: "Review Added" });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- RAZORPAY PAYMENT ROUTES ---
+// RAZORPAY: CREATE ORDER
 app.post('/api/create-order', async (req, res) => {
-    const { amount } = req.body; 
     try {
+        const { amount } = req.body; 
         const options = {
-            amount: amount * 100, 
+            amount: amount * 100, // Convert to paisa
             currency: "INR",
             receipt: "receipt_" + Date.now()
         };
         const order = await razorpay.orders.create(options);
         res.json(order);
     } catch (error) {
-        res.status(500).json({ error: "Something went wrong creating Razorpay order" });
+        res.status(500).json({ error: "Razorpay Error" });
     }
 });
 
+// RAZORPAY: VERIFY
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
 
-    // Use .env ONLY
-    const secret = process.env.RAZORPAY_KEY_SECRET;
-    
-    const shasum = crypto.createHmac("sha256", secret);
-    shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
-    const digest = shasum.digest("hex");
+    try {
+        const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+        shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
+        const digest = shasum.digest("hex");
 
-    if (digest !== razorpaySignature) {
-        return res.status(400).json({ message: "Invalid Transaction" });
+        if (digest !== razorpaySignature) {
+            return res.status(400).json({ message: "Invalid Transaction" });
+        }
+
+        const newOrder = new Order({
+            razorpay_order_id: orderCreationId,
+            payment_status: "Paid",
+            customer: customerDetails.name,
+            email: customerDetails.email,
+            phone: customerDetails.phone,
+            address: customerDetails.address,
+            items: customerDetails.items,
+            total: customerDetails.total
+        });
+        await newOrder.save();
+        
+        res.json({ message: "Payment Successful", orderId: newOrder._id });
+    } catch (error) {
+        res.status(500).json({ error: "Verification Error" });
     }
-
-    const newOrder = new Order({
-        razorpay_order_id: orderCreationId,
-        payment_status: "Paid",
-        customer: customerDetails.name,
-        email: customerDetails.email,
-        phone: customerDetails.phone,
-        address: customerDetails.address,
-        items: customerDetails.items,
-        total: customerDetails.total
-    });
-    await newOrder.save();
-    res.json({ message: "Payment Successful", orderId: newOrder._id });
 });
 
-// --- ORDERS ---
+// ADMIN: GET ALL ORDERS
 app.get('/api/orders', async (req, res) => {
-    const orders = await Order.find();
+    const orders = await Order.find().sort({ date: -1 });
     res.json(orders);
 });
 
+// USER: GET MY ORDERS
 app.get('/api/my-orders', async (req, res) => {
     const { email } = req.query;
     if(!email) return res.status(400).json({ error: "Email required" });
@@ -223,13 +219,4 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// 10. ERROR HANDLER
-app.use((err, req, res, next) => {
-    console.error("Express Error Handler:", err);
-    res.status(500).json({ error: err.message || "Something went wrong" });
-});
-
-// 11. START SERVER
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 BNG Server Active on Port ${PORT}`));
