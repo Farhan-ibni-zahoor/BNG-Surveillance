@@ -21,7 +21,7 @@
             --bg-deep: #020202;
             --bg-panel: #0a0a0a;
             --bg-glass: rgba(10, 10, 10, 0.95);
-            --primary: #f59e0b; /* Amber/Gold Accent */
+            --primary: #f59e0b;
             --primary-dim: rgba(245, 158, 11, 0.1);
             --primary-glow: rgba(245, 158, 11, 0.4);
             --secondary: #1a1a1a;
@@ -85,7 +85,7 @@
         ::selection { background: var(--primary); color: #000; }
 
         /* ============================================================
-           3. ANIMATIONS
+           3. ENHANCED ANIMATIONS
            ============================================================ */
         @keyframes slideUp { 
             from { opacity: 0; transform: translateY(40px); } 
@@ -103,19 +103,45 @@
         }
 
         @keyframes pulseBorder {
-            0% { border-color: var(--border); }
+            0%, 100% { border-color: var(--border); }
             50% { border-color: var(--primary); }
-            100% { border-color: var(--border); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px var(--primary-glow); }
+            50% { box-shadow: 0 0 40px var(--primary-glow), 0 0 60px var(--primary-glow); }
         }
 
         .animate-enter { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .fade-in { animation: fadeIn 0.5s ease forwards; }
+        .scale-in { animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .slide-in-right { animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         /* ============================================================
-           4. SHARED UI COMPONENTS
+           4. ENHANCED UI COMPONENTS
            ============================================================ */
         
-        /* Buttons */
+        /* Buttons with Better Interactions */
         .btn { 
             padding: 14px 28px; 
             border-radius: var(--radius-md); 
@@ -131,6 +157,26 @@
             justify-content: center; 
             font-size: 0.85rem;
             letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary { 
@@ -149,6 +195,7 @@
             background: rgba(255,255,255,0.03); 
             border: 1px solid var(--border); 
             color: var(--text-main); 
+            backdrop-filter: blur(10px);
         }
         .btn-secondary:hover { 
             border-color: var(--primary); 
@@ -162,18 +209,40 @@
             color: var(--danger); 
             border: 1px solid var(--danger); 
         }
-        .btn-danger:hover { background: var(--danger); color: #fff; }
+        .btn-danger:hover { 
+            background: var(--danger); 
+            color: #fff; 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -10px rgba(239, 68, 68, 0.5);
+        }
 
         .btn-success { 
             background: rgba(16, 185, 129, 0.1); 
             color: var(--success); 
             border: 1px solid var(--success); 
         }
-        .btn-success:hover { background: var(--success); color: #000; }
+        .btn-success:hover { 
+            background: var(--success); 
+            color: #000; 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -10px rgba(16, 185, 129, 0.5);
+        }
 
-        /* Form Controls */
-        .form-group { margin-bottom: 20px; }
-        .label-tech { font-family: var(--font-tech); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; display: block; text-transform: uppercase; }
+        /* Enhanced Form Controls */
+        .form-group { 
+            margin-bottom: 20px; 
+            position: relative;
+        }
+        
+        .label-tech { 
+            font-family: var(--font-tech); 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            display: block; 
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
         
         input, textarea, select { 
             width: 100%; 
@@ -183,13 +252,19 @@
             color: #fff; 
             border-radius: var(--radius-md); 
             font-family: var(--font-main); 
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 1rem;
         }
-        input:focus, textarea:focus { 
+        
+        input:focus, textarea:focus, select:focus { 
             border-color: var(--primary); 
             background: #151515;
-            box-shadow: 0 0 0 4px var(--primary-dim);
+            box-shadow: 0 0 0 4px var(--primary-dim), 0 10px 30px -10px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .form-group:focus-within .label-tech {
+            color: var(--primary);
         }
 
         /* Badges */
@@ -200,12 +275,14 @@
             font-weight: 800;
             text-transform: uppercase;
             font-family: var(--font-tech);
+            display: inline-block;
+            animation: scaleIn 0.3s ease;
         }
         .badge-solved { background: var(--success); color: #000; }
         .badge-open { background: var(--primary); color: #000; }
 
         /* ============================================================
-           5. NAVIGATION & HEADER
+           5. ENHANCED NAVIGATION & HEADER
            ============================================================ */
         nav { 
             position: sticky; 
@@ -219,6 +296,11 @@
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border); 
+            transition: all 0.3s ease;
+        }
+
+        nav:hover {
+            background: rgba(10, 10, 10, 0.98);
         }
 
         .logo { 
@@ -230,17 +312,28 @@
             gap: 12px; 
             letter-spacing: -1px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
         .logo i { 
             color: var(--primary); 
             filter: drop-shadow(0 0 8px var(--primary-glow));
+            animation: float 3s ease-in-out infinite;
         }
         .logo span { color: #fff; }
 
-        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
 
         /* ============================================================
-           6. HERO & HOME SECTIONS
+           6. ENHANCED HERO & HOME SECTIONS
            ============================================================ */
         .hero { 
             position: relative; 
@@ -255,27 +348,45 @@
             border: 1px solid var(--border); 
             background: url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?q=80&w=1920&auto=format&fit=crop') center/cover; 
         }
+        
         .hero::before { 
             content: ''; 
             position: absolute; 
             inset: 0; 
             background: linear-gradient(0deg, var(--bg-deep) 10%, rgba(0,0,0,0.4) 100%); 
         }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-deep) 100%);
+        }
+        
         .hero-content { 
             position: relative; 
             z-index: 2; 
             max-width: 900px; 
             padding: 40px; 
         }
+        
         .hero-content h1 {
             font-size: 4rem;
             line-height: 1.1;
             margin-bottom: 20px;
+            animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* Service Banner */
         .service-banner { 
-            background: linear-gradient(90deg, #0a0a0a 0%, #111 100%); 
+            background: linear-gradient(135deg, #0a0a0a 0%, #111 100%); 
             border: 1px solid var(--border); 
             border-left: 5px solid var(--primary); 
             padding: 4rem; 
@@ -288,7 +399,14 @@
             gap: 30px; 
             position: relative;
             overflow: hidden;
+            transition: all 0.4s ease;
         }
+        
+        .service-banner:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.8);
+        }
+        
         .service-banner::after {
             content: '\f3ed';
             font-family: 'Font Awesome 6 Free';
@@ -302,7 +420,7 @@
         }
 
         /* ============================================================
-           7. PRODUCT CATALOG STYLES
+           7. ENHANCED PRODUCT CATALOG STYLES
            ============================================================ */
         .catalog-header {
             display: flex;
@@ -328,10 +446,26 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             position: relative; 
         }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card:hover::before {
+            left: 100%;
+        }
+        
         .card:hover { 
             transform: translateY(-15px) scale(1.02); 
             border-color: var(--primary); 
-            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8);
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8), 0 0 0 1px var(--primary-glow);
         }
 
         .card-img-box { 
@@ -344,7 +478,8 @@
             position: relative; 
             overflow: hidden; 
         }
-        /* Scanline Overlay */
+        
+        /* Enhanced Scanline */
         .card-img-box::before {
             content: '';
             position: absolute;
@@ -359,10 +494,13 @@
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain; 
-            transition: 0.6s ease; 
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
-        .card:hover img { transform: scale(1.1) rotate(2deg); }
+        .card:hover img { 
+            transform: scale(1.1) rotate(2deg); 
+            filter: drop-shadow(0 20px 40px rgba(245, 158, 11, 0.3));
+        }
         
         .card-info { padding: 2rem; }
         .price-tag { 
@@ -371,6 +509,7 @@
             font-weight: 800; 
             margin: 10px 0;
             color: var(--primary);
+            text-shadow: 0 0 20px var(--primary-glow);
         }
 
         /* OUT OF STOCK OVERLAY */
@@ -391,10 +530,132 @@
             font-family: var(--font-tech);
             z-index: 10;
             box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* ============================================================
-           8. ADMIN PANEL LAYOUT & DASHBOARD
+           8. SUCCESS LOGIN MODAL (NEW!)
+           ============================================================ */
+        .success-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .success-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .success-content {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            padding: 4rem 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform: scale(0.8) translateY(50px);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 40px 100px -20px var(--primary-glow), 0 0 0 1px rgba(245, 158, 11, 0.2);
+        }
+
+        .success-modal.active .success-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .success-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #000;
+            position: relative;
+            z-index: 1;
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both;
+            box-shadow: 0 20px 40px -20px var(--primary-glow);
+        }
+
+        .success-title {
+            font-family: var(--font-tech);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease 0.5s both;
+        }
+
+        .success-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease 0.6s both;
+        }
+
+        .user-info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease 0.7s both;
+        }
+
+        .user-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .user-info-label {
+            font-family: var(--font-tech);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .user-info-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ============================================================
+           9. ADMIN PANEL LAYOUT & DASHBOARD
            ============================================================ */
         .admin-layout { 
             display: flex; 
@@ -426,13 +687,37 @@
             font-family: var(--font-tech); 
             font-size: 0.95rem; 
             font-weight: 600;
-            transition: 0.3s; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             display: flex;
             align-items: center;
             gap: 15px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .sidebar-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-btn:hover::before,
+        .sidebar-btn.active::before {
+            transform: scaleY(1);
+        }
+        
         .sidebar-btn i { font-size: 1.1rem; width: 25px; }
-        .sidebar-btn:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .sidebar-btn:hover { 
+            background: rgba(255,255,255,0.03); 
+            color: #fff; 
+            transform: translateX(5px);
+        }
         .sidebar-btn.active { 
             background: var(--primary-dim); 
             color: var(--primary); 
@@ -446,8 +731,48 @@
             background: var(--bg-deep);
         }
 
+        /* Enhanced stat boxes */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px -20px var(--primary-glow);
+        }
+
+        .stat-box:hover::before {
+            transform: scaleX(1);
+        }
+
         /* ============================================================
-           9. MODALS & UI OVERLAYS
+           10. ENHANCED MODALS & UI OVERLAYS
            ============================================================ */
         .overlay { 
             position: fixed; 
@@ -466,7 +791,7 @@
         .overlay.active { opacity: 1; pointer-events: all; }
         
         .modal { 
-            background: #0d0d0d; 
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%); 
             width: 95%; 
             max-width: 600px; 
             padding: 3.5rem; 
@@ -477,18 +802,19 @@
             max-height: 85vh; 
             overflow-y: auto; 
             position: relative;
+            box-shadow: 0 40px 100px -30px rgba(0,0,0,0.8);
         }
         .overlay.active .modal { transform: translateY(0) scale(1); }
 
-        /* Cart Panel */
+        /* Enhanced Cart Panel */
         .cart-panel { 
             position: fixed; 
             top: 0; 
             right: -500px; 
             width: 450px; 
             height: 100vh; 
-            background: #0a0a0a; 
-            border-left: 1px solid var(--primary); 
+            background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%); 
+            border-left: 2px solid var(--primary); 
             z-index: 2100; 
             padding: 3rem; 
             transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); 
@@ -498,8 +824,110 @@
         }
         .cart-panel.open { right: 0; }
 
+        /* Enhanced Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
+            color: #000;
+            padding: 18px 30px;
+            border-radius: 50px;
+            font-family: var(--font-tech);
+            font-weight: 700;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 4000;
+            box-shadow: 0 20px 40px -20px var(--primary-glow);
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Enhanced Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-deep);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Tag */
+        .tag {
+            display: inline-block;
+            background: var(--primary-dim);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-family: var(--font-tech);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Enhanced Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead tr {
+            border-bottom: 2px solid var(--border);
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-family: var(--font-tech);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255,255,255,0.02);
+            transform: scale(1.01);
+        }
+
         /* ============================================================
-           10. FOOTER
+           11. FOOTER
            ============================================================ */
         footer {
             text-align: center;
@@ -518,12 +946,23 @@
         .social-links a {
             font-size: 1.8rem;
             color: #fff;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
-        .social-links a:hover { color: var(--primary); transform: translateY(-5px); }
+        .social-links a:hover { 
+            color: var(--primary); 
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        /* Container utility */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
 
         /* ============================================================
-           11. RESPONSIVE MEDIA QUERIES
+           12. RESPONSIVE MEDIA QUERIES
            ============================================================ */
         @media (max-width: 1024px) {
             .admin-content { padding: 2rem; }
@@ -544,11 +983,30 @@
                 border-bottom: 1px solid var(--border); 
                 margin-top: 0;
             }
-            .sidebar-btn { width: auto; white-space: nowrap; margin-bottom: 0; }
+            .sidebar-btn { 
+                width: auto; 
+                white-space: nowrap; 
+                margin-bottom: 0; 
+                flex-shrink: 0;
+            }
             .admin-layout { flex-direction: column; }
             .admin-content { margin-left: 0; padding: 1.5rem; }
             nav { padding: 1rem 5%; }
-            .service-banner { padding: 2rem; text-align: center; justify-content: center; }
+            .service-banner { 
+                padding: 2rem; 
+                text-align: center; 
+                justify-content: center; 
+            }
+            .hero-content h1 { font-size: 2.5rem; }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+            .success-content {
+                padding: 3rem 2rem;
+            }
         }
     </style>
 </head>
@@ -560,6 +1018,34 @@
     </div>
 
     <div id="toast" class="toast">Action Logged Successfully</div>
+
+    <!-- SUCCESS LOGIN MODAL (NEW!) -->
+    <div id="success-modal" class="success-modal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2 class="success-title">ACCESS GRANTED</h2>
+            <p class="success-subtitle">Welcome to the command center, Agent.</p>
+            <div class="user-info-card">
+                <div class="user-info-row">
+                    <span class="user-info-label">Agent Name</span>
+                    <span class="user-info-value" id="success-user-name">-</span>
+                </div>
+                <div class="user-info-row">
+                    <span class="user-info-label">Clearance Level</span>
+                    <span class="user-info-value" id="success-user-role">-</span>
+                </div>
+                <div class="user-info-row">
+                    <span class="user-info-label">Secure Channel</span>
+                    <span class="user-info-value" id="success-user-email">-</span>
+                </div>
+            </div>
+            <button onclick="app.closeSuccessModal()" class="btn btn-primary" style="width: 100%; position: relative; z-index: 1;">
+                <i class="fa-solid fa-rocket"></i> Enter System
+            </button>
+        </div>
+    </div>
 
     <div id="cart-panel" class="cart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
@@ -589,22 +1075,22 @@
             <span>BNG <span style="font-weight:300; opacity:0.7;">SURVEILLANCE</span></span>
         </div>
         <div class="nav-right" id="nav-actions-area">
-            </div>
+        </div>
     </nav>
 
     <main id="app-root-view">
-        </main>
+    </main>
 
     <div id="modal-overlay" class="overlay">
         <div id="modal-body-content" class="modal">
-            </div>
+        </div>
     </div>
 
     <script>
         // --- 1. CONFIGURATION ---
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
-            RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ', // Replace with your real live key
+            RAZORPAY_ID: 'rzp_hgsgssv',
             WHATSAPP_ID: '916006750581'
         };
 
@@ -626,7 +1112,6 @@
              * Boot sequence
              */
             init: async () => {
-                // Fade out loader
                 setTimeout(() => {
                     const loader = document.getElementById('loader');
                     if(loader) {
@@ -778,9 +1263,6 @@
             // PRODUCT & CART LOGIC
             // ============================================================
 
-            /**
-             * Open Detailed Product Modal
-             */
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
                 if(!p) return;
@@ -850,9 +1332,6 @@
                 app.openModal(html);
             },
 
-            /**
-             * Add to cart with quantity selection
-             */
             executeAddToCart: (id) => {
                 if(!APP_STATE.user) {
                     app.showToast("Access Denied: Please Login First");
@@ -868,11 +1347,9 @@
                     return;
                 }
 
-                // Check if already in cart
                 const existingIndex = APP_STATE.cart.findIndex(item => item._id === id);
                 
                 if(existingIndex !== -1) {
-                    // Update quantity if total doesn't exceed stock
                     const newTotalQty = APP_STATE.cart[existingIndex].qty + qtyRequested;
                     if(newTotalQty > product.stock) {
                         app.showToast("Limit Reached: Cannot add more to cart.");
@@ -880,13 +1357,12 @@
                     }
                     APP_STATE.cart[existingIndex].qty = newTotalQty;
                 } else {
-                    // Add new item
                     APP_STATE.cart.push({ ...product, qty: qtyRequested });
                 }
 
                 app.showToast(`${product.name} staged for acquisition.`);
                 app.closeModal();
-                app.renderHeader(); // update counts
+                app.renderHeader();
             },
 
             toggleCart: () => {
@@ -953,7 +1429,7 @@
 
             checkout: () => {
                 if(APP_STATE.cart.length === 0) return;
-                app.toggleCart(); // Close panel
+                app.toggleCart();
 
                 const finalTotal = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
@@ -1069,7 +1545,7 @@
                         APP_STATE.cart = [];
                         app.showToast("Authorization Confirmed.");
                         app.renderOrderSuccess(response.razorpay_order_id, total);
-                        app.syncInventory(); // Refetch stocks
+                        app.syncInventory();
                     } else {
                         app.showToast("Payment Verification Failed");
                     }
@@ -1093,11 +1569,10 @@
             },
 
             // ============================================================
-            // SERVICE & SUPPORT (RESTRICTED)
+            // SERVICE & SUPPORT
             // ============================================================
 
             renderRaiseRequest: () => {
-                // 1. Check if user is logged in
                 if(!APP_STATE.user) {
                     app.showToast("Security Alert: System access required for Support.");
                     app.showAuth('login');
@@ -1166,7 +1641,6 @@
                 };
 
                 try {
-                    // 1. Log to Database
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -1174,7 +1648,6 @@
                     });
 
                     if(res.ok) {
-                        // 2. Open WhatsApp
                         const waText = `*NEW ${type.toUpperCase()} REQUEST*%0AFrom: ${APP_STATE.user.name}%0AEmail: ${APP_STATE.user.email}%0A-----------------%0A${encodeURIComponent(fullMessage)}`;
                         window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
                         
@@ -1185,7 +1658,7 @@
             },
 
             // ============================================================
-            // ADMIN PORTAL & COMMAND LOGIC
+            // ADMIN PORTAL
             // ============================================================
 
             renderAdminPortal: async () => {
@@ -1248,7 +1721,6 @@
             getTabContent: (tab) => {
                 const totalRevenue = APP_STATE.orders.reduce((sum, o) => sum + (o.total || 0), 0);
 
-                // --- DASHBOARD TAB ---
                 if(tab === 'dashboard') {
                     return `
                         <h1 style="font-family: var(--font-tech); margin-bottom: 3rem;">SYSTEM ANALYTICS</h1>
@@ -1273,7 +1745,6 @@
                     `;
                 }
 
-                // --- ORDERS TAB ---
                 if(tab === 'orders') {
                     return `
                         <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">ORDER LOGS</h1>
@@ -1304,7 +1775,6 @@
                     `;
                 }
 
-                // --- QUERIES TAB (UPDATED WORKFLOW) ---
                 if(tab === 'queries') {
                     return `
                         <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">SUPPORT TICKETS</h1>
@@ -1335,7 +1805,6 @@
                     `;
                 }
 
-                // --- INVENTORY TAB (EDITING ENABLED) ---
                 if(tab === 'inventory') {
                     return `
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
@@ -1369,8 +1838,6 @@
                 return '';
             },
 
-            // --- ADMIN LOGIC ACTIONS ---
-
             executeSolveQuery: async (id) => {
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}/solve`, { method: 'PATCH' });
@@ -1382,7 +1849,7 @@
             },
 
             executeDeleteQuery: async (id) => {
-                if(!confirm("Permenantly remove this record from command logs?")) return;
+                if(!confirm("Permanently remove this record from command logs?")) return;
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}`, { method: 'DELETE' });
                     if(res.ok) {
@@ -1500,7 +1967,7 @@
             },
 
             // ============================================================
-            // PROFILE & AUTH LOGIC
+            // PROFILE & AUTH
             // ============================================================
 
             renderProfile: async () => {
@@ -1513,7 +1980,7 @@
 
                 root.innerHTML = `
                     <div class="container animate-enter" style="max-width: 900px; padding: 5rem 2rem;">
-                        <h1 style="font-family: var(--font-tech); margin-bottom: 1rem;">AGENT PROFILE</h1>
+                        <h1 style="font-family: var(--font-tech); margin-bottom: 1rem;">ORDER HISTORY</h1>
                         <p style="color: var(--primary); font-weight: 700; margin-bottom: 3rem;">AUTHORIZED PERSONNEL ONLY</p>
                         
                         <div class="stat-box" style="margin-bottom: 3rem; background: rgba(255,255,255,0.02);">
@@ -1614,13 +2081,27 @@
                     if(res.ok) {
                         APP_STATE.user = data;
                         sessionStorage.setItem('user', JSON.stringify(data));
-                        app.showToast("Signed in. No limits."); // CUSTOM SUCCESS MESSAGE
                         app.closeModal();
-                        app.init();
+                        app.showSuccessModal(data);
                     } else {
                         app.showToast(data.error || "Access Denied");
                     }
                 } catch(e) { app.showToast("Connection Interrupted"); }
+            },
+
+            // NEW SUCCESS MODAL LOGIC
+            showSuccessModal: (user) => {
+                const modal = document.getElementById('success-modal');
+                document.getElementById('success-user-name').textContent = user.name;
+                document.getElementById('success-user-email').textContent = user.email;
+                document.getElementById('success-user-role').textContent = user.role === 'author' ? 'ADMIN' : 'OPERATIVE';
+                
+                modal.classList.add('active');
+            },
+
+            closeSuccessModal: () => {
+                document.getElementById('success-modal').classList.remove('active');
+                app.init();
             },
 
             handleRegister: async (e) => {
