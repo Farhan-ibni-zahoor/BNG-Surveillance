@@ -100,25 +100,38 @@ const upload = multer({ storage: storage });
 
 // --- ROUTES ---
 
-// AUTH: REGISTER (UPDATED WITH OTP)
+// AUTH: REGISTER (FIXED TO HANDLE UNVERIFIED USERS)
 app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
     try {
-        const existing = await User.findOne({ email });
-        if (existing) return res.status(400).json({ error: "Email already registered" });
+        let user = await User.findOne({ email });
 
-        // Generate 6-digit OTP
+        // Case 1: User exists AND is already verified -> Block them
+        if (user && user.isVerified) {
+            return res.status(400).json({ error: "Email already registered" });
+        }
+
+        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        const newUser = new User({ 
-            name, 
-            email, 
-            password, 
-            otp, 
-            isVerified: false // User is not verified yet
-        });
-        
-        await newUser.save();
+        // Case 2: User exists but NOT verified -> Update them (Resend OTP)
+        if (user && !user.isVerified) {
+            user.name = name;
+            user.password = password;
+            user.otp = otp;
+            await user.save();
+        } 
+        // Case 3: New User -> Create them
+        else {
+            user = new User({ 
+                name, 
+                email, 
+                password, 
+                otp, 
+                isVerified: false 
+            });
+            await user.save();
+        }
 
         // Send Email
         const mailOptions = {
@@ -130,13 +143,14 @@ app.post('/api/register', async (req, res) => {
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log(error);
-                return res.status(500).json({ error: "Error sending email" });
+                console.log("Email Error:", error);
+                return res.status(500).json({ error: "Error sending email. Check server logs." });
             }
-            res.json({ message: "Registration successful. Check email for OTP." });
+            res.json({ message: "Verification code sent to email." });
         });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Registration Failed" });
     }
 });
