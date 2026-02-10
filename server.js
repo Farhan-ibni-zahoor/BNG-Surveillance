@@ -100,41 +100,33 @@ const upload = multer({ storage: storage });
 
 // --- ROUTES ---
 
-// AUTH: REGISTER (Includes Logic to Resend OTP for Unverified Users)
+// AUTH: REGISTER
 app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
     try {
         let user = await User.findOne({ email });
-
-        // Block if user is already verified
         if (user && user.isVerified) {
             return res.status(400).json({ error: "Email already registered" });
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // If user exists but is NOT verified, update them
         if (user && !user.isVerified) {
             user.name = name;
             user.password = password;
             user.otp = otp;
             await user.save();
-        } 
-        // Create new user
-        else {
+        } else {
             user = new User({ name, email, password, otp, isVerified: false });
             await user.save();
         }
 
-        // Send Email
-        const mailOptions = {
+        transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: 'Verify Your Account - BNG Surveillance',
             text: `Your Verification OTP is: ${otp}`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
+        }, (error, info) => {
             if (error) {
                 console.log("Email Error:", error);
                 return res.status(500).json({ error: "Error sending email." });
@@ -235,6 +227,7 @@ app.post('/api/create-order', async (req, res) => {
     } catch (error) { res.status(500).json({ error: "Razorpay Error" }); }
 });
 
+// --- VERIFY PAYMENT (AND NOTIFY ADMIN) ---
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
     try {
@@ -255,22 +248,41 @@ app.post('/api/verify-payment', async (req, res) => {
             status: "Processing"
         });
         await newOrder.save();
+
+        // 🔔 NOTIFY ADMIN VIA EMAIL (INSTANT ALERT)
+        const itemList = customerDetails.items.map(i => `${i.name} (Rs.${i.price})`).join(', ');
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER, // Sends email to yourself (Admin)
+            subject: `💰 NEW ORDER: ₹${customerDetails.total} - ${customerDetails.name}`,
+            text: `YOU HAVE A NEW ORDER!\n\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}\n\nItems:\n${itemList}\n\nTotal: Rs.${customerDetails.total}\n\nCheck Admin Dashboard for details.`
+        });
+
         res.json({ message: "Payment Successful", orderId: newOrder._id });
     } catch (error) { res.status(500).json({ error: "Verification Error" }); }
 });
 
-// --- ADMIN & REQUEST ROUTES ---
+// --- ADMIN & REQUEST ROUTES (AND NOTIFY ADMIN) ---
 
 // Submit a Request (User)
 app.post('/api/requests', async (req, res) => {
     try {
         const newRequest = new Request(req.body);
         await newRequest.save();
+
+        // 🔔 NOTIFY ADMIN VIA EMAIL (INSTANT ALERT)
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER, // Sends email to yourself (Admin)
+            subject: `🔔 NEW ${req.body.type.toUpperCase()} REQUEST`,
+            text: `YOU HAVE A NEW REQUEST!\n\nFrom: ${req.body.customerName}\nEmail: ${req.body.email}\n\nDetails:\n${req.body.message}\n\nCheck Admin Dashboard for details.`
+        });
+
         res.json(newRequest);
     } catch (e) { res.status(500).json({ error: "Error saving request" }); }
 });
 
-// Get All Requests (Admin - NEW ROUTE)
+// Get All Requests (Admin)
 app.get('/api/admin/requests', async (req, res) => {
     try {
         const requests = await Request.find().sort({ date: -1 });
