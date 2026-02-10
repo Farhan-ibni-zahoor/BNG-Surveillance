@@ -6,7 +6,6 @@
     <title>BNG Surveillance | Secure Systems</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -318,21 +317,21 @@
             <i class="fa-solid fa-video"></i> BNG <span style="color:var(--text-main)">SURVEILLANCE</span>
         </div>
         <div id="nav-actions">
-            </div>
+        </div>
     </nav>
 
     <main id="app-root">
-        </main>
+    </main>
 
     <div id="modal-overlay" class="overlay">
         <div id="modal-body" class="modal">
-            </div>
+        </div>
     </div>
 
     <script>
         // --- CONFIGURATION ---
         const CONFIG = {
-            API_URL: '/api', // Change to your backend URL
+            API_URL: '/api', // Change to your backend URL if hosted elsewhere
             RAZORPAY_KEY: 'rzp_live_SDiqNk2jPMuXQQ', // ⚠️ REPLACE WITH REAL KEY
             ADMIN_PHONE: '916006750581'
         };
@@ -341,8 +340,9 @@
         const state = {
             user: JSON.parse(sessionStorage.getItem('user')) || null,
             cart: [],
-            products: [], // Will fetch from API
-            orders: []
+            products: [],
+            orders: [],
+            tempEmail: null // Stores email during OTP verification
         };
 
         // --- APP ENGINE ---
@@ -352,7 +352,10 @@
                 // Simulate boot sequence
                 setTimeout(() => {
                     document.getElementById('loader').style.opacity = 0;
-                    setTimeout(() => document.getElementById('loader').remove(), 500);
+                    setTimeout(() => {
+                        const loader = document.getElementById('loader');
+                        if(loader) loader.remove();
+                    }, 500);
                 }, 1500);
 
                 await app.fetchProducts(); // Initial data load
@@ -372,7 +375,7 @@
             renderNav: () => {
                 const container = document.getElementById('nav-actions');
                 if (!state.user) {
-                    container.innerHTML = `<button onclick="app.renderAuth()" class="btn btn-secondary">Login Terminal</button>`;
+                    container.innerHTML = `<button onclick="app.renderAuth('login')" class="btn btn-secondary">Login Terminal</button>`;
                 } else {
                     const adminBtn = state.user.role === 'author' 
                         ? `<button onclick="app.renderAdmin()" class="btn btn-secondary"><i class="fa-solid fa-chart-line"></i> Admin</button>` 
@@ -406,11 +409,8 @@
                             </div>
                         </section>
 
-                        <div id="grid" class="container">
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 2rem;">
-                                <i class="fa-solid fa-satellite-dish" style="color:var(--primary)"></i>
-                                <h2>Hardware Inventory</h2>
-                            </div>
+                        <div class="container" id="grid">
+                            <h3 style="color:var(--primary); margin-bottom:10px;">Welcome, ${state.user ? state.user.name : 'Guest'}</h3>
                             
                             <div class="grid">
                                 ${state.products.map(p => `
@@ -439,22 +439,55 @@
                 `;
             },
 
-            renderAuth: (isRegister = false) => {
+            renderAuth: (mode = 'login') => {
                 const root = document.getElementById('app-root');
+                
+                let title = 'Terminal Login';
+                let content = '';
+
+                if (mode === 'login') {
+                    content = `
+                        <form onsubmit="app.handleLogin(event)">
+                            <input type="email" name="email" placeholder="Secure Email" required>
+                            <input type="password" name="password" placeholder="Passcode" required>
+                            <button type="submit" class="btn btn-primary" style="width:100%">Access System</button>
+                        </form>
+                        <p style="text-align:center; margin-top:1.5rem; color:var(--text-muted);">
+                            Need clearance? <a href="#" onclick="app.renderAuth('register')" style="color:var(--primary)">Register</a>
+                        </p>
+                    `;
+                } else if (mode === 'register') {
+                    title = 'New Agent Registration';
+                    content = `
+                        <form onsubmit="app.handleRegister(event)">
+                            <input type="text" name="name" placeholder="Agent Name" required>
+                            <input type="email" name="email" placeholder="Secure Email" required>
+                            <input type="password" name="password" placeholder="Passcode" required>
+                            <button type="submit" class="btn btn-primary" style="width:100%">Register</button>
+                        </form>
+                        <p style="text-align:center; margin-top:1.5rem; color:var(--text-muted);">
+                            Already have ID? <a href="#" onclick="app.renderAuth('login')" style="color:var(--primary)">Login</a>
+                        </p>
+                    `;
+                } else if (mode === 'verify') {
+                    title = 'Security Verification';
+                    content = `
+                        <p style="text-align:center; color:#ccc; margin-bottom:1.5rem;">
+                            Enter the 6-digit code sent to <br><strong style="color:var(--primary)">${state.tempEmail}</strong>
+                        </p>
+                        <form onsubmit="app.handleVerifyOTP(event)">
+                            <input type="text" name="otp" placeholder="000000" maxlength="6" style="text-align:center; letter-spacing:5px; font-size:1.5rem;" required>
+                            <button type="submit" class="btn btn-primary" style="width:100%">Verify Identity</button>
+                        </form>
+                        <button onclick="app.renderAuth('register')" class="btn btn-secondary" style="width:100%; margin-top:10px;">Back</button>
+                    `;
+                }
+
                 root.innerHTML = `
                     <div class="container animate-enter" style="min-height: 80vh; display:flex; align-items:center; justify-content:center;">
                         <div style="background:var(--bg-panel); padding:3rem; border-radius:20px; border:1px solid var(--border); width:100%; max-width:450px;">
-                            <h2 style="text-align:center; margin-bottom:2rem;">${isRegister ? 'New Agent Registration' : 'Terminal Login'}</h2>
-                            <form onsubmit="${isRegister ? 'app.handleRegister(event)' : 'app.handleLogin(event)'}">
-                                ${isRegister ? '<input type="text" name="name" placeholder="Agent Name" required>' : ''}
-                                <input type="email" name="email" placeholder="Secure Email" required>
-                                <input type="password" name="password" placeholder="Passcode" required>
-                                <button type="submit" class="btn btn-primary" style="width:100%">${isRegister ? 'Register' : 'Access System'}</button>
-                            </form>
-                            <p style="text-align:center; margin-top:1.5rem; font-size:0.9rem; color:var(--text-muted);">
-                                ${isRegister ? 'Already have ID?' : 'Need clearance?'} 
-                                <a href="#" onclick="app.renderAuth(${!isRegister})" style="color:var(--primary)">${isRegister ? 'Login' : 'Register'}</a>
-                            </p>
+                            <h2 style="text-align:center; margin-bottom:2rem;">${title}</h2>
+                            ${content}
                         </div>
                     </div>
                 `;
@@ -463,14 +496,13 @@
             renderAdmin: async () => {
                 if(!state.user || state.user.role !== 'author') return app.renderShop();
                 
-                // Fetch fresh data
                 try {
                     const [oRes, pRes] = await Promise.all([
                         fetch(`${CONFIG.API_URL}/orders`),
                         fetch(`${CONFIG.API_URL}/products`)
                     ]);
                     state.orders = await oRes.json();
-                    state.products = await pRes.json(); // refresh products
+                    state.products = await pRes.json();
                 } catch(e) { console.log("Admin fetch error"); }
 
                 const totalRevenue = state.orders.reduce((acc, o) => acc + (o.total||0), 0);
@@ -498,7 +530,7 @@
                             <h3>Live Order Feed</h3>
                             <div style="overflow-x:auto">
                                 <table class="data-table">
-                                    <thead><tr><th>Date</th><th>Client</th><th>Contact</th><th>Items</th><th>Status</th><th>Amount</th></tr></thead>
+                                    <thead><tr><th>Date</th><th>Client</th><th>Contact</th><th>Items</th><th>Status</th><th>Amount</th><th>Action</th></tr></thead>
                                     <tbody>
                                         ${state.orders.map(o => `
                                             <tr>
@@ -506,8 +538,18 @@
                                                 <td>${o.customer}</td>
                                                 <td>${o.phone}</td>
                                                 <td>${o.items.length} Units</td>
-                                                <td><span style="color:var(--success)">CONFIRMED</span></td>
+                                                <td>
+                                                    ${o.status === 'Delivered' 
+                                                    ? '<span style="color:var(--success)">DELIVERED</span>' 
+                                                    : '<span style="color:var(--primary)">PENDING</span>'}
+                                                </td>
                                                 <td style="color:var(--primary); font-weight:bold;">₹${o.total}</td>
+                                                <td>
+                                                    ${o.status === 'Delivered' 
+                                                    ? '<i class="fa-solid fa-check"></i>' 
+                                                    : `<button onclick="app.markDelivered('${o._id}')" class="btn btn-secondary" style="padding:5px">Mark Delivered</button>`
+                                                    }
+                                                </td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -518,9 +560,18 @@
                 `;
             },
 
+            markDelivered: async (id) => {
+                try {
+                    await fetch(`${CONFIG.API_URL}/orders/${id}/deliver`, { method: 'PATCH' });
+                    app.showToast("Status Updated");
+                    app.renderAdmin();
+                } catch(e) {
+                    app.showToast("Update Failed");
+                }
+            },
+
             renderProfile: async () => {
                 const root = document.getElementById('app-root');
-                // Fetch user specific orders
                 let myOrders = [];
                 try {
                     const res = await fetch(`${CONFIG.API_URL}/my-orders?email=${state.user.email}`);
@@ -574,13 +625,42 @@
             handleRegister: async (e) => {
                 e.preventDefault();
                 const formData = Object.fromEntries(new FormData(e.target));
+                state.tempEmail = formData.email; 
+
                 try {
-                    await fetch(`${CONFIG.API_URL}/register`, {
+                    const res = await fetch(`${CONFIG.API_URL}/register`, {
                         method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(formData)
                     });
-                    app.showToast("Registration Successful. Please Login.");
-                    app.renderAuth(false);
+                    
+                    if(res.ok) {
+                        app.showToast("OTP Sent to Email");
+                        app.renderAuth('verify');
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error || "Registration Error");
+                    }
                 } catch(err) { app.showToast("Registration Error"); }
+            },
+
+            handleVerifyOTP: async (e) => {
+                e.preventDefault();
+                const otp = e.target.otp.value;
+                
+                try {
+                    const res = await fetch(`${CONFIG.API_URL}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ email: state.tempEmail, otp: otp })
+                    });
+
+                    if(res.ok) {
+                        app.showToast("Identity Verified. Please Login.");
+                        app.renderAuth('login');
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error || "Invalid OTP");
+                    }
+                } catch(err) { app.showToast("Verification Error"); }
             },
 
             logout: () => {
@@ -594,8 +674,6 @@
             // --- CART LOGIC ---
             toggleCart: () => {
                 const panel = document.getElementById('cart-panel');
-                const overlay = document.getElementById('modal-overlay'); // Reuse overlay if needed, or just slide
-                
                 if(panel.classList.contains('open')) {
                     panel.classList.remove('open');
                 } else {
@@ -660,6 +738,7 @@
                         <input type="text" value="${state.user.name}" readonly style="opacity:0.6">
                         <input type="tel" id="c-phone" placeholder="Mobile Number" required>
                         <textarea id="c-address" placeholder="Delivery Address" rows="3" required></textarea>
+                        <input type="text" id="c-pincode" placeholder="6-Digit Pincode" maxlength="6" required>
                         <div style="margin: 1rem 0; font-weight:bold; font-size:1.2rem;">
                             Amount: <span style="color:var(--primary)">₹${total.toLocaleString('en-IN')}</span>
                         </div>
@@ -672,6 +751,7 @@
             processPayment: async (amount) => {
                 const phone = document.getElementById('c-phone').value;
                 const address = document.getElementById('c-address').value;
+                const pincode = document.getElementById('c-pincode').value;
                 
                 if(!phone || !address) return app.showToast("Details Missing");
 
