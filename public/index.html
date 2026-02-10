@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNG Surveillance | Secure Systems</title>
+    <title>BNG Surveillance | Secure Systems Command</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -13,36 +13,49 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <style>
-        /* ==============================
-           1. CORE VARIABLES
-           ============================== */
+        /* ============================================================
+           1. CORE DESIGN SYSTEM & VARIABLES
+           ============================================================ */
         :root {
+            /* Color Palette */
             --bg-deep: #020202;
             --bg-panel: #0a0a0a;
             --bg-glass: rgba(10, 10, 10, 0.95);
-            
-            --primary: #f59e0b; /* Amber Gold */
+            --primary: #f59e0b; /* Amber/Gold Accent */
             --primary-dim: rgba(245, 158, 11, 0.1);
+            --primary-glow: rgba(245, 158, 11, 0.4);
+            --secondary: #1a1a1a;
             
+            /* UI Semantic Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            /* Text Colors */
             --text-main: #ffffff;
             --text-muted: #888888;
+            --text-dim: #555555;
             
+            /* Layout & Spacing */
             --border: rgba(255, 255, 255, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 8px;
+            --sidebar-width: 280px;
             
+            /* Typography */
             --font-main: 'Outfit', sans-serif;
             --font-tech: 'Space Grotesk', monospace;
-            
-            --sidebar-width: 250px;
         }
 
-        /* ==============================
-           2. RESET & BASE STYLES
-           ============================== */
+        /* ============================================================
+           2. GLOBAL RESET & BASE STYLES
+           ============================================================ */
         * { 
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
             outline: none; 
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -50,401 +63,475 @@
             color: var(--text-main);
             font-family: var(--font-main);
             min-height: 100vh;
+            line-height: 1.6;
             overflow-x: hidden;
-            /* Grid Background Pattern */
             background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-deep); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { 
+            background: #222; 
+            border: 2px solid var(--bg-deep); 
+            border-radius: 10px; 
+        }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* ==============================
-           3. UI COMPONENTS (Buttons, Inputs)
-           ============================== */
+        /* Typography Selection */
+        ::selection { background: var(--primary); color: #000; }
+
+        /* ============================================================
+           3. ANIMATIONS
+           ============================================================ */
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(40px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes pulseBorder {
+            0% { border-color: var(--border); }
+            50% { border-color: var(--primary); }
+            100% { border-color: var(--border); }
+        }
+
+        .animate-enter { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+
+        /* ============================================================
+           4. SHARED UI COMPONENTS
+           ============================================================ */
+        
+        /* Buttons */
         .btn { 
-            padding: 12px 24px; 
-            border-radius: 6px; 
+            padding: 14px 28px; 
+            border-radius: var(--radius-md); 
             font-family: var(--font-tech); 
             font-weight: 700; 
             text-transform: uppercase; 
-            letter-spacing: 1px; 
-            font-size: 0.8rem; 
             cursor: pointer; 
-            transition: all 0.3s ease; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             border: 1px solid transparent; 
             display: inline-flex; 
             align-items: center; 
-            gap: 8px; 
+            gap: 10px; 
             justify-content: center; 
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
         }
 
         .btn-primary { 
             background: var(--primary); 
             color: #000; 
-            box-shadow: 0 0 20px var(--primary-dim); 
+            box-shadow: 0 10px 20px -10px var(--primary-glow); 
         }
         .btn-primary:hover { 
             background: #fff; 
-            transform: translateY(-2px); 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 30px -10px rgba(255,255,255,0.2);
         }
+        .btn-primary:active { transform: translateY(-1px); }
 
         .btn-secondary { 
-            background: transparent; 
+            background: rgba(255,255,255,0.03); 
             border: 1px solid var(--border); 
             color: var(--text-main); 
         }
         .btn-secondary:hover { 
             border-color: var(--primary); 
             color: var(--primary); 
-            background: var(--primary-dim); 
+            background: var(--primary-dim);
+            transform: translateY(-2px);
         }
 
         .btn-danger { 
             background: rgba(239, 68, 68, 0.1); 
-            color: #ef4444; 
-            border: 1px solid #ef4444; 
+            color: var(--danger); 
+            border: 1px solid var(--danger); 
         }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
 
         .btn-success { 
             background: rgba(16, 185, 129, 0.1); 
-            color: #10b981; 
-            border: 1px solid #10b981; 
+            color: var(--success); 
+            border: 1px solid var(--success); 
         }
+        .btn-success:hover { background: var(--success); color: #000; }
 
-        .btn-whatsapp { 
-            background: #25D366; 
-            color: #000; 
-            border: none; 
-        }
-
-        .text-gradient { 
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
-
-        /* Animations */
-        .animate-enter { animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Form Inputs */
+        /* Form Controls */
+        .form-group { margin-bottom: 20px; }
+        .label-tech { font-family: var(--font-tech); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; display: block; text-transform: uppercase; }
+        
         input, textarea, select { 
             width: 100%; 
-            background: #151515; 
+            background: #111; 
             border: 1px solid var(--border); 
-            padding: 15px; 
+            padding: 16px; 
             color: #fff; 
-            border-radius: 8px; 
+            border-radius: var(--radius-md); 
             font-family: var(--font-main); 
-            margin-bottom: 15px; 
+            transition: 0.3s;
+            font-size: 1rem;
         }
-        input:focus { border-color: var(--primary); }
+        input:focus, textarea:focus { 
+            border-color: var(--primary); 
+            background: #151515;
+            box-shadow: 0 0 0 4px var(--primary-dim);
+        }
 
-        /* ==============================
-           4. LAYOUT SECTIONS
-           ============================== */
-        
-        /* Navbar */
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: var(--font-tech);
+        }
+        .badge-solved { background: var(--success); color: #000; }
+        .badge-open { background: var(--primary); color: #000; }
+
+        /* ============================================================
+           5. NAVIGATION & HEADER
+           ============================================================ */
         nav { 
             position: sticky; 
             top: 0; 
-            z-index: 100; 
+            z-index: 1000; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 1.2rem 5%; 
+            padding: 1.2rem 8%; 
             background: var(--bg-glass); 
-            backdrop-filter: blur(20px); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border); 
         }
+
         .logo { 
-            font-size: 1.5rem; 
+            font-size: 1.6rem; 
             font-family: var(--font-tech); 
             font-weight: 800; 
             display: flex; 
             align-items: center; 
-            gap: 10px; 
+            gap: 12px; 
+            letter-spacing: -1px;
+            cursor: pointer;
         }
-        .logo i { color: var(--primary); }
+        .logo i { 
+            color: var(--primary); 
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+        .logo span { color: #fff; }
 
-        /* Hero Section */
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+
+        /* ============================================================
+           6. HERO & HOME SECTIONS
+           ============================================================ */
         .hero { 
             position: relative; 
-            height: 60vh; 
+            height: 70vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             text-align: center; 
             margin: 2rem 5%; 
-            border-radius: 20px; 
+            border-radius: 24px; 
             overflow: hidden; 
             border: 1px solid var(--border); 
-            background: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1920&auto=format&fit=crop') center/cover; 
+            background: url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?q=80&w=1920&auto=format&fit=crop') center/cover; 
         }
         .hero::before { 
             content: ''; 
             position: absolute; 
             inset: 0; 
-            background: linear-gradient(0deg, var(--bg-deep) 0%, rgba(0,0,0,0.6) 100%); 
+            background: linear-gradient(0deg, var(--bg-deep) 10%, rgba(0,0,0,0.4) 100%); 
         }
         .hero-content { 
             position: relative; 
             z-index: 2; 
-            max-width: 800px; 
-            padding: 20px; 
+            max-width: 900px; 
+            padding: 40px; 
+        }
+        .hero-content h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
         }
 
         /* Service Banner */
         .service-banner { 
-            background: linear-gradient(45deg, #111, #0a0a0a); 
+            background: linear-gradient(90deg, #0a0a0a 0%, #111 100%); 
             border: 1px solid var(--border); 
-            border-left: 4px solid var(--primary); 
-            padding: 3rem; 
-            margin: 4rem 5% 2rem; 
-            border-radius: 12px; 
+            border-left: 5px solid var(--primary); 
+            padding: 4rem; 
+            margin: 5rem 5% 3rem; 
+            border-radius: 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             flex-wrap: wrap; 
-            gap: 20px; 
+            gap: 30px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .service-banner::after {
+            content: '\f3ed';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            font-size: 15rem;
+            color: rgba(255,255,255,0.02);
+            transform: rotate(-15deg);
         }
 
-        /* Product Grid */
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem 5%; }
+        /* ============================================================
+           7. PRODUCT CATALOG STYLES
+           ============================================================ */
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 2rem; 
-            margin-top: 2rem; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 2.5rem; 
+            margin-top: 3rem; 
         }
+        
         .card { 
             background: var(--bg-panel); 
             border: 1px solid var(--border); 
-            border-radius: 16px; 
+            border-radius: 20px; 
             overflow: hidden; 
-            transition: 0.4s ease; 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative; 
         }
         .card:hover { 
-            transform: translateY(-10px); 
+            transform: translateY(-15px) scale(1.02); 
             border-color: var(--primary); 
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8);
         }
+
         .card-img-box { 
-            height: 250px; 
+            height: 280px; 
             background: #000; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 20px; 
+            padding: 30px; 
             position: relative; 
             overflow: hidden; 
         }
-        /* Scanner Effect */
-        .card-img-box::after { 
-            content: ''; 
-            position: absolute; 
-            top: -100%; 
-            left: 0; 
-            width: 100%; 
-            height: 50%; 
-            background: linear-gradient(to bottom, transparent, var(--primary-dim), transparent); 
-            animation: scan 3s infinite linear; 
+        /* Scanline Overlay */
+        .card-img-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: var(--primary);
+            opacity: 0.3;
+            z-index: 2;
+            animation: scanline 4s linear infinite;
         }
-        @keyframes scan { 0% { top: -100%; } 100% { top: 200%; } }
         
         .card img { 
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain; 
-            transition: 0.4s; 
+            transition: 0.6s ease; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         }
-        .card:hover img { transform: scale(1.1); }
-        .card-info { padding: 1.5rem; }
-        .tag { font-size: 0.7rem; color: var(--primary); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-        .price { font-size: 1.5rem; font-family: var(--font-tech); font-weight: 700; margin-top: 5px; }
+        .card:hover img { transform: scale(1.1) rotate(2deg); }
+        
+        .card-info { padding: 2rem; }
+        .price-tag { 
+            font-size: 1.8rem; 
+            font-family: var(--font-tech); 
+            font-weight: 800; 
+            margin: 10px 0;
+            color: var(--primary);
+        }
 
-        /* Stock Styles */
+        /* OUT OF STOCK OVERLAY */
         .out-of-stock { 
-            filter: grayscale(1); 
-            opacity: 0.6; 
+            filter: grayscale(1) contrast(0.8); 
             pointer-events: none; 
         }
-        .stock-label {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #ef4444;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            z-index: 5;
+        .stock-label { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: #ef4444; 
+            color: #fff; 
+            padding: 8px 15px; 
+            border-radius: 6px; 
+            font-size: 0.75rem; 
+            font-weight: 900; 
+            font-family: var(--font-tech);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
         }
 
-        /* ==============================
-           5. ADMIN PANEL STYLES
-           ============================== */
-        .admin-layout { display: flex; min-height: 100vh; }
+        /* ============================================================
+           8. ADMIN PANEL LAYOUT & DASHBOARD
+           ============================================================ */
+        .admin-layout { 
+            display: flex; 
+            min-height: calc(100vh - 75px); 
+        }
+        
         .sidebar { 
             width: var(--sidebar-width); 
-            background: #0a0a0a; 
+            background: #080808; 
             border-right: 1px solid var(--border); 
-            padding: 2rem; 
+            padding: 2.5rem 1.5rem; 
             position: fixed; 
             height: 100%; 
             top: 75px; 
             left: 0; 
             overflow-y: auto; 
         }
+
         .sidebar-btn { 
             width: 100%; 
             text-align: left; 
-            padding: 15px; 
-            margin-bottom: 10px; 
+            padding: 16px 20px; 
+            margin-bottom: 12px; 
             background: transparent; 
-            border: none; 
-            color: #888; 
+            border: 1px solid transparent; 
+            color: #777; 
             cursor: pointer; 
-            border-radius: 8px; 
+            border-radius: 12px; 
             font-family: var(--font-tech); 
-            font-size: 1rem; 
+            font-size: 0.95rem; 
+            font-weight: 600;
             transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        .sidebar-btn:hover, .sidebar-btn.active { 
+        .sidebar-btn i { font-size: 1.1rem; width: 25px; }
+        .sidebar-btn:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .sidebar-btn.active { 
             background: var(--primary-dim); 
             color: var(--primary); 
+            border-color: rgba(245, 158, 11, 0.2);
         }
+
         .admin-content { 
             margin-left: var(--sidebar-width); 
-            padding: 2rem; 
+            padding: 4rem; 
             width: 100%; 
+            background: var(--bg-deep);
         }
 
-        .stat-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 1.5rem; 
-            margin-bottom: 2rem; 
-        }
-        .stat-box { 
-            background: linear-gradient(145deg, #151515, #0a0a0a); 
-            border: 1px solid var(--border); 
-            padding: 1.5rem; 
-            border-radius: 12px; 
-        }
-        .data-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 1rem; 
-        }
-        .data-table th { 
-            text-align: left; 
-            padding: 1rem; 
-            color: var(--text-muted); 
-            font-size: 0.8rem; 
-            border-bottom: 1px solid var(--border); 
-            text-transform: uppercase; 
-        }
-        .data-table td { 
-            padding: 1rem; 
-            border-bottom: 1px solid var(--border); 
-            font-size: 0.9rem; 
-        }
-
-        /* ==============================
-           6. MODALS & SLIDEOVERS
-           ============================== */
+        /* ============================================================
+           9. MODALS & UI OVERLAYS
+           ============================================================ */
         .overlay { 
             position: fixed; 
             inset: 0; 
-            background: rgba(0,0,0,0.9); 
-            backdrop-filter: blur(8px); 
-            z-index: 1000; 
+            background: rgba(0,0,0,0.92); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 2000; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             opacity: 0; 
             pointer-events: none; 
-            transition: 0.3s; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
         }
         .overlay.active { opacity: 1; pointer-events: all; }
         
         .modal { 
-            background: #111; 
-            width: 90%; 
-            max-width: 500px; 
-            padding: 2.5rem; 
-            border-radius: 20px; 
+            background: #0d0d0d; 
+            width: 95%; 
+            max-width: 600px; 
+            padding: 3.5rem; 
+            border-radius: 28px; 
             border: 1px solid var(--border); 
-            transform: translateY(50px); 
-            transition: 0.4s; 
-            max-height: 90vh; 
+            transform: translateY(60px) scale(0.95); 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            max-height: 85vh; 
             overflow-y: auto; 
+            position: relative;
         }
-        .overlay.active .modal { transform: translateY(0); }
+        .overlay.active .modal { transform: translateY(0) scale(1); }
 
+        /* Cart Panel */
         .cart-panel { 
             position: fixed; 
             top: 0; 
-            right: -450px; 
-            width: 400px; 
+            right: -500px; 
+            width: 450px; 
             height: 100vh; 
-            background: #0e0e0e; 
+            background: #0a0a0a; 
             border-left: 1px solid var(--primary); 
-            z-index: 1100; 
-            padding: 2rem; 
-            transition: 0.4s cubic-bezier(0.77, 0, 0.175, 1); 
+            z-index: 2100; 
+            padding: 3rem; 
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); 
             display: flex; 
             flex-direction: column; 
+            box-shadow: -20px 0 60px rgba(0,0,0,0.8);
         }
         .cart-panel.open { right: 0; }
 
-        /* Toast Notifications */
-        .toast { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 30px; 
-            background: #111; 
-            border-left: 4px solid var(--primary); 
-            padding: 1rem 2rem; 
-            border-radius: 8px; 
-            color: #fff; 
-            transform: translateY(100px); 
-            transition: 0.3s; 
-            z-index: 2000; 
+        /* ============================================================
+           10. FOOTER
+           ============================================================ */
+        footer {
+            text-align: center;
+            padding: 6rem 2rem;
+            margin-top: 8rem;
+            background: #050505;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
         }
-        .toast.show { transform: translateY(0); }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .social-links a {
+            font-size: 1.8rem;
+            color: #fff;
+            transition: 0.3s;
+        }
+        .social-links a:hover { color: var(--primary); transform: translateY(-5px); }
 
-        /* Loading Spinner */
-        #loader { 
-            position: fixed; 
-            inset: 0; 
-            background: #000; 
-            z-index: 9999; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            transition: 0.5s; 
+        /* ============================================================
+           11. RESPONSIVE MEDIA QUERIES
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .admin-content { padding: 2rem; }
+            .hero-content h1 { font-size: 3rem; }
         }
-        .spinner { 
-            width: 50px; 
-            height: 50px; 
-            border: 3px solid #333; 
-            border-top-color: var(--primary); 
-            border-radius: 50%; 
-            animation: spin 1s infinite linear; 
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Responsive */
         @media (max-width: 768px) {
+            :root { --sidebar-width: 100%; }
             .cart-panel { width: 100%; right: -100%; }
             .sidebar { 
                 position: static; 
@@ -452,15 +539,16 @@
                 height: auto; 
                 display: flex; 
                 overflow-x: auto; 
-                top: 0; 
                 padding: 1rem; 
                 border-right: none; 
                 border-bottom: 1px solid var(--border); 
+                margin-top: 0;
             }
+            .sidebar-btn { width: auto; white-space: nowrap; margin-bottom: 0; }
             .admin-layout { flex-direction: column; }
-            .admin-content { margin-left: 0; padding: 1rem; }
-            .hero-content h1 { font-size: 2.5rem; }
-            nav { padding: 1rem; }
+            .admin-content { margin-left: 0; padding: 1.5rem; }
+            nav { padding: 1rem 5%; }
+            .service-banner { padding: 2rem; text-align: center; justify-content: center; }
         }
     </style>
 </head>
@@ -468,290 +556,745 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <div style="margin-top: 20px; font-family: var(--font-tech); letter-spacing: 3px; color: var(--primary);">INITIALIZING SYSTEM...</div>
+        <div style="margin-top: 25px; font-family: var(--font-tech); letter-spacing: 5px; color: var(--primary); font-weight: 600;">INITIALIZING COMMAND CENTER...</div>
     </div>
 
-    <div id="toast" class="toast">Action Successful</div>
+    <div id="toast" class="toast">Action Logged Successfully</div>
 
     <div id="cart-panel" class="cart-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2><i class="fa-solid fa-server"></i> Cart</h2>
-            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+            <h2 style="font-family: var(--font-tech);"><i class="fa-solid fa-cart-arrow-down"></i> LOGISTICS CART</h2>
+            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 10px 15px;"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="cart-items" style="flex: 1; overflow-y: auto;">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 50px;">Cart is empty</div>
-        </div>
-        <div style="border-top: 1px solid var(--border); padding-top: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1.2rem; font-weight: 700;">
-                <span>TOTAL</span>
-                <span id="cart-total" class="text-gradient">₹0</span>
+        
+        <div id="cart-items-container" style="flex: 1; overflow-y: auto; padding-right: 10px;">
+            <div style="text-align: center; color: var(--text-muted); margin-top: 100px; opacity: 0.5;">
+                <i class="fa-solid fa-box-open" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                <p>No hardware staged for deployment.</p>
             </div>
-            <button onclick="app.checkout()" class="btn btn-primary" style="width: 100%;">Initialize Checkout</button>
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 1.4rem; font-weight: 800; font-family: var(--font-tech);">
+                <span>NET TOTAL</span>
+                <span id="cart-total-display" class="text-gradient">₹0</span>
+            </div>
+            <button onclick="app.checkout()" id="checkout-main-btn" class="btn btn-primary" style="width: 100%; padding: 20px;">Execute Acquisition</button>
         </div>
     </div>
 
     <nav>
-        <div class="logo">
-            <i class="fa-solid fa-video"></i> BNG <span style="color:var(--text-main)">SURVEILLANCE</span>
+        <div class="logo" onclick="app.renderShop()">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>BNG <span style="font-weight:300; opacity:0.7;">SURVEILLANCE</span></span>
         </div>
-        <div id="nav-actions"></div>
+        <div class="nav-right" id="nav-actions-area">
+            </div>
     </nav>
 
-    <main id="app-root"></main>
+    <main id="app-root-view">
+        </main>
 
     <div id="modal-overlay" class="overlay">
-        <div id="modal-body" class="modal"></div>
+        <div id="modal-body-content" class="modal">
+            </div>
     </div>
 
     <script>
-        const CONFIG = {
-            API_URL: '/api', 
-            RAZORPAY_KEY: 'rzp_live_SDiqNk2jPMuXQQ', // ⚠️ REPLACE WITH REAL KEY
-            ADMIN_PHONE: '916006750581'
+        // --- 1. CONFIGURATION ---
+        const COMMAND_CONFIG = {
+            API_BASE: '/api', 
+            RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ', // Replace with your real live key
+            WHATSAPP_ID: '916006750581'
         };
 
-        const state = {
+        // --- 2. APPLICATION STATE ---
+        const APP_STATE = {
             user: JSON.parse(sessionStorage.getItem('user')) || null,
             cart: [],
-            products: [],
+            inventory: [],
             orders: [],
-            requests: [],
-            activeAdminTab: 'dashboard',
-            tempEmail: null 
+            queries: [],
+            currentAdminTab: 'dashboard',
+            registrationEmail: null
         };
 
+        // --- 3. SYSTEM ENGINE ---
         const app = {
+            
+            /**
+             * Boot sequence
+             */
             init: async () => {
+                // Fade out loader
                 setTimeout(() => {
-                    document.getElementById('loader').style.opacity = 0;
-                    setTimeout(() => {
-                        const loader = document.getElementById('loader');
-                        if(loader) loader.remove();
-                    }, 500);
-                }, 1500);
+                    const loader = document.getElementById('loader');
+                    if(loader) {
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.remove(), 600);
+                    }
+                }, 1800);
 
-                await app.fetchProducts();
-                app.renderNav();
-                app.renderShop(); 
+                await app.syncInventory();
+                app.refreshUI();
             },
 
-            fetchProducts: async () => {
+            /**
+             * Fetch latest products and stock from DB
+             */
+            syncInventory: async () => {
                 try {
-                    const res = await fetch(`${CONFIG.API_URL}/products`);
-                    if(res.ok) state.products = await res.json();
-                } catch(e) { console.error("API Error", e); }
+                    const response = await fetch(`${COMMAND_CONFIG.API_BASE}/products`);
+                    if(response.ok) {
+                        APP_STATE.inventory = await response.json();
+                    }
+                } catch(err) {
+                    console.error("Database Sync Failed", err);
+                    app.showToast("Critical: Sync Failure");
+                }
             },
 
-            renderNav: () => {
-                const container = document.getElementById('nav-actions');
-                if (!state.user) {
-                    container.innerHTML = `<button onclick="app.renderAuth('login')" class="btn btn-secondary">Login Terminal</button>`;
+            /**
+             * Primary UI Router
+             */
+            refreshUI: () => {
+                app.renderHeader();
+                app.renderShop();
+            },
+
+            // ============================================================
+            // UI RENDERERS
+            // ============================================================
+
+            renderHeader: () => {
+                const nav = document.getElementById('nav-actions-area');
+                if (!APP_STATE.user) {
+                    nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i> Agent Login</button>`;
                 } else {
-                    const adminBtn = state.user.role === 'author' 
-                        ? `<button onclick="app.renderAdmin()" class="btn btn-secondary"><i class="fa-solid fa-shield-halved"></i> Admin Panel</button>` 
-                        : '';
-                    container.innerHTML = `
-                        ${adminBtn}
-                        <button onclick="app.renderProfile()" class="btn btn-secondary"><i class="fa-solid fa-user-astronaut"></i></button>
+                    const isAdmin = APP_STATE.user.role === 'author';
+                    nav.innerHTML = `
+                        ${isAdmin ? `<button onclick="app.renderAdminPortal()" class="btn btn-secondary"><i class="fa-solid fa-terminal"></i> Command Panel</button>` : ''}
+                        <button onclick="app.renderProfile()" class="btn btn-secondary" title="View Profile"><i class="fa-solid fa-id-card-clip"></i></button>
                         <button onclick="app.toggleCart()" class="btn btn-primary">
-                            <i class="fa-solid fa-cart-shopping"></i> <span id="cart-count">${state.cart.length}</span>
+                            <i class="fa-solid fa-cart-flatbed-suitcases"></i>
+                            <span id="header-cart-count" style="background:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${APP_STATE.cart.length}</span>
                         </button>
-                        <button onclick="app.logout()" class="btn btn-danger" style="padding: 8px 12px;"><i class="fa-solid fa-power-off"></i></button>
+                        <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-power-off"></i></button>
                     `;
                 }
             },
 
             renderShop: () => {
-                const root = document.getElementById('app-root');
+                const root = document.getElementById('app-root-view');
+                
+                let productCards = APP_STATE.inventory.map(p => {
+                    const isSoldOut = p.stock <= 0;
+                    return `
+                        <div class="card ${isSoldOut ? 'out-of-stock' : ''}">
+                            ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
+                            <div class="card-img-box">
+                                <img src="${p.image}" alt="${p.name}">
+                            </div>
+                            <div class="card-info">
+                                <div class="tag">${p.category}</div>
+                                <h3 style="font-family: var(--font-tech); margin-bottom: 5px;">${p.name}</h3>
+                                <div class="price-tag">₹${p.price.toLocaleString('en-IN')}</div>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Available Stock: ${p.stock} Units</p>
+                                ${!isSoldOut 
+                                    ? `<button onclick="app.viewProductDetails('${p._id}')" class="btn btn-secondary" style="width:100%;">View Specifications</button>`
+                                    : `<button class="btn btn-secondary" style="width:100%;" disabled>Hardware Depleted</button>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
                 root.innerHTML = `
                     <div class="animate-enter">
                         <section class="hero">
                             <div class="hero-content">
-                                <h1>Next Gen <span class="text-gradient">Security</span></h1>
-                                <p style="color: #ccc; margin: 1.5rem 0; font-size: 1.1rem;">
-                                    Professional grade surveillance equipment for mission-critical environments.
-                                    24/7 Monitoring. Cloud Integrated. AI Powered.
+                                <div class="badge-open" style="display:inline-block; padding:5px 15px; border-radius:50px; margin-bottom:20px; font-size:0.7rem; letter-spacing:2px; font-weight:bold;">MILITARY GRADE SECURITY</div>
+                                <h1>NEXT GENERATION <br><span class="text-gradient">SURVEILLANCE SYSTEMS</span></h1>
+                                <p style="color: #bbb; margin: 2rem auto; font-size: 1.2rem; max-width: 600px; font-weight: 300;">
+                                    Deploying high-fidelity optics and AI-integrated recording arrays for total environment control.
                                 </p>
-                                <button onclick="document.getElementById('grid').scrollIntoView({behavior:'smooth'})" class="btn btn-primary">
-                                    Access Catalog
-                                </button>
+                                <div style="display:flex; gap:15px; justify-content:center;">
+                                    <button onclick="document.getElementById('catalog-anchor').scrollIntoView({behavior:'smooth'})" class="btn btn-primary">Initialize Access</button>
+                                    <button onclick="app.renderRaiseRequest()" class="btn btn-secondary">Request Support</button>
+                                </div>
                             </div>
                         </section>
 
-                        <div class="container" id="grid">
-                            ${state.user ? `<h3 style="color:var(--primary); margin-bottom:20px;">Signed in. No limits. <span style="color:#fff;">${state.user.name}</span></h3>` : ''}
-                            <h3 style="color:var(--primary); margin-bottom:10px;">Hardware Catalog</h3>
+                        <div class="container" id="catalog-anchor">
+                            <div class="catalog-header">
+                                <div>
+                                    <h2 style="font-size: 2.2rem;">HARDWARE <span class="text-gradient">INVENTORY</span></h2>
+                                    <p style="color: var(--text-muted);">Browse current tactical equipment availability.</p>
+                                </div>
+                                <div style="font-family: var(--font-tech); font-size: 0.8rem; opacity: 0.6;">
+                                    STATUS: ONLINE | STREAMS: ENCRYPTED
+                                </div>
+                            </div>
+
                             <div class="grid">
-                                ${state.products.map(p => `
-                                    <div class="card ${p.stock <= 0 ? 'out-of-stock' : ''}">
-                                        <div class="card-img-box">
-                                            <img src="${p.image}" alt="${p.name}">
-                                            ${p.stock <= 0 ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
-                                        </div>
-                                        <div class="card-info">
-                                            <div class="tag">${p.category}</div>
-                                            <h3 style="margin: 5px 0;">${p.name}</h3>
-                                            <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
-                                            ${p.stock > 0 
-                                                ? `<button onclick="app.openProductModal('${p._id}')" class="btn btn-secondary" style="width:100%; margin-top:1rem;">View & Buy</button>` 
-                                                : `<button class="btn btn-secondary" style="width:100%; margin-top:1rem;" disabled>Sold Out</button>`
-                                            }
-                                        </div>
-                                    </div>
-                                `).join('')}
+                                ${productCards || '<div style="grid-column: 1/-1; text-align:center; padding:5rem;">No hardware currently listed in the database.</div>'}
                             </div>
                         </div>
 
-                        <div class="service-banner">
+                        <div class="service-banner animate-enter">
+                            <div style="max-width: 600px;">
+                                <h2 style="font-size: 2.2rem; margin-bottom: 10px;"><i class="fa-solid fa-headset" style="color:var(--primary)"></i> TECHNICAL SUPPORT</h2>
+                                <p style="color:#aaa; font-size: 1.1rem;">
+                                    Facing system downtime or require professional installation? Raise a high-priority service request and our engineers will respond within 24 hours.
+                                </p>
+                            </div>
                             <div>
-                                <h2 style="margin-bottom:5px;"><i class="fa-solid fa-headset" style="color:var(--primary)"></i> Service & Support</h2>
-                                <p style="color:#aaa;">Facing issues with your cameras? Need a new installation or maintenance?</p>
+                                <button onclick="app.renderRaiseRequest()" class="btn btn-primary" style="padding: 20px 40px;">Open Service Query</button>
                             </div>
-                            <button onclick="app.renderRaiseRequest()" class="btn btn-secondary">Raise a Request</button>
                         </div>
 
-                        <footer style="text-align:center; padding: 4rem; margin-top:4rem; border-top:1px solid var(--border); color:var(--text-muted); background:#050505;">
-                            <div style="font-size:1.5rem; margin-bottom:1rem;">
-                                <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank" style="color:#fff; margin:0 10px;"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank" style="color:#fff; margin:0 10px;"><i class="fa-brands fa-facebook"></i></a>
+                        <footer>
+                            <div class="social-links">
+                                <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="mailto:bngsurveillance@gmail.com"><i class="fa-solid fa-envelope"></i></a>
                             </div>
-                            <p style="margin-bottom:1rem;">BNG SURVEILLANCE SYSTEMS © 2024</p>
-                            <p style="font-size:0.9rem;">Secured by <a href="https://farhanzahoor.info" target="_blank" style="color:var(--primary); text-decoration:none;">Farhan Zahoor</a></p>
+                            <div style="font-family: var(--font-tech); font-size: 1.2rem; margin-bottom: 20px; letter-spacing: 3px;">BNG SURVEILLANCE SYSTEMS</div>
+                            <p style="margin-bottom: 15px; opacity: 0.5; font-size: 0.8rem;">
+                                ALL SYSTEMS RECORDED & ENCRYPTED. UNAUTHORIZED ACCESS IS PROHIBITED.
+                            </p>
+                            <p style="font-size: 0.9rem;">
+                                Infrastructure Developed by 
+                                <a href="https://farhanzahoor.info" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">
+                                    FARHAN ZAHOOR
+                                </a>
+                            </p>
                         </footer>
                     </div>
                 `;
             },
 
-            // --- AUTH LOGIC ---
-            renderAuth: (mode = 'login') => {
-                const root = document.getElementById('app-root');
-                let title = 'Terminal Login';
-                let content = '';
+            // ============================================================
+            // PRODUCT & CART LOGIC
+            // ============================================================
 
-                if (mode === 'login') {
-                    content = `
-                        <form onsubmit="app.handleLogin(event)">
-                            <input type="email" name="email" placeholder="Secure Email" required>
-                            <input type="password" name="password" placeholder="Passcode" required>
-                            <button type="submit" class="btn btn-primary" style="width:100%">Access System</button>
-                        </form>
-                        <p style="text-align:center; margin-top:1.5rem; color:var(--text-muted);">
-                            Need clearance? <a href="#" onclick="app.renderAuth('register')" style="color:var(--primary)">Register</a>
-                        </p>
-                    `;
-                } else if (mode === 'register') {
-                    title = 'New Agent Registration';
-                    content = `
-                        <form onsubmit="app.handleRegister(event)">
-                            <input type="text" name="name" placeholder="Agent Name" required>
-                            <input type="email" name="email" placeholder="Secure Email" required>
-                            <input type="password" name="password" placeholder="Passcode" required>
-                            <button type="submit" class="btn btn-primary" style="width:100%">Register</button>
-                        </form>
-                        <p style="text-align:center; margin-top:1.5rem; color:var(--text-muted);">
-                            Already have ID? <a href="#" onclick="app.renderAuth('login')" style="color:var(--primary)">Login</a>
-                        </p>
-                    `;
-                } else if (mode === 'verify') {
-                    title = 'Security Verification';
-                    content = `
-                        <p style="text-align:center; color:#ccc; margin-bottom:1.5rem;">
-                            Enter the 6-digit code sent to <br><strong style="color:var(--primary)">${state.tempEmail}</strong>
-                        </p>
-                        <form onsubmit="app.handleVerifyOTP(event)">
-                            <input type="text" name="otp" placeholder="000000" maxlength="6" style="text-align:center; letter-spacing:5px; font-size:1.5rem;" required>
-                            <button type="submit" class="btn btn-primary" style="width:100%">Verify Identity</button>
-                        </form>
-                        <button onclick="app.renderAuth('register')" class="btn btn-secondary" style="width:100%; margin-top:10px;">Back</button>
-                    `;
-                }
+            /**
+             * Open Detailed Product Modal
+             */
+            viewProductDetails: (id) => {
+                const p = APP_STATE.inventory.find(x => x._id === id);
+                if(!p) return;
 
-                root.innerHTML = `
-                    <div class="container animate-enter" style="min-height: 80vh; display:flex; align-items:center; justify-content:center;">
-                        <div style="background:var(--bg-panel); padding:3rem; border-radius:20px; border:1px solid var(--border); width:100%; max-width:450px;">
-                            <h2 style="text-align:center; margin-bottom:2rem;">${title}</h2>
-                            ${content}
+                const hasReviews = p.reviews && p.reviews.length > 0;
+
+                const html = `
+                    <div class="fade-in">
+                        <img src="${p.image}" style="width:100%; height:320px; object-fit:contain; background:#000; border-radius:20px; margin-bottom:2rem; border: 1px solid var(--border);">
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div class="tag">${p.category}</div>
+                                <h2 style="font-size: 2rem; font-family: var(--font-tech);">${p.name}</h2>
+                            </div>
+                            <div class="price-tag" style="font-size: 2.2rem; margin:0;">₹${p.price.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <p style="color: #aaa; margin: 1.5rem 0; line-height: 1.8; font-size: 1.1rem; border-left: 2px solid var(--primary); padding-left: 20px;">
+                            ${p.desc}
+                        </p>
+
+                        <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span class="label-tech">Inventory Status</span>
+                                <span style="font-weight: 800; font-size: 1.1rem; color: ${p.stock < 5 ? 'var(--danger)' : 'var(--success)'}">
+                                    ${p.stock} Units in Reserve
+                                </span>
+                            </div>
+                            <div style="width: 120px;">
+                                <span class="label-tech">Select Qty</span>
+                                <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="margin:0; padding: 10px; text-align:center;">
+                            </div>
+                        </div>
+
+                        <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 20px;">
+                            <i class="fa-solid fa-plus-circle"></i> Add to Logistics Cart
+                        </button>
+
+                        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                            <h4 style="font-family: var(--font-tech); margin-bottom: 1.5rem;"><i class="fa-solid fa-clipboard-check"></i> FIELD OPERATION REPORTS</h4>
+                            
+                            <div id="review-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 2rem; padding-right: 10px;">
+                                ${!hasReviews ? '<p style="color: var(--text-dim); text-align:center;">No field reports available for this hardware.</p>' : 
+                                    p.reviews.map(r => `
+                                        <div style="background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border);">
+                                            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                                                <strong style="color: var(--primary); font-size: 0.8rem; text-transform:uppercase;">${r.user}</strong>
+                                                <small style="opacity:0.4; font-size:0.7rem;">${new Date(r.date).toLocaleDateString()}</small>
+                                            </div>
+                                            <div style="font-size: 0.95rem; color: #ccc;">${r.comment}</div>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+
+                            ${APP_STATE.user ? `
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="review-comment-field" placeholder="Draft a field report..." style="margin:0;">
+                                    <button onclick="app.postFieldReport('${p._id}')" class="btn btn-secondary" style="padding: 0 20px;"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            ` : '<p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">Login required to post reports.</p>'}
                         </div>
                     </div>
                 `;
+
+                app.openModal(html);
             },
 
-            // --- ADMIN PANEL ---
-            renderAdmin: async () => {
-                if(!state.user || state.user.role !== 'author') return app.renderShop();
-                try {
-                    const [oRes, pRes, reqRes] = await Promise.all([
-                        fetch(`${CONFIG.API_URL}/orders`),
-                        fetch(`${CONFIG.API_URL}/products`),
-                        fetch(`${CONFIG.API_URL}/admin/requests`)
-                    ]);
-                    state.orders = await oRes.json();
-                    state.products = await pRes.json();
-                    if(reqRes.ok) state.requests = await reqRes.json();
-                } catch(e) { console.log("Admin fetch error"); }
+            /**
+             * Add to cart with quantity selection
+             */
+            executeAddToCart: (id) => {
+                if(!APP_STATE.user) {
+                    app.showToast("Access Denied: Please Login First");
+                    app.showAuth('login');
+                    return;
+                }
 
-                const root = document.getElementById('app-root');
-                root.innerHTML = `
-                    <div class="admin-layout animate-enter">
-                        <div class="sidebar">
-                            <h3 style="margin-bottom:2rem; padding-left:15px; color:#fff;">COMMAND CENTER</h3>
-                            <button onclick="app.switchAdminTab('dashboard')" class="sidebar-btn ${state.activeAdminTab === 'dashboard' ? 'active' : ''}"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
-                            <button onclick="app.switchAdminTab('orders')" class="sidebar-btn ${state.activeAdminTab === 'orders' ? 'active' : ''}"><i class="fa-solid fa-truck-fast"></i> Orders</button>
-                            <button onclick="app.switchAdminTab('queries')" class="sidebar-btn ${state.activeAdminTab === 'queries' ? 'active' : ''}"><i class="fa-solid fa-envelope-open-text"></i> Queries</button>
-                            <button onclick="app.switchAdminTab('inventory')" class="sidebar-btn ${state.activeAdminTab === 'inventory' ? 'active' : ''}"><i class="fa-solid fa-box"></i> Inventory</button>
-                            <button onclick="app.renderShop()" class="sidebar-btn" style="margin-top:auto; color:var(--primary);"><i class="fa-solid fa-arrow-left"></i> Exit Admin</button>
+                const product = APP_STATE.inventory.find(x => x._id === id);
+                const qtyRequested = parseInt(document.getElementById('purchase-qty-input').value) || 1;
+
+                if(qtyRequested > product.stock) {
+                    app.showToast("Error: Requested quantity exceeds stock level.");
+                    return;
+                }
+
+                // Check if already in cart
+                const existingIndex = APP_STATE.cart.findIndex(item => item._id === id);
+                
+                if(existingIndex !== -1) {
+                    // Update quantity if total doesn't exceed stock
+                    const newTotalQty = APP_STATE.cart[existingIndex].qty + qtyRequested;
+                    if(newTotalQty > product.stock) {
+                        app.showToast("Limit Reached: Cannot add more to cart.");
+                        return;
+                    }
+                    APP_STATE.cart[existingIndex].qty = newTotalQty;
+                } else {
+                    // Add new item
+                    APP_STATE.cart.push({ ...product, qty: qtyRequested });
+                }
+
+                app.showToast(`${product.name} staged for acquisition.`);
+                app.closeModal();
+                app.renderHeader(); // update counts
+            },
+
+            toggleCart: () => {
+                const panel = document.getElementById('cart-panel');
+                if(panel.classList.contains('open')) {
+                    panel.classList.remove('open');
+                } else {
+                    app.renderCartContents();
+                    panel.classList.add('open');
+                }
+            },
+
+            renderCartContents: () => {
+                const container = document.getElementById('cart-items-container');
+                const totalDisplay = document.getElementById('cart-total-display');
+                
+                if(APP_STATE.cart.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); margin-top: 100px; opacity: 0.5;">
+                            <i class="fa-solid fa-box-open" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                            <p>No hardware staged for deployment.</p>
                         </div>
-                        <div class="admin-content">${app.getAdminContent(state.activeAdminTab)}</div>
+                    `;
+                    totalDisplay.innerText = "₹0";
+                    return;
+                }
+
+                let total = 0;
+                let html = APP_STATE.cart.map((item, idx) => {
+                    const rowTotal = item.price * item.qty;
+                    total += rowTotal;
+                    return `
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; position: relative;" class="animate-enter">
+                            <div style="display:flex; gap: 15px; align-items:center;">
+                                <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; background: #000; border-radius: 8px;">
+                                <div style="flex: 1;">
+                                    <h4 style="font-family: var(--font-tech); font-size: 0.9rem;">${item.name}</h4>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                        ₹${item.price.toLocaleString()} x ${item.qty} units
+                                    </div>
+                                    <div style="color: var(--primary); font-weight: 800; font-family: var(--font-tech);">₹${rowTotal.toLocaleString()}</div>
+                                </div>
+                                <button onclick="app.removeCartItem(${idx})" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 1.2rem;">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = html;
+                totalDisplay.innerText = "₹" + total.toLocaleString('en-IN');
+            },
+
+            removeCartItem: (idx) => {
+                APP_STATE.cart.splice(idx, 1);
+                app.renderCartContents();
+                app.renderHeader();
+            },
+
+            // ============================================================
+            // CHECKOUT & PAYMENT FLOW
+            // ============================================================
+
+            checkout: () => {
+                if(APP_STATE.cart.length === 0) return;
+                app.toggleCart(); // Close panel
+
+                const finalTotal = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;"><i class="fa-solid fa-truck-ramp-box"></i> DISPATCH LOGISTICS</h2>
+                        
+                        <div class="form-group">
+                            <label class="label-tech">Operations Agent</label>
+                            <input type="text" value="${APP_STATE.user.name}" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Communication Line (Phone)</label>
+                            <input type="tel" id="checkout-phone" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Deployment Coordinates (Address)</label>
+                            <textarea id="checkout-address" placeholder="Full installation address..." rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Regional Code (Pincode)</label>
+                            <input type="text" id="checkout-pincode" placeholder="6-Digit Code" maxlength="6" required>
+                        </div>
+
+                        <div style="background: var(--primary-dim); border: 1px solid var(--primary); padding: 20px; border-radius: 12px; margin: 2rem 0; text-align: center;">
+                            <div class="label-tech" style="color: var(--primary);">Total Authorization Amount</div>
+                            <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-tech);">₹${finalTotal.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <button onclick="app.initiatePayment(${finalTotal})" class="btn btn-primary" style="width: 100%; padding: 20px;">
+                            <i class="fa-solid fa-credit-card"></i> Finalize Secure Payment
+                        </button>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            initiatePayment: async (amount) => {
+                const phone = document.getElementById('checkout-phone').value;
+                const address = document.getElementById('checkout-address').value;
+                const pincode = document.getElementById('checkout-pincode').value;
+
+                if(!phone || !address || !pincode) {
+                    app.showToast("Error: Missing deployment details.");
+                    return;
+                }
+
+                try {
+                    app.showToast("Connecting to Secure Gateway...");
+                    
+                    const response = await fetch(`${COMMAND_CONFIG.API_BASE}/create-order`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ amount })
+                    });
+                    
+                    const orderData = await response.json();
+
+                    const options = {
+                        "key": COMMAND_CONFIG.RAZORPAY_ID,
+                        "amount": orderData.amount,
+                        "currency": "INR",
+                        "name": "BNG SURVEILLANCE",
+                        "description": "Tactical Hardware Acquisition",
+                        "order_id": orderData.id,
+                        "handler": (resp) => app.verifyPaymentResponse(resp, amount, phone, address, pincode),
+                        "theme": { "color": "#f59e0b" },
+                        "prefill": {
+                            "name": APP_STATE.user.name,
+                            "email": APP_STATE.user.email,
+                            "contact": phone
+                        }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                    app.closeModal();
+
+                } catch(e) {
+                    app.showToast("Gateway Connection Failure");
+                }
+            },
+
+            verifyPaymentResponse: async (response, total, phone, address, pincode) => {
+                try {
+                    app.showToast("Verifying Transaction...");
+                    
+                    const payload = {
+                        orderCreationId: response.razorpay_order_id,
+                        razorpayPaymentId: response.razorpay_payment_id,
+                        razorpaySignature: response.razorpay_signature,
+                        customerDetails: {
+                            name: APP_STATE.user.name,
+                            email: APP_STATE.user.email,
+                            phone,
+                            address,
+                            pincode,
+                            items: APP_STATE.cart,
+                            total
+                        }
+                    };
+
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-payment`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+
+                    if(res.ok) {
+                        APP_STATE.cart = [];
+                        app.showToast("Authorization Confirmed.");
+                        app.renderOrderSuccess(response.razorpay_order_id, total);
+                        app.syncInventory(); // Refetch stocks
+                    } else {
+                        app.showToast("Payment Verification Failed");
+                    }
+                } catch(e) {
+                    app.showToast("Server Synchronization Error");
+                }
+            },
+
+            renderOrderSuccess: (id, amount) => {
+                const html = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fa-solid fa-circle-check" style="font-size: 5rem; color: var(--success); margin-bottom: 2rem;"></i>
+                        <h2 style="font-family: var(--font-tech);">ACQUISITION COMPLETE</h2>
+                        <p style="color: var(--text-muted); margin: 1rem 0;">Transaction ID: #${id.substr(-8)}</p>
+                        <p style="margin-bottom: 2rem;">Hardware deployment initialized. An operative will contact you at your coordinates.</p>
+                        
+                        <button onclick="app.closeModal()" class="btn btn-primary" style="width: 100%;">Return to Command</button>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            // ============================================================
+            // SERVICE & SUPPORT (RESTRICTED)
+            // ============================================================
+
+            renderRaiseRequest: () => {
+                // 1. Check if user is logged in
+                if(!APP_STATE.user) {
+                    app.showToast("Security Alert: System access required for Support.");
+                    app.showAuth('login');
+                    return;
+                }
+
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;"><i class="fa-solid fa-headset"></i> RAISE SERVICE REQUEST</h2>
+                        
+                        <div class="form-group">
+                            <label class="label-tech">Request Category</label>
+                            <select id="req-type-select">
+                                <option value="Installation">New System Installation</option>
+                                <option value="Maintenance">Routine Maintenance</option>
+                                <option value="Fault">Hardware Fault / Issue</option>
+                                <option value="Upgrade">System Upgrade Query</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Deployment Address</label>
+                            <textarea id="req-addr-field" placeholder="Where is the system located?" rows="2" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Pincode</label>
+                            <input type="text" id="req-pin-field" placeholder="6-Digit Pin" maxlength="6">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label-tech">Detailed Intelligence (Message)</label>
+                            <textarea id="req-msg-field" placeholder="Describe the specific issue or requirement..." rows="4" required></textarea>
+                        </div>
+
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2rem;">
+                            Clicking submit will log this query to our database and initiate a WhatsApp handshake.
+                        </p>
+
+                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary" style="width: 100%; padding: 18px;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Query & Open WhatsApp
+                        </button>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            executeSubmitRequest: async () => {
+                const type = document.getElementById('req-type-select').value;
+                const msg = document.getElementById('req-msg-field').value;
+                const addr = document.getElementById('req-addr-field').value;
+                const pin = document.getElementById('req-pin-field').value;
+
+                if(!msg || !addr || !pin) {
+                    app.showToast("Validation Error: All fields mandatory.");
+                    return;
+                }
+
+                const fullMessage = `${msg}\n\n[Location Data]\nAddr: ${addr}\nPin: ${pin}`;
+
+                const data = {
+                    customerName: APP_STATE.user.name,
+                    email: APP_STATE.user.email,
+                    type: type,
+                    message: fullMessage
+                };
+
+                try {
+                    // 1. Log to Database
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    });
+
+                    if(res.ok) {
+                        // 2. Open WhatsApp
+                        const waText = `*NEW ${type.toUpperCase()} REQUEST*%0AFrom: ${APP_STATE.user.name}%0AEmail: ${APP_STATE.user.email}%0A-----------------%0A${encodeURIComponent(fullMessage)}`;
+                        window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
+                        
+                        app.showToast("Query Logged. Handshake initiated.");
+                        app.closeModal();
+                    }
+                } catch(e) { app.showToast("Server Request Failed"); }
+            },
+
+            // ============================================================
+            // ADMIN PORTAL & COMMAND LOGIC
+            // ============================================================
+
+            renderAdminPortal: async () => {
+                if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.renderShop();
+
+                try {
+                    app.showToast("Accessing Secure Database...");
+                    const [ordersRes, inventoryRes, queriesRes] = await Promise.all([
+                        fetch(`${COMMAND_CONFIG.API_BASE}/orders`),
+                        fetch(`${COMMAND_CONFIG.API_BASE}/products`),
+                        fetch(`${COMMAND_CONFIG.API_BASE}/admin/requests`)
+                    ]);
+
+                    APP_STATE.orders = await ordersRes.json();
+                    APP_STATE.inventory = await inventoryRes.json();
+                    if(queriesRes.ok) APP_STATE.queries = await queriesRes.json();
+
+                } catch(e) { console.error("Admin Load Failed"); }
+
+                const root = document.getElementById('app-root-view');
+                root.innerHTML = `
+                    <div class="admin-layout fade-in">
+                        <aside class="sidebar">
+                            <h3 style="font-family: var(--font-tech); margin-bottom: 2rem; padding: 0 10px; color: var(--primary);">COMMAND SYSTEM</h3>
+                            
+                            <button onclick="app.switchAdminTab('dashboard')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}">
+                                <i class="fa-solid fa-chart-line"></i> Analytics
+                            </button>
+                            <button onclick="app.switchAdminTab('orders')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}">
+                                <i class="fa-solid fa-folder-open"></i> Orders
+                            </button>
+                            <button onclick="app.switchAdminTab('queries')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}">
+                                <i class="fa-solid fa-headset"></i> Support Queries
+                            </button>
+                            <button onclick="app.switchAdminTab('inventory')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}">
+                                <i class="fa-solid fa-boxes-stacked"></i> Stock Control
+                            </button>
+                            
+                            <div style="margin-top: 4rem; padding: 0 10px;">
+                                <button onclick="app.renderShop()" class="btn btn-secondary" style="width:100%;">
+                                    <i class="fa-solid fa-house"></i> Exit Terminal
+                                </button>
+                            </div>
+                        </aside>
+
+                        <main class="admin-content">
+                            <div id="admin-tab-view">
+                                ${app.getTabContent(APP_STATE.currentAdminTab)}
+                            </div>
+                        </main>
                     </div>
                 `;
             },
 
             switchAdminTab: (tab) => {
-                state.activeAdminTab = tab;
-                app.renderAdmin(); 
+                APP_STATE.currentAdminTab = tab;
+                app.renderAdminPortal();
             },
 
-            getAdminContent: (tab) => {
-                const totalRevenue = state.orders.reduce((acc, o) => acc + (o.total||0), 0);
-                if (tab === 'dashboard') {
+            getTabContent: (tab) => {
+                const totalRevenue = APP_STATE.orders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+                // --- DASHBOARD TAB ---
+                if(tab === 'dashboard') {
                     return `
-                        <h1>Dashboard Overview</h1>
-                        <div class="stat-grid" style="margin-top:2rem;">
-                            <div class="stat-box"><div style="color:var(--text-muted); font-size:0.9rem;">TOTAL REVENUE</div><div class="text-gradient" style="font-size:2.5rem; font-weight:700;">₹${totalRevenue.toLocaleString('en-IN')}</div></div>
-                            <div class="stat-box"><div style="color:var(--text-muted); font-size:0.9rem;">TOTAL ORDERS</div><div style="font-size:2.5rem; font-weight:700;">${state.orders.length}</div></div>
-                            <div class="stat-box"><div style="color:var(--text-muted); font-size:0.9rem;">PRODUCTS LISTED</div><div style="font-size:2.5rem; font-weight:700;">${state.products.length}</div></div>
-                            <div class="stat-box"><div style="color:var(--text-muted); font-size:0.9rem;">OPEN QUERIES</div><div style="font-size:2.5rem; font-weight:700;">${state.requests.length}</div></div>
+                        <h1 style="font-family: var(--font-tech); margin-bottom: 3rem;">SYSTEM ANALYTICS</h1>
+                        <div class="stat-grid">
+                            <div class="stat-box">
+                                <div class="label-tech">Gross Acquisition Value</div>
+                                <div class="text-gradient" style="font-size: 3rem; font-weight: 900; font-family: var(--font-tech);">₹${totalRevenue.toLocaleString()}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="label-tech">Order Volume</div>
+                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.orders.length}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="label-tech">Active Support Tickets</div>
+                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.queries.filter(q => q.status !== 'Solved').length}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="label-tech">Hardware SKUs</div>
+                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.inventory.length}</div>
+                            </div>
                         </div>
                     `;
                 }
-                if (tab === 'orders') {
+
+                // --- ORDERS TAB ---
+                if(tab === 'orders') {
                     return `
-                        <h1>Order Management</h1>
-                        <div class="stat-box" style="margin-top:2rem; overflow-x:auto;">
+                        <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">ORDER LOGS</h1>
+                        <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
-                                <thead><tr><th>Date</th><th>Client</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                                <thead>
+                                    <tr><th>Date</th><th>Client</th><th>Details</th><th>Value</th><th>Status</th><th>Ops</th></tr>
+                                </thead>
                                 <tbody>
-                                    ${state.orders.map(o => `<tr><td>${new Date(o.date).toLocaleDateString()}</td><td>${o.customer}<br><span style="color:#666; font-size:0.8rem">${o.phone}</span></td><td style="color:var(--primary)">₹${o.total}</td><td>${o.status}</td><td>${o.status !== 'Delivered' ? `<button onclick="app.markDelivered('${o._id}')" class="btn btn-secondary" style="padding:5px; font-size:0.7rem;">Mark Delivered</button>` : '<i class="fa-solid fa-check" style="color:var(--success)"></i>'}</td></tr>`).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-                if (tab === 'queries') {
-                    return `
-                        <h1>Service Requests & Queries</h1>
-                        <div class="stat-box" style="margin-top:2rem; overflow-x:auto;">
-                            <table class="data-table">
-                                <thead><tr><th>Date</th><th>User</th><th>Message</th><th>Actions</th></tr></thead>
-                                <tbody>
-                                    ${state.requests.map(r => `
+                                    ${APP_STATE.orders.map(o => `
                                         <tr>
-                                            <td>${new Date(r.date).toLocaleDateString()}</td>
-                                            <td>${r.customerName}<br><small>${r.email}</small></td>
-                                            <td>${r.message}</td>
+                                            <td>${new Date(o.date).toLocaleDateString()}</td>
+                                            <td><strong>${o.customer}</strong><br><small>${o.phone}</small></td>
+                                            <td>${o.items.length} units</td>
+                                            <td style="color: var(--primary);">₹${o.total}</td>
+                                            <td><span class="badge ${o.status === 'Delivered' ? 'badge-solved' : 'badge-open'}">${o.status}</span></td>
                                             <td>
-                                                <button onclick="app.solveQuery('${r._id}')" class="btn btn-success" style="padding:5px 10px;">Solve</button>
-                                                <button onclick="app.deleteQuery('${r._id}')" class="btn btn-danger" style="padding:5px 10px;">Delete</button>
+                                                ${o.status !== 'Delivered' 
+                                                    ? `<button onclick="app.executeOrderDelivery('${o._id}')" class="btn btn-secondary" style="padding:5px 10px; font-size:0.7rem;">Deploy</button>` 
+                                                    : '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i>'
+                                                }
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -760,66 +1303,242 @@
                         </div>
                     `;
                 }
-                if (tab === 'inventory') {
+
+                // --- QUERIES TAB (UPDATED WORKFLOW) ---
+                if(tab === 'queries') {
                     return `
-                        <div style="display:flex; justify-content:space-between; align-items:center;"><h1>Inventory</h1><button onclick="app.openAddProductModal()" class="btn btn-primary">+ Add Product</button></div>
-                        <div class="stat-box" style="margin-top:2rem; overflow-x:auto;">
+                        <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">SUPPORT TICKETS</h1>
+                        <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
-                                <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead>
+                                <thead>
+                                    <tr><th>Date</th><th>Agent</th><th>Briefing</th><th>Status</th><th>Protocol</th></tr>
+                                </thead>
                                 <tbody>
-                                    ${state.products.map(p => `<tr><td><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td><td>${p.name}</td><td>${p.category}</td><td>₹${p.price}</td><td>${p.stock}</td></tr>`).join('')}
+                                    ${APP_STATE.queries.map(q => `
+                                        <tr class="${q.status === 'Solved' ? 'fade-in' : ''}">
+                                            <td>${new Date(q.date).toLocaleDateString()}</td>
+                                            <td><strong>${q.customerName}</strong><br><small>${q.email}</small></td>
+                                            <td><div style="max-width:300px; white-space:pre-wrap; font-size:0.85rem; font-family:monospace;">${q.message}</div></td>
+                                            <td><span class="badge ${q.status === 'Solved' ? 'badge-solved' : 'badge-open'}">${q.status}</span></td>
+                                            <td>
+                                                ${q.status !== 'Solved' 
+                                                    ? `<button onclick="app.executeSolveQuery('${q._id}')" class="btn btn-success" style="padding: 5px 15px; font-size: 0.7rem;">Mark Solved</button>`
+                                                    : `<button onclick="app.executeDeleteQuery('${q._id}')" class="btn btn-danger" style="padding: 5px 15px; font-size: 0.7rem;">Delete Log</button>`
+                                                }
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            ${APP_STATE.queries.length === 0 ? '<div style="padding:2rem; text-align:center; opacity:0.5;">No active tickets found.</div>' : ''}
+                        </div>
+                    `;
+                }
+
+                // --- INVENTORY TAB (EDITING ENABLED) ---
+                if(tab === 'inventory') {
+                    return `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+                            <h1 style="font-family: var(--font-tech);">HARDWARE RESERVE</h1>
+                            <button onclick="app.showAddProduct()" class="btn btn-primary">+ Register New Unit</button>
+                        </div>
+                        <div class="stat-box" style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Unit</th><th>Price</th><th>Reserve Stock</th><th>Category</th><th>Modify</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${APP_STATE.inventory.map(p => `
+                                        <tr>
+                                            <td><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; vertical-align:middle; margin-right:10px;"> <strong>${p.name}</strong></td>
+                                            <td>₹${p.price}</td>
+                                            <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--text-main)'}; font-weight: 800;">${p.stock}</td>
+                                            <td>${p.category}</td>
+                                            <td>
+                                                <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 5px 15px; font-size: 0.7rem;">
+                                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
                                 </tbody>
                             </table>
                         </div>
                     `;
                 }
+                return '';
             },
 
-            // --- ADMIN ACTIONS ---
-            markDelivered: async (id) => {
+            // --- ADMIN LOGIC ACTIONS ---
+
+            executeSolveQuery: async (id) => {
                 try {
-                    await fetch(`${CONFIG.API_URL}/orders/${id}/deliver`, { method: 'PATCH' });
-                    app.showToast("Status Updated");
-                    app.renderAdmin();
-                } catch(e) { app.showToast("Update Failed"); }
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}/solve`, { method: 'PATCH' });
+                    if(res.ok) {
+                        app.showToast("Status Updated: Solved");
+                        app.renderAdminPortal();
+                    }
+                } catch(e) { app.showToast("Operation Failed"); }
             },
 
-            solveQuery: async (id) => {
-                await fetch(`${CONFIG.API_URL}/requests/${id}/solve`, { method: 'PATCH' });
-                app.showToast("Marked as Solved");
-                app.renderAdmin();
+            executeDeleteQuery: async (id) => {
+                if(!confirm("Permenantly remove this record from command logs?")) return;
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}`, { method: 'DELETE' });
+                    if(res.ok) {
+                        app.showToast("Record Purged Successfully");
+                        app.renderAdminPortal();
+                    }
+                } catch(e) { app.showToast("Delete Operation Failed"); }
             },
 
-            deleteQuery: async (id) => {
-                await fetch(`${CONFIG.API_URL}/requests/${id}`, { method: 'DELETE' });
-                app.showToast("Request Deleted");
-                app.renderAdmin();
+            showAddProduct: () => {
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">REGISTER NEW HARDWARE</h2>
+                        <form id="add-product-form" onsubmit="app.executeAddProduct(event)">
+                            <div class="form-group">
+                                <label class="label-tech">Hardware Name</label>
+                                <input name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Acquisition Price (INR)</label>
+                                <input name="price" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Initial Reserve Quantity (Stock)</label>
+                                <input name="stock" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Classification (Category)</label>
+                                <input name="category" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Hardware Specs / Briefing</label>
+                                <textarea name="desc" required rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Schematic Upload (Image)</label>
+                                <input type="file" name="image" required style="padding: 10px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 18px;">Upload to Reserve</button>
+                        </form>
+                    </div>
+                `;
+                app.openModal(html);
             },
+
+            executeAddProduct: async (e) => {
+                e.preventDefault();
+                app.showToast("Uploading Hardware Data...");
+                const fd = new FormData(e.target);
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { method: 'POST', body: fd });
+                    if(res.ok) {
+                        app.showToast("Hardware Online.");
+                        app.closeModal();
+                        app.renderAdminPortal();
+                    }
+                } catch(err) { app.showToast("Database Write Error"); }
+            },
+
+            showEditProduct: (p) => {
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">MODIFY HARDWARE UNIT</h2>
+                        <form onsubmit="app.executeEditProduct(event, '${p._id}')">
+                            <div class="form-group">
+                                <label class="label-tech">Unit Name</label>
+                                <input name="name" value="${p.name}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Unit Price (INR)</label>
+                                <input name="price" type="number" value="${p.price}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Current Reserve (Stock)</label>
+                                <input name="stock" type="number" value="${p.stock}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Classification</label>
+                                <input name="category" value="${p.category}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Unit Specifications</label>
+                                <textarea name="desc" required rows="3">${p.desc}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Replace Schematic (Optional Image)</label>
+                                <input type="file" name="image" style="padding: 10px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 18px;">Apply Modifications</button>
+                        </form>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            executeEditProduct: async (e, id) => {
+                e.preventDefault();
+                app.showToast("Applying System Changes...");
+                const fd = new FormData(e.target);
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'PUT', body: fd });
+                    if(res.ok) {
+                        app.showToast("Modifications Authenticated.");
+                        app.closeModal();
+                        app.renderAdminPortal();
+                    }
+                } catch(err) { app.showToast("Update Failed"); }
+            },
+
+            executeOrderDelivery: async (id) => {
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
+                    if(res.ok) { app.showToast("Order Status: Deployed"); app.renderAdminPortal(); }
+                } catch(e) { app.showToast("Deployment Error"); }
+            },
+
+            // ============================================================
+            // PROFILE & AUTH LOGIC
+            // ============================================================
 
             renderProfile: async () => {
-                const root = document.getElementById('app-root');
-                let myOrders = [];
+                const root = document.getElementById('app-root-view');
+                let orders = [];
                 try {
-                    const res = await fetch(`${CONFIG.API_URL}/my-orders?email=${state.user.email}`);
-                    if(res.ok) myOrders = await res.json();
-                } catch(e){}
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/my-orders?email=${APP_STATE.user.email}`);
+                    if(res.ok) orders = await res.json();
+                } catch(e) {}
 
                 root.innerHTML = `
-                    <div class="container animate-enter" style="max-width:800px;">
-                        <h1 style="margin-bottom:2rem;">Agent Profile: ${state.user.name}</h1>
+                    <div class="container animate-enter" style="max-width: 900px; padding: 5rem 2rem;">
+                        <h1 style="font-family: var(--font-tech); margin-bottom: 1rem;">AGENT PROFILE</h1>
+                        <p style="color: var(--primary); font-weight: 700; margin-bottom: 3rem;">AUTHORIZED PERSONNEL ONLY</p>
+                        
+                        <div class="stat-box" style="margin-bottom: 3rem; background: rgba(255,255,255,0.02);">
+                            <h3 style="margin-bottom: 20px;">Personal Briefing</h3>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div><span class="label-tech">Full Name</span><div style="font-size: 1.2rem;">${APP_STATE.user.name}</div></div>
+                                <div><span class="label-tech">Encryption Email</span><div style="font-size: 1.2rem;">${APP_STATE.user.email}</div></div>
+                            </div>
+                        </div>
+
                         <div class="stat-box">
-                            <h3 style="margin-bottom:1rem; color:var(--primary);">Order History</h3>
-                            ${myOrders.length === 0 ? '<p>No acquisitions recorded.</p>' : 
-                                myOrders.map(o => `
-                                    <div style="border-bottom:1px solid var(--border); padding:1rem 0;">
-                                        <div style="display:flex; justify-content:space-between;">
-                                            <strong>#${o._id.substr(-6)}</strong>
-                                            <span>${new Date(o.date).toLocaleDateString()}</span>
+                            <h3 style="margin-bottom: 20px;">Deployment History (Orders)</h3>
+                            ${orders.length === 0 ? '<p style="opacity: 0.5;">No system acquisitions recorded.</p>' : 
+                                orders.map(o => `
+                                    <div style="border-bottom: 1px solid var(--border); padding: 20px 0;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                            <div>
+                                                <div style="font-family: var(--font-tech); color: var(--primary);">ORDER #${o._id.substr(-8)}</div>
+                                                <div style="font-size: 0.9rem; opacity: 0.7;">${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-weight: 800;">₹${o.total.toLocaleString()}</div>
+                                                <div class="badge ${o.status === 'Delivered' ? 'badge-solved' : 'badge-open'}">${o.status}</div>
+                                            </div>
                                         </div>
-                                        <div style="color:var(--text-muted); font-size:0.9rem; margin:5px 0;">
-                                            ${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
-                                        </div>
-                                        <div style="text-align:right; font-weight:bold;">₹${o.total}</div>
                                     </div>
                                 `).join('')
                             }
@@ -828,375 +1547,150 @@
                 `;
             },
 
-            // --- ACTIONS ---
+            showAuth: (mode = 'login') => {
+                let content = '';
+                if(mode === 'login') {
+                    content = `
+                        <form onsubmit="app.handleLogin(event)">
+                            <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">TERMINAL ACCESS</h2>
+                            <div class="form-group">
+                                <label class="label-tech">Identifier (Email)</label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Secure Passcode</label>
+                                <input type="password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Verify Credentials</button>
+                            <p style="text-align:center; margin-top: 1.5rem; font-size: 0.9rem; opacity:0.7;">
+                                New Operative? <a href="#" onclick="app.showAuth('register')" style="color: var(--primary);">Register Unit</a>
+                            </p>
+                        </form>
+                    `;
+                } else if (mode === 'register') {
+                    content = `
+                        <form onsubmit="app.handleRegister(event)">
+                            <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">OPERATIVE REGISTRATION</h2>
+                            <div class="form-group">
+                                <label class="label-tech">Legal Name</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Email Contact</label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label-tech">Establish Passcode</label>
+                                <input type="password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Initiate Verification</button>
+                        </form>
+                    `;
+                } else if (mode === 'verify') {
+                    content = `
+                        <form onsubmit="app.handleVerifyOTP(event)">
+                            <h2 style="font-family: var(--font-tech); margin-bottom: 1rem;">OTP AUTHENTICATION</h2>
+                            <p style="color: var(--text-muted); margin-bottom: 2rem; text-align: center;">Enter the 6-digit code sent to your encrypted line.</p>
+                            <input type="text" name="otp" placeholder="000000" maxlength="6" style="text-align: center; font-size: 2rem; letter-spacing: 10px;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Finalize Identity</button>
+                        </form>
+                    `;
+                }
+
+                app.openModal(`<div class="fade-in">${content}</div>`);
+            },
+
             handleLogin: async (e) => {
                 e.preventDefault();
-                const formData = Object.fromEntries(new FormData(e.target));
+                app.showToast("Authenticating...");
+                const fd = Object.fromEntries(new FormData(e.target));
                 try {
-                    const res = await fetch(`${CONFIG.API_URL}/login`, {
-                        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(formData)
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/login`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
                     });
                     const data = await res.json();
                     if(res.ok) {
-                        state.user = data;
+                        APP_STATE.user = data;
                         sessionStorage.setItem('user', JSON.stringify(data));
-                        app.showToast(`Welcome, Agent ${data.name}`);
+                        app.showToast("Signed in. No limits."); // CUSTOM SUCCESS MESSAGE
+                        app.closeModal();
                         app.init();
                     } else {
-                        app.showToast("Access Denied: " + data.error);
+                        app.showToast(data.error || "Access Denied");
                     }
-                } catch(err) { app.showToast("Connection Failed"); }
+                } catch(e) { app.showToast("Connection Interrupted"); }
             },
 
             handleRegister: async (e) => {
                 e.preventDefault();
-                const formData = Object.fromEntries(new FormData(e.target));
-                state.tempEmail = formData.email; 
+                app.showToast("Transmitting Protocol...");
+                const fd = Object.fromEntries(new FormData(e.target));
+                APP_STATE.registrationEmail = fd.email;
                 try {
-                    const res = await fetch(`${CONFIG.API_URL}/register`, {
-                        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(formData)
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/register`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
                     });
                     if(res.ok) {
-                        app.showToast("OTP Sent to Email");
-                        app.renderAuth('verify');
+                        app.showToast("OTP Transmitted to Email.");
+                        app.showAuth('verify');
                     } else {
                         const data = await res.json();
-                        app.showToast(data.error || "Registration Error");
+                        app.showToast(data.error);
                     }
-                } catch(err) { app.showToast("Registration Error"); }
+                } catch(e) { app.showToast("Registration Failed"); }
             },
 
             handleVerifyOTP: async (e) => {
                 e.preventDefault();
                 const otp = e.target.otp.value;
                 try {
-                    const res = await fetch(`${CONFIG.API_URL}/verify-otp`, {
-                        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email: state.tempEmail, otp: otp })
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: APP_STATE.registrationEmail, otp })
                     });
                     if(res.ok) {
-                        app.showToast("Verified! Please Login.");
-                        app.renderAuth('login');
+                        app.showToast("Agent Verified. Proceed to Login.");
+                        app.showAuth('login');
                     } else {
-                        const data = await res.json();
-                        app.showToast(data.error || "Invalid OTP");
+                        app.showToast("Checksum Invalid (Incorrect OTP)");
                     }
-                } catch(err) { app.showToast("Verification Error"); }
+                } catch(e) { app.showToast("Verification Logic Failure"); }
             },
 
-            logout: () => {
+            executeLogout: () => {
                 sessionStorage.removeItem('user');
-                state.user = null;
-                state.cart = [];
+                APP_STATE.user = null;
+                APP_STATE.cart = [];
+                app.showToast("Session Terminated Safely.");
                 app.init();
-                app.showToast("Logged Out");
             },
 
-            // --- CART & MODALS ---
-            toggleCart: () => {
-                const panel = document.getElementById('cart-panel');
-                if(panel.classList.contains('open')) {
-                    panel.classList.remove('open');
-                } else {
-                    app.renderCartItems();
-                    panel.classList.add('open');
-                }
-            },
-
-            addToCart: (id) => {
-                if(!state.user) {
-                    app.showToast("Login required for purchase");
-                    app.renderAuth();
-                    app.closeModal();
-                    return;
-                }
-                const p = state.products.find(x => x._id === id);
-                const qtyInput = document.getElementById('buy-qty');
-                const qty = qtyInput ? parseInt(qtyInput.value) : 1;
-
-                if (qty > p.stock) return app.showToast("Not enough stock!");
-
-                // Check if item exists in cart
-                const existing = state.cart.find(item => item._id === id);
-                if (existing) {
-                    if (existing.qty + qty > p.stock) return app.showToast("Stock limit reached!");
-                    existing.qty += qty;
-                } else {
-                    state.cart.push({ ...p, qty });
-                }
-
-                document.getElementById('cart-count').innerText = state.cart.length;
-                app.showToast(`${p.name} Added`);
-                app.closeModal();
-            },
-
-            renderCartItems: () => {
-                const container = document.getElementById('cart-items');
-                if(state.cart.length === 0) {
-                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:#666;"><i class="fa-solid fa-basket-shopping" style="font-size:2rem;"></i><br>Empty</div>`;
-                    document.getElementById('cart-total').innerText = "₹0";
-                    return;
-                }
-                let total = 0;
-                container.innerHTML = state.cart.map((item, index) => {
-                    const itemTotal = item.price * item.qty;
-                    total += itemTotal;
-                    return `
-                        <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <div style="font-weight:600;">${item.name} <span style="font-size:0.8rem; color:#888;">(x${item.qty})</span></div>
-                                <div style="font-size:0.8rem; color:var(--primary);">₹${item.price}</div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <span style="font-weight:bold;">₹${itemTotal}</span>
-                                <button onclick="app.removeFromCart(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('cart-total').innerText = "Total: ₹" + total.toLocaleString('en-IN');
-            },
-
-            removeFromCart: (index) => {
-                state.cart.splice(index, 1);
-                document.getElementById('cart-count').innerText = state.cart.length;
-                app.renderCartItems();
-            },
-
-            // --- SERVICE REQUESTS (With Address Capture) ---
-            renderRaiseRequest: () => {
-                const html = `
-                    <h2>Raise Request</h2>
-                    <select id="req-type">
-                        <option value="Service">Service Request</option>
-                        <option value="Issue">Report an Issue</option>
-                    </select>
-                    
-                    <input type="tel" id="req-phone" placeholder="Mobile Number" required>
-                    <textarea id="req-address" placeholder="Address (Area, Street, Landmark)" rows="2" required></textarea>
-                    <input type="text" id="req-pincode" placeholder="Pincode" maxlength="6" required>
-                    
-                    <textarea id="req-msg" rows="3" placeholder="Describe your requirement or issue..."></textarea>
-                    <button onclick="app.submitRequest()" class="btn btn-primary" style="width:100%">Submit Request</button>
-                `;
-                app.openModalContent(html);
-            },
-
-            submitRequest: async () => {
-                const type = document.getElementById('req-type').value;
-                const msg = document.getElementById('req-msg').value;
-                const phone = document.getElementById('req-phone').value;
-                const address = document.getElementById('req-address').value;
-                const pincode = document.getElementById('req-pincode').value;
-
-                if(!phone || !address || !pincode || !msg) return app.showToast("Please fill all details");
-                
-                // Pack details into message string to fit existing backend schema
-                const fullMessage = `${msg}\n\n[Contact Details]\nPhone: ${phone}\nAddress: ${address}\nPincode: ${pincode}`;
-
-                const data = {
-                    customerName: state.user?.name || 'Guest',
-                    email: state.user?.email || 'N/A',
-                    type: type,
-                    message: fullMessage
-                };
-
+            postFieldReport: async (id) => {
+                const comment = document.getElementById('review-comment-field').value;
+                if(!comment) return;
                 try {
-                    await fetch(`${CONFIG.API_URL}/requests`, {
-                        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
                     });
-                    
-                    const waText = `*NEW ${type.toUpperCase()}*%0AFrom: ${data.customerName}%0AEmail: ${data.email}%0AMessage: ${fullMessage}`;
-                    window.open(`https://wa.me/${CONFIG.ADMIN_PHONE}?text=${waText}`);
-                    app.showToast("Request sent");
-                    app.closeModal();
-                } catch(e) { app.showToast("Error sending request"); }
+                    app.showToast("Field Report Logged.");
+                    app.syncInventory().then(() => app.viewProductDetails(id));
+                } catch(e) {}
             },
 
-            // --- CHECKOUT ---
-            checkout: () => {
-                if(state.cart.length === 0) return;
-                app.toggleCart(); 
-                const total = state.cart.reduce((a,b)=>a+(b.price*b.qty), 0);
-                
-                const html = `
-                    <h2 style="margin-bottom:1.5rem;">Shipping Details</h2>
-                    <form id="checkout-form">
-                        <input type="text" value="${state.user.name}" readonly style="opacity:0.6">
-                        <input type="tel" id="c-phone" placeholder="Mobile Number" required>
-                        <textarea id="c-address" placeholder="Delivery Address" rows="3" required></textarea>
-                        <input type="text" id="c-pincode" placeholder="6-Digit Pincode" maxlength="6" required>
-                        
-                        <div style="margin: 1rem 0; font-weight:bold; font-size:1.2rem; border-top:1px solid var(--border); padding-top:10px;">
-                            Total: <span style="color:var(--primary)">₹${total.toLocaleString('en-IN')}</span>
-                        </div>
-                        
-                        <button type="button" onclick="app.processPayment(${total})" class="btn btn-primary" style="width:100%">Proceed to Payment</button>
-                    </form>
-                `;
-                app.openModalContent(html);
-            },
+            // ============================================================
+            // UTILITIES
+            // ============================================================
 
-            processPayment: async (amount) => {
-                const phone = document.getElementById('c-phone').value;
-                const address = document.getElementById('c-address').value;
-                const pincode = document.getElementById('c-pincode').value;
-                
-                if(!phone || !address || !pincode) return app.showToast("Please fill all details");
-
-                try {
-                    const res = await fetch(`${CONFIG.API_URL}/create-order`, {
-                        method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount })
-                    });
-                    const orderData = await res.json();
-
-                    const options = {
-                        "key": CONFIG.RAZORPAY_KEY,
-                        "amount": orderData.amount,
-                        "currency": "INR",
-                        "name": "BNG Security",
-                        "description": "Surveillance Equipment",
-                        "order_id": orderData.id,
-                        "handler": function (response){
-                            app.verifyPayment(response, amount, phone, address, pincode);
-                        },
-                        "theme": { "color": "#f59e0b" },
-                        "prefill": {
-                            "name": state.user.name,
-                            "email": state.user.email,
-                            "contact": phone
-                        }
-                    };
-                    const rzp = new Razorpay(options);
-                    rzp.open();
-                    app.closeModal();
-                } catch(e) { app.showToast("Payment Initialization Failed"); }
-            },
-
-            verifyPayment: async (response, amount, phone, address, pincode) => {
-                try {
-                    const items = [...state.cart];
-                    const res = await fetch(`${CONFIG.API_URL}/verify-payment`, {
-                        method: 'POST', headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({
-                            orderCreationId: response.razorpay_order_id,
-                            razorpayPaymentId: response.razorpay_payment_id,
-                            razorpaySignature: response.razorpay_signature,
-                            customerDetails: {
-                                name: state.user.name, email: state.user.email,
-                                phone, address, pincode, items, total: amount
-                            }
-                        })
-                    });
-                    
-                    if(res.ok) {
-                        state.cart = []; 
-                        document.getElementById('cart-count').innerText = 0;
-                        app.renderSuccess(response.razorpay_order_id, amount, items);
-                        app.fetchProducts(); // Refresh stock data
-                    }
-                } catch(e) { app.showToast("Verification Error"); }
-            },
-
-            renderSuccess: (orderId, total, items) => {
-                const itemList = items.map(i => `%E2%80%A2 ${i.qty}x ${i.name}`).join('%0A');
-                const waText = `*NEW ORDER ALERT*%0A------------------%0AID: ${orderId}%0ACustomer: ${state.user.name}%0ATotal: Rs.${total}%0A------------------%0AItems:%0A${itemList}`;
-                const html = `
-                    <div style="text-align:center; padding:1rem;">
-                        <i class="fa-solid fa-circle-check" style="font-size:4rem; color:var(--success); margin-bottom:1rem;"></i>
-                        <h2>Order Confirmed</h2>
-                        <p style="color:#aaa; margin-bottom:2rem;">ID: #${orderId}</p>
-                        <a href="https://wa.me/${CONFIG.ADMIN_PHONE}?text=${waText}" target="_blank" class="btn btn-whatsapp" style="width:100%; text-decoration:none;">
-                            <i class="fa-brands fa-whatsapp"></i> Notify Admin
-                        </a>
-                        <button onclick="app.closeModal()" class="btn btn-secondary" style="width:100%; margin-top:10px;">Close</button>
-                    </div>
-                `;
-                app.openModalContent(html);
-            },
-
-            // --- PRODUCT MODALS ---
-            openProductModal: (id) => {
-                const p = state.products.find(x => x._id === id);
-                const html = `
-                    <img src="${p.image}" style="width:100%; height:200px; object-fit:contain; background:#000; border-radius:10px; margin-bottom:1rem;">
-                    <div class="tag">${p.category}</div>
-                    <h2>${p.name}</h2>
-                    <h3 style="color:var(--primary); margin: 0.5rem 0;">₹${p.price.toLocaleString('en-IN')}</h3>
-                    <p style="color:#ccc; line-height:1.6; margin-bottom:1.5rem;">${p.desc}</p>
-                    <p style="margin-bottom:1rem;">Stock Available: <strong>${p.stock}</strong></p>
-                    
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
-                        <label>Quantity:</label>
-                        <input type="number" id="buy-qty" value="1" min="1" max="${p.stock}" style="width:80px; margin:0;">
-                    </div>
-
-                    <button onclick='app.addToCart("${p._id}")' class="btn btn-primary" style="width:100%">Add to Cart</button>
-                    
-                    <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1rem;">
-                        <h4>Field Reports (Reviews)</h4>
-                        <div style="max-height:150px; overflow-y:auto; margin:1rem 0;">
-                            ${p.reviews && p.reviews.length ? p.reviews.map(r => `
-                                <div style="background:#222; padding:8px; border-radius:6px; margin-bottom:8px; font-size:0.9rem;">
-                                    <span style="color:var(--primary)">${r.user}:</span> ${r.comment}
-                                </div>
-                            `).join('') : '<span style="color:#666">No reports filed.</span>'}
-                        </div>
-                        ${state.user ? `
-                            <form onsubmit="app.submitReview(event, '${p._id}')" style="display:flex; gap:10px; margin-top:10px;">
-                                <input name="comment" placeholder="Write report..." style="margin:0; padding:8px;">
-                                <button class="btn btn-secondary" style="padding:0 15px;"><i class="fa-solid fa-paper-plane"></i></button>
-                            </form>
-                        ` : ''}
-                    </div>
-                `;
-                app.openModalContent(html);
-            },
-
-            submitReview: async (e, id) => {
-                e.preventDefault();
-                const comment = e.target.comment.value;
-                try {
-                    await fetch(`${CONFIG.API_URL}/review/${id}`, {
-                        method:'POST', headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({user: state.user.name, comment})
-                    });
-                    app.showToast("Review Logged");
-                    app.fetchProducts().then(() => app.openProductModal(id)); 
-                } catch(e){}
-            },
-
-            openAddProductModal: () => {
-                const html = `
-                    <h2>Add Hardware</h2>
-                    <form onsubmit="app.handleAddProduct(event)">
-                        <input type="text" name="name" placeholder="Product Name" required>
-                        <input type="number" name="price" placeholder="Price" required>
-                        <input type="number" name="stock" placeholder="Stock Quantity" required>
-                        <input type="text" name="category" placeholder="Category" required>
-                        <textarea name="desc" placeholder="Specs/Description" required></textarea>
-                        <input type="file" name="image" required style="padding:10px;">
-                        <button class="btn btn-primary" style="width:100%">Upload to Database</button>
-                    </form>
-                `;
-                app.openModalContent(html);
-            },
-
-            handleAddProduct: async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                try {
-                    await fetch(`${CONFIG.API_URL}/products`, {method:'POST', body:formData});
-                    app.showToast("Hardware Added");
-                    app.closeModal();
-                    app.renderAdmin();
-                } catch(e){ app.showToast("Upload Error"); }
-            },
-
-            openModalContent: (html) => {
-                const overlay = document.getElementById('modal-overlay');
-                const body = document.getElementById('modal-body');
-                body.innerHTML = html;
-                overlay.classList.add('active');
+            openModal: (html) => {
+                document.getElementById('modal-body-content').innerHTML = html;
+                document.getElementById('modal-overlay').classList.add('active');
             },
 
             closeModal: () => {
@@ -1207,14 +1701,16 @@
                 const t = document.getElementById('toast');
                 t.innerText = msg;
                 t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 3000);
+                setTimeout(() => t.classList.remove('show'), 3500);
             }
         };
 
+        // EVENT LISTENERS
         document.getElementById('modal-overlay').addEventListener('click', (e) => {
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
 
+        // BOOT THE ENGINE
         window.onload = app.init;
     </script>
 </body>
