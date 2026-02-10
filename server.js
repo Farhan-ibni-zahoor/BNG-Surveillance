@@ -9,7 +9,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
-const nodemailer = require('nodemailer'); // Now Active
+const nodemailer = require('nodemailer'); 
 
 // 2. CONFIGURATION
 const app = express();
@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema({
     name: String,
     email: { type: String, unique: true },
     password: { type: String, required: false },
-    isVerified: { type: Boolean, default: false }, // Default is false
+    isVerified: { type: Boolean, default: false }, 
     otp: String,
     role: { type: String, default: 'customer' }
 });
@@ -100,36 +100,29 @@ const upload = multer({ storage: storage });
 
 // --- ROUTES ---
 
-// AUTH: REGISTER (FIXED TO HANDLE UNVERIFIED USERS)
+// AUTH: REGISTER (Includes Logic to Resend OTP for Unverified Users)
 app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
     try {
         let user = await User.findOne({ email });
 
-        // Case 1: User exists AND is already verified -> Block them
+        // Block if user is already verified
         if (user && user.isVerified) {
             return res.status(400).json({ error: "Email already registered" });
         }
 
-        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Case 2: User exists but NOT verified -> Update them (Resend OTP)
+        // If user exists but is NOT verified, update them
         if (user && !user.isVerified) {
             user.name = name;
             user.password = password;
             user.otp = otp;
             await user.save();
         } 
-        // Case 3: New User -> Create them
+        // Create new user
         else {
-            user = new User({ 
-                name, 
-                email, 
-                password, 
-                otp, 
-                isVerified: false 
-            });
+            user = new User({ name, email, password, otp, isVerified: false });
             await user.save();
         }
 
@@ -144,15 +137,12 @@ app.post('/api/register', async (req, res) => {
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log("Email Error:", error);
-                return res.status(500).json({ error: "Error sending email. Check server logs." });
+                return res.status(500).json({ error: "Error sending email." });
             }
             res.json({ message: "Verification code sent to email." });
         });
 
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Registration Failed" });
-    }
+    } catch (err) { res.status(500).json({ error: "Registration Failed" }); }
 });
 
 // AUTH: VERIFY OTP
@@ -165,40 +155,32 @@ app.post('/api/verify-otp', async (req, res) => {
 
         if (user.otp === otp) {
             user.isVerified = true;
-            user.otp = null; // Clear OTP after usage
+            user.otp = null; 
             await user.save();
-            res.json({ message: "Email verified successfully. You can now login." });
+            res.json({ message: "Email verified successfully." });
         } else {
             res.status(400).json({ error: "Invalid OTP" });
         }
-    } catch (e) {
-        res.status(500).json({ error: "Verification failed" });
-    }
+    } catch (e) { res.status(500).json({ error: "Verification failed" }); }
 });
 
-// AUTH: LOGIN (UPDATED TO CHECK VERIFICATION)
+// AUTH: LOGIN
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
     // Admin Override
     if(email === "bngsurveillance@gmail.com" && password === "Surveillance@0627") {
-        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "6006750581" }); 
+        return res.json({ name: "Farhan (Admin)", email, role: "author", phone: "916006750581" }); 
     }
     
     try {
         const user = await User.findOne({ email, password });
         if(!user) return res.status(401).json({ error: "Invalid Credentials" });
-
-        // Check if verified
-        if(!user.isVerified) {
-            return res.status(403).json({ error: "Account not verified. Please verify OTP." });
-        }
+        if(!user.isVerified) return res.status(403).json({ error: "Account not verified. Verify OTP." });
 
         res.json(user);
     } catch (e) { res.status(500).json({ error: "Server Error" }); }
 });
-
-// ... (KEEP ALL OTHER ROUTES THE SAME: Products, Orders, Requests, Razorpay) ...
 
 // PRODUCTS: GET ALL
 app.get('/api/products', async (req, res) => {
@@ -277,29 +259,47 @@ app.post('/api/verify-payment', async (req, res) => {
     } catch (error) { res.status(500).json({ error: "Verification Error" }); }
 });
 
-// ADMIN & REQUEST ROUTES
+// --- ADMIN & REQUEST ROUTES ---
+
+// Submit a Request (User)
 app.post('/api/requests', async (req, res) => {
     try {
         const newRequest = new Request(req.body);
         await newRequest.save();
         res.json(newRequest);
-    } catch (e) { res.status(500).json({ error: "Error" }); }
+    } catch (e) { res.status(500).json({ error: "Error saving request" }); }
 });
 
+// Get All Requests (Admin - NEW ROUTE)
+app.get('/api/admin/requests', async (req, res) => {
+    try {
+        const requests = await Request.find().sort({ date: -1 });
+        res.json(requests);
+    } catch (e) { res.status(500).json({ error: "Fetch Error" }); }
+});
+
+// Get All Orders (Admin)
 app.get('/api/orders', async (req, res) => {
     const orders = await Order.find().sort({ date: -1 });
     res.json(orders);
 });
 
+// Update Order Status (Admin)
 app.patch('/api/orders/:id/deliver', async (req, res) => {
     await Order.findByIdAndUpdate(req.params.id, { status: 'Delivered' });
     res.json({ message: "Order marked as delivered" });
 });
 
+// Get My Orders (User)
 app.get('/api/my-orders', async (req, res) => {
     const { email } = req.query;
     const orders = await Order.find({ email }).sort({ date: -1 });
     res.json(orders);
 });
 
-app.listen(PORT, () => console.log(`🚀 BNG Server Active on Port ${PORT}`));
+// --- SERVER STARTUP (OPTIMIZED FOR VERCEL) ---
+module.exports = app;
+
+if (require.main === module) {
+    app.listen(PORT, () => console.log(`🚀 BNG Server Active on Port ${PORT}`));
+}
