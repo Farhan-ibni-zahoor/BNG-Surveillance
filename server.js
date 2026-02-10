@@ -28,7 +28,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// 5. EMAIL CONFIGURATION (NODEMAILER)
+// 5. EMAIL CONFIGURATION (With Improved Error Handling)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -36,6 +36,16 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
+
+// Helper function to send emails safely
+const sendEmail = async (to, subject, text) => {
+    try {
+        await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, text });
+        console.log(`✅ Email sent to ${to}`);
+    } catch (error) {
+        console.error(`❌ Email Failed to ${to}:`, error.message);
+    }
+};
 
 // 6. DATABASE CONNECTION
 const DB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/bng-surveillance';
@@ -59,10 +69,11 @@ const UserSchema = new mongoose.Schema({
 });
 
 const ProductSchema = new mongoose.Schema({
-    name: String,
-    category: String,
-    price: Number,
-    image: String,
+    name: String, 
+    category: String, 
+    price: Number, 
+    stock: { type: Number, default: 0 }, // NEW: Stock field
+    image: String, 
     desc: String,
     reviews: [{ user: String, comment: String, date: { type: Date, default: Date.now } }]
 });
@@ -86,7 +97,7 @@ const RequestSchema = new mongoose.Schema({
     email: String,
     type: String,
     message: String,
-    status: { type: String, default: 'Open' },
+    status: { type: String, default: 'Open' }, // Track status (Open/Solved)
     date: { type: Date, default: Date.now }
 });
 
@@ -121,18 +132,8 @@ app.post('/api/register', async (req, res) => {
             await user.save();
         }
 
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Verify Your Account - BNG Surveillance',
-            text: `Your Verification OTP is: ${otp}`
-        }, (error, info) => {
-            if (error) {
-                console.log("Email Error:", error);
-                return res.status(500).json({ error: "Error sending email." });
-            }
-            res.json({ message: "Verification code sent to email." });
-        });
+        await sendEmail(email, 'Verify Your Account - BNG Surveillance', `Your Verification OTP is: ${otp}`);
+        res.json({ message: "Verification code sent to email." });
 
     } catch (err) { res.status(500).json({ error: "Registration Failed" }); }
 });
@@ -182,7 +183,7 @@ app.get('/api/products', async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// PRODUCTS: ADD NEW (Admin)
+// PRODUCTS: ADD NEW (With Stock)
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: "No image file uploaded" });
@@ -192,10 +193,15 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
             async (error, result) => {
                 if (error) return res.status(500).json({ error: "Cloudinary Upload Failed" });
 
-                const { name, category, price, desc } = req.body;
+                const { name, category, price, desc, stock } = req.body;
                 const newProduct = new Product({ 
-                    name, category, price: Number(price), 
-                    image: result.secure_url, desc, reviews: [] 
+                    name, 
+                    category, 
+                    price: Number(price), 
+                    stock: Number(stock), // Save stock from request
+                    image: result.secure_url, 
+                    desc, 
+                    reviews: [] 
                 });
                 await newProduct.save();
                 res.json(newProduct);
@@ -227,13 +233,24 @@ app.post('/api/create-order', async (req, res) => {
     } catch (error) { res.status(500).json({ error: "Razorpay Error" }); }
 });
 
-// --- VERIFY PAYMENT (AND NOTIFY ADMIN) ---
+// VERIFY PAYMENT & DEDUCT STOCK
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
     try {
         const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
         shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
         if (shasum.digest("hex") !== razorpaySignature) return res.status(400).json({ message: "Invalid Transaction" });
+
+        // DEDUCT STOCK LOGIC
+        // We loop through items bought and reduce their stock count in the DB
+        if (customerDetails.items && customerDetails.items.length > 0) {
+            for (const item of customerDetails.items) {
+                // Assuming item has _id and qty
+                if(item._id && item.qty) {
+                    await Product.findByIdAndUpdate(item._id, { $inc: { stock: -item.qty } });
+                }
+            }
+        }
 
         const newOrder = new Order({
             razorpay_order_id: orderCreationId,
@@ -249,20 +266,17 @@ app.post('/api/verify-payment', async (req, res) => {
         });
         await newOrder.save();
 
-        // 🔔 NOTIFY ADMIN VIA EMAIL (INSTANT ALERT)
-        const itemList = customerDetails.items.map(i => `${i.name} (Rs.${i.price})`).join(', ');
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Sends email to yourself (Admin)
-            subject: `💰 NEW ORDER: ₹${customerDetails.total} - ${customerDetails.name}`,
-            text: `YOU HAVE A NEW ORDER!\n\nName: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}\n\nItems:\n${itemList}\n\nTotal: Rs.${customerDetails.total}\n\nCheck Admin Dashboard for details.`
-        });
+        // NOTIFY ADMIN
+        const itemList = customerDetails.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+        await sendEmail(process.env.EMAIL_USER, `💰 NEW ORDER: ₹${customerDetails.total} - ${customerDetails.name}`, 
+            `YOU HAVE A NEW ORDER!\n\nName: ${customerDetails.name}\nItems: ${itemList}\nTotal: Rs.${customerDetails.total}\n\nCheck Admin Dashboard.`
+        );
 
         res.json({ message: "Payment Successful", orderId: newOrder._id });
     } catch (error) { res.status(500).json({ error: "Verification Error" }); }
 });
 
-// --- ADMIN & REQUEST ROUTES (AND NOTIFY ADMIN) ---
+// --- ADMIN & REQUEST ROUTES ---
 
 // Submit a Request (User)
 app.post('/api/requests', async (req, res) => {
@@ -270,13 +284,10 @@ app.post('/api/requests', async (req, res) => {
         const newRequest = new Request(req.body);
         await newRequest.save();
 
-        // 🔔 NOTIFY ADMIN VIA EMAIL (INSTANT ALERT)
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Sends email to yourself (Admin)
-            subject: `🔔 NEW ${req.body.type.toUpperCase()} REQUEST`,
-            text: `YOU HAVE A NEW REQUEST!\n\nFrom: ${req.body.customerName}\nEmail: ${req.body.email}\n\nDetails:\n${req.body.message}\n\nCheck Admin Dashboard for details.`
-        });
+        // NOTIFY ADMIN
+        await sendEmail(process.env.EMAIL_USER, `🔔 NEW ${req.body.type.toUpperCase()} REQUEST`, 
+            `YOU HAVE A NEW REQUEST!\n\nFrom: ${req.body.customerName}\nEmail: ${req.body.email}\n\nDetails:\n${req.body.message}`
+        );
 
         res.json(newRequest);
     } catch (e) { res.status(500).json({ error: "Error saving request" }); }
@@ -288,6 +299,22 @@ app.get('/api/admin/requests', async (req, res) => {
         const requests = await Request.find().sort({ date: -1 });
         res.json(requests);
     } catch (e) { res.status(500).json({ error: "Fetch Error" }); }
+});
+
+// Delete Request (Admin - NEW)
+app.delete('/api/requests/:id', async (req, res) => {
+    try {
+        await Request.findByIdAndDelete(req.params.id);
+        res.json({ message: "Request Deleted" });
+    } catch (e) { res.status(500).json({ error: "Delete failed" }); }
+});
+
+// Mark Request Solved (Admin - NEW)
+app.patch('/api/requests/:id/solve', async (req, res) => {
+    try {
+        await Request.findByIdAndUpdate(req.params.id, { status: 'Solved' });
+        res.json({ message: "Request Marked Solved" });
+    } catch (e) { res.status(500).json({ error: "Update failed" }); }
 });
 
 // Get All Orders (Admin)
@@ -309,7 +336,7 @@ app.get('/api/my-orders', async (req, res) => {
     res.json(orders);
 });
 
-// --- SERVER STARTUP (OPTIMIZED FOR VERCEL) ---
+// --- SERVER STARTUP ---
 module.exports = app;
 
 if (require.main === module) {

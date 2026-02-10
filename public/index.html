@@ -111,6 +111,12 @@
             border: 1px solid #ef4444; 
         }
 
+        .btn-success { 
+            background: rgba(16, 185, 129, 0.1); 
+            color: #10b981; 
+            border: 1px solid #10b981; 
+        }
+
         .btn-whatsapp { 
             background: #25D366; 
             color: #000; 
@@ -261,6 +267,25 @@
         .card-info { padding: 1.5rem; }
         .tag { font-size: 0.7rem; color: var(--primary); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         .price { font-size: 1.5rem; font-family: var(--font-tech); font-weight: 700; margin-top: 5px; }
+
+        /* Stock Styles */
+        .out-of-stock { 
+            filter: grayscale(1); 
+            opacity: 0.6; 
+            pointer-events: none; 
+        }
+        .stock-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 5;
+        }
 
         /* ==============================
            5. ADMIN PANEL STYLES
@@ -554,20 +579,23 @@
                         </section>
 
                         <div class="container" id="grid">
+                            ${state.user ? `<h3 style="color:var(--primary); margin-bottom:20px;">Signed in. No limits. <span style="color:#fff;">${state.user.name}</span></h3>` : ''}
                             <h3 style="color:var(--primary); margin-bottom:10px;">Hardware Catalog</h3>
                             <div class="grid">
                                 ${state.products.map(p => `
-                                    <div class="card">
+                                    <div class="card ${p.stock <= 0 ? 'out-of-stock' : ''}">
                                         <div class="card-img-box">
                                             <img src="${p.image}" alt="${p.name}">
+                                            ${p.stock <= 0 ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
                                         </div>
                                         <div class="card-info">
                                             <div class="tag">${p.category}</div>
                                             <h3 style="margin: 5px 0;">${p.name}</h3>
                                             <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
-                                            <button onclick="app.openProductModal('${p._id}')" class="btn btn-secondary" style="width:100%; margin-top:1rem;">
-                                                System Details
-                                            </button>
+                                            ${p.stock > 0 
+                                                ? `<button onclick="app.openProductModal('${p._id}')" class="btn btn-secondary" style="width:100%; margin-top:1rem;">View & Buy</button>` 
+                                                : `<button class="btn btn-secondary" style="width:100%; margin-top:1rem;" disabled>Sold Out</button>`
+                                            }
                                         </div>
                                     </div>
                                 `).join('')}
@@ -648,7 +676,7 @@
                 `;
             },
 
-            // --- ADMIN PANEL LOGIC ---
+            // --- ADMIN PANEL ---
             renderAdmin: async () => {
                 if(!state.user || state.user.role !== 'author') return app.renderShop();
                 try {
@@ -714,9 +742,19 @@
                         <h1>Service Requests & Queries</h1>
                         <div class="stat-box" style="margin-top:2rem; overflow-x:auto;">
                             <table class="data-table">
-                                <thead><tr><th>Date</th><th>User</th><th>Type</th><th>Message</th></tr></thead>
+                                <thead><tr><th>Date</th><th>User</th><th>Message</th><th>Actions</th></tr></thead>
                                 <tbody>
-                                    ${state.requests.length === 0 ? '<tr><td colspan="4" style="text-align:center;">No active queries</td></tr>' : state.requests.map(r => `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${r.customerName}<br><span style="color:#666">${r.email}</span></td><td><span style="background:#222; padding:3px 8px; border-radius:4px; font-size:0.8rem;">${r.type}</span></td><td><div style="white-space:pre-wrap; font-family:monospace; font-size:0.8rem;">${r.message}</div></td></tr>`).join('')}
+                                    ${state.requests.map(r => `
+                                        <tr>
+                                            <td>${new Date(r.date).toLocaleDateString()}</td>
+                                            <td>${r.customerName}<br><small>${r.email}</small></td>
+                                            <td>${r.message}</td>
+                                            <td>
+                                                <button onclick="app.solveQuery('${r._id}')" class="btn btn-success" style="padding:5px 10px;">Solve</button>
+                                                <button onclick="app.deleteQuery('${r._id}')" class="btn btn-danger" style="padding:5px 10px;">Delete</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -727,9 +765,9 @@
                         <div style="display:flex; justify-content:space-between; align-items:center;"><h1>Inventory</h1><button onclick="app.openAddProductModal()" class="btn btn-primary">+ Add Product</button></div>
                         <div class="stat-box" style="margin-top:2rem; overflow-x:auto;">
                             <table class="data-table">
-                                <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th></tr></thead>
+                                <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead>
                                 <tbody>
-                                    ${state.products.map(p => `<tr><td><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td><td>${p.name}</td><td>${p.category}</td><td>₹${p.price}</td></tr>`).join('')}
+                                    ${state.products.map(p => `<tr><td><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td><td>${p.name}</td><td>${p.category}</td><td>₹${p.price}</td><td>${p.stock}</td></tr>`).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -737,12 +775,25 @@
                 }
             },
 
+            // --- ADMIN ACTIONS ---
             markDelivered: async (id) => {
                 try {
                     await fetch(`${CONFIG.API_URL}/orders/${id}/deliver`, { method: 'PATCH' });
                     app.showToast("Status Updated");
                     app.renderAdmin();
                 } catch(e) { app.showToast("Update Failed"); }
+            },
+
+            solveQuery: async (id) => {
+                await fetch(`${CONFIG.API_URL}/requests/${id}/solve`, { method: 'PATCH' });
+                app.showToast("Marked as Solved");
+                app.renderAdmin();
+            },
+
+            deleteQuery: async (id) => {
+                await fetch(`${CONFIG.API_URL}/requests/${id}`, { method: 'DELETE' });
+                app.showToast("Request Deleted");
+                app.renderAdmin();
             },
 
             renderProfile: async () => {
@@ -766,7 +817,7 @@
                                             <span>${new Date(o.date).toLocaleDateString()}</span>
                                         </div>
                                         <div style="color:var(--text-muted); font-size:0.9rem; margin:5px 0;">
-                                            ${o.items.map(i => i.name).join(', ')}
+                                            ${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
                                         </div>
                                         <div style="text-align:right; font-weight:bold;">₹${o.total}</div>
                                     </div>
@@ -777,7 +828,7 @@
                 `;
             },
 
-            // --- USER ACTIONS ---
+            // --- ACTIONS ---
             handleLogin: async (e) => {
                 e.preventDefault();
                 const formData = Object.fromEntries(new FormData(e.target));
@@ -851,16 +902,30 @@
                 }
             },
 
-            addToCart: (product) => {
+            addToCart: (id) => {
                 if(!state.user) {
                     app.showToast("Login required for purchase");
                     app.renderAuth();
                     app.closeModal();
                     return;
                 }
-                state.cart.push(product);
+                const p = state.products.find(x => x._id === id);
+                const qtyInput = document.getElementById('buy-qty');
+                const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+
+                if (qty > p.stock) return app.showToast("Not enough stock!");
+
+                // Check if item exists in cart
+                const existing = state.cart.find(item => item._id === id);
+                if (existing) {
+                    if (existing.qty + qty > p.stock) return app.showToast("Stock limit reached!");
+                    existing.qty += qty;
+                } else {
+                    state.cart.push({ ...p, qty });
+                }
+
                 document.getElementById('cart-count').innerText = state.cart.length;
-                app.showToast(`${product.name} Added`);
+                app.showToast(`${p.name} Added`);
                 app.closeModal();
             },
 
@@ -873,18 +938,22 @@
                 }
                 let total = 0;
                 container.innerHTML = state.cart.map((item, index) => {
-                    total += item.price;
+                    const itemTotal = item.price * item.qty;
+                    total += itemTotal;
                     return `
                         <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <div style="font-weight:600;">${item.name}</div>
+                                <div style="font-weight:600;">${item.name} <span style="font-size:0.8rem; color:#888;">(x${item.qty})</span></div>
                                 <div style="font-size:0.8rem; color:var(--primary);">₹${item.price}</div>
                             </div>
-                            <button onclick="app.removeFromCart(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-weight:bold;">₹${itemTotal}</span>
+                                <button onclick="app.removeFromCart(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                     `;
                 }).join('');
-                document.getElementById('cart-total').innerText = "₹" + total.toLocaleString('en-IN');
+                document.getElementById('cart-total').innerText = "Total: ₹" + total.toLocaleString('en-IN');
             },
 
             removeFromCart: (index) => {
@@ -947,7 +1016,7 @@
             checkout: () => {
                 if(state.cart.length === 0) return;
                 app.toggleCart(); 
-                const total = state.cart.reduce((a,b)=>a+b.price, 0);
+                const total = state.cart.reduce((a,b)=>a+(b.price*b.qty), 0);
                 
                 const html = `
                     <h2 style="margin-bottom:1.5rem;">Shipping Details</h2>
@@ -1023,12 +1092,13 @@
                         state.cart = []; 
                         document.getElementById('cart-count').innerText = 0;
                         app.renderSuccess(response.razorpay_order_id, amount, items);
+                        app.fetchProducts(); // Refresh stock data
                     }
                 } catch(e) { app.showToast("Verification Error"); }
             },
 
             renderSuccess: (orderId, total, items) => {
-                const itemList = items.map(i => `%E2%80%A2 ${i.name} (Rs.${i.price})`).join('%0A');
+                const itemList = items.map(i => `%E2%80%A2 ${i.qty}x ${i.name}`).join('%0A');
                 const waText = `*NEW ORDER ALERT*%0A------------------%0AID: ${orderId}%0ACustomer: ${state.user.name}%0ATotal: Rs.${total}%0A------------------%0AItems:%0A${itemList}`;
                 const html = `
                     <div style="text-align:center; padding:1rem;">
@@ -1053,7 +1123,15 @@
                     <h2>${p.name}</h2>
                     <h3 style="color:var(--primary); margin: 0.5rem 0;">₹${p.price.toLocaleString('en-IN')}</h3>
                     <p style="color:#ccc; line-height:1.6; margin-bottom:1.5rem;">${p.desc}</p>
-                    <button onclick='app.addToCart(${JSON.stringify(p)})' class="btn btn-primary" style="width:100%">Add to Cart</button>
+                    <p style="margin-bottom:1rem;">Stock Available: <strong>${p.stock}</strong></p>
+                    
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                        <label>Quantity:</label>
+                        <input type="number" id="buy-qty" value="1" min="1" max="${p.stock}" style="width:80px; margin:0;">
+                    </div>
+
+                    <button onclick='app.addToCart("${p._id}")' class="btn btn-primary" style="width:100%">Add to Cart</button>
+                    
                     <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1rem;">
                         <h4>Field Reports (Reviews)</h4>
                         <div style="max-height:150px; overflow-y:auto; margin:1rem 0;">
@@ -1093,6 +1171,7 @@
                     <form onsubmit="app.handleAddProduct(event)">
                         <input type="text" name="name" placeholder="Product Name" required>
                         <input type="number" name="price" placeholder="Price" required>
+                        <input type="number" name="stock" placeholder="Stock Quantity" required>
                         <input type="text" name="category" placeholder="Category" required>
                         <textarea name="desc" placeholder="Specs/Description" required></textarea>
                         <input type="file" name="image" required style="padding:10px;">
