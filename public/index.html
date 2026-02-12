@@ -308,6 +308,13 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-banner:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
         }
 
         .category-banner-icon {
@@ -897,7 +904,7 @@
         // ================================================================
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
-            RAZORPAY_ID: 'rzphsdsjhch',
+            RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ',
             WHATSAPP_ID: '916006750581'
         };
 
@@ -946,7 +953,8 @@
             queries: [],
             currentAdminTab: 'dashboard',
             registrationEmail: null,
-            userLocation: null
+            userLocation: null,
+            selectedCategory: null
         };
 
         // ================================================================
@@ -998,37 +1006,30 @@
             },
 
             // ============================================================
-            // FIXED SCROLL TO PRODUCTS FUNCTION
+            // SCROLL TO PRODUCTS FUNCTION
             // ============================================================
             scrollToProducts: async () => {
                 console.log('📹 Browse Cameras button clicked!');
                 
-                // Ensure we're on the shop page
                 const root = document.getElementById('app-root-view');
                 if (!root) {
                     console.error('❌ App root not found');
                     return;
                 }
                 
-                // Check if shop content is rendered
                 const hasShopContent = root.innerHTML.includes('category-section');
                 
                 if (!hasShopContent || APP_STATE.inventory.length === 0) {
                     console.log('🔄 Rendering shop first...');
                     
-                    // Sync inventory if empty
                     if (APP_STATE.inventory.length === 0) {
                         await app.syncInventory();
                     }
                     
-                    // Render shop
                     app.renderShop();
-                    
-                    // Wait for DOM update
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
                 
-                // Now try to find and scroll to first product section
                 const categories = ['ANALOG', 'IP', 'WIFI', '4G', 'ACCESSORIES'];
                 let targetSection = null;
                 
@@ -1042,7 +1043,6 @@
                 }
                 
                 if (targetSection) {
-                    // Smooth scroll with offset for fixed nav
                     const navHeight = document.querySelector('nav')?.offsetHeight || 70;
                     const yOffset = -navHeight - 20;
                     const y = targetSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
@@ -1056,11 +1056,28 @@
                 } else {
                     console.warn('⚠️ No product sections found');
                     app.showToast("Loading products... Please wait!");
-                    
-                    // Try one more sync
                     await app.syncInventory();
                     app.renderShop();
                 }
+            },
+
+            // ============================================================
+            // CATEGORY FILTERING
+            // ============================================================
+            filterByCategory: (categoryKey) => {
+                console.log('🔍 Filtering category:', categoryKey);
+                APP_STATE.selectedCategory = categoryKey;
+                app.renderShop();
+                
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            showAllCategories: () => {
+                console.log('📋 Showing all categories');
+                APP_STATE.selectedCategory = null;
+                app.renderShop();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
 
             // ============================================================
@@ -1093,6 +1110,7 @@
                 
                 console.log('🏪 Rendering shop...');
                 console.log(`📦 Inventory count: ${APP_STATE.inventory.length}`);
+                console.log(`🔍 Selected category: ${APP_STATE.selectedCategory || 'ALL'}`);
                 
                 // Group products by category
                 const productsByCategory = {};
@@ -1101,7 +1119,12 @@
                     console.log(`Category ${key}: ${productsByCategory[key].length} products`);
                 });
 
-                let categorySections = Object.keys(CATEGORIES).map(catKey => {
+                // Determine which categories to show
+                const categoriesToShow = APP_STATE.selectedCategory 
+                    ? [APP_STATE.selectedCategory] 
+                    : Object.keys(CATEGORIES);
+
+                let categorySections = categoriesToShow.map(catKey => {
                     const cat = CATEGORIES[catKey];
                     const products = productsByCategory[catKey] || [];
                     
@@ -1131,7 +1154,7 @@
 
                     return `
                         <div class="category-section slide-up" id="${catKey}-section">
-                            <div class="category-banner">
+                            <div class="category-banner" onclick="app.filterByCategory('${catKey}')">
                                 <div class="category-banner-text">
                                     <h3><i class="fa-solid ${cat.icon}"></i> ${cat.name}</h3>
                                     <div class="installation-badge">
@@ -1148,8 +1171,18 @@
                     `;
                 }).join('');
 
+                // Add "View All Categories" button if a single category is selected
+                const backButton = APP_STATE.selectedCategory ? `
+                    <div style="text-align: center; padding: 40px 5%; max-width: 1400px; margin: 0 auto;">
+                        <button onclick="app.showAllCategories()" class="btn btn-secondary" style="font-size: 1.1rem; padding: 16px 32px;">
+                            <i class="fa-solid fa-grid"></i> View All Categories
+                        </button>
+                    </div>
+                ` : '';
+
                 root.innerHTML = `
                     <div class="fade-in">
+                        ${!APP_STATE.selectedCategory ? `
                         <section class="hero">
                             <div class="hero-content">
                                 <div class="badge badge-primary" style="font-size: 0.9rem; padding: 8px 16px; margin-bottom: 20px;">
@@ -1169,8 +1202,25 @@
                                 </div>
                             </div>
                         </section>
+                        ` : `
+                        <div style="padding: 40px 5% 20px; max-width: 1400px; margin: 0 auto;">
+                            <button onclick="app.showAllCategories()" class="btn btn-secondary" style="margin-bottom: 20px;">
+                                <i class="fa-solid fa-arrow-left"></i> Back to All Categories
+                            </button>
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">
+                                <i class="fa-solid ${CATEGORIES[APP_STATE.selectedCategory].icon}"></i> 
+                                ${CATEGORIES[APP_STATE.selectedCategory].name}
+                            </h1>
+                            <p style="color: var(--text-muted); font-size: 1.1rem;">
+                                <i class="fa-solid ${APP_STATE.selectedCategory === 'ACCESSORIES' ? 'fa-truck-fast' : 'fa-tools'}"></i> 
+                                ${CATEGORIES[APP_STATE.selectedCategory].badge}
+                            </p>
+                        </div>
+                        `}
 
                         ${categorySections}
+
+                        ${backButton}
 
                         <footer>
                             <div class="footer-content">
