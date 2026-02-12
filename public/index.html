@@ -897,7 +897,7 @@
         // ================================================================
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
-            RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ',
+            RAZORPAY_ID: 'rzphsdsjhch',
             WHATSAPP_ID: '916006750581'
         };
 
@@ -979,17 +979,49 @@
             },
 
             syncInventory: async () => {
+                console.log('📦 Connecting to BNG Backend...');
                 try {
-                    console.log('📦 Syncing inventory...');
-                    const response = await fetch(`${COMMAND_CONFIG.API_BASE}/products`);
-                    if(response.ok) {
-                        APP_STATE.inventory = await response.json();
-                        console.log(`✅ Loaded ${APP_STATE.inventory.length} products`);
+
+        // 1. Try to fetch from YOUR real server
+                    const response = await fetch('/api/products');
+        
+                    if (response.ok) {
+                        const products = await response.json();
+            
+                        if (products.length > 0) {
+                            console.log(`✅ Connected to Server: Found ${products.length} products`);
+                            APP_STATE.inventory = products;
+                            return; // Exit here, we have real data!
+                        } else {
+                            console.warn("⚠️ Server connected, but Database is empty.");
+                        }
                     }
-                } catch(err) {
-                    console.error("❌ Database Sync Failed", err);
-                    app.showToast("Failed to load products");
+                } catch (err) {
+                    console.warn("❌ Could not connect to server (is node server.js running?)");
                 }
+
+    // 2. Fallback: If server is down OR database is empty, use Mock Data so site doesn't look broken
+                console.log("⚠️ Using Local Test Data");
+                APP_STATE.inventory = [
+                    {
+                        _id: '1', name: 'Hikvision Dome Camera', category: 'ANALOG', 
+                        price: 1850, stock: 15, image: 'https://m.media-amazon.com/images/I/41d+12+cTJL._SX300_SY300_QL70_FMwebp_.jpg', 
+                        desc: 'High quality analog dome camera suitable for indoor surveillance.'
+                    },
+                    {
+                         _id: '2', name: 'CP Plus Bullet Cam', category: 'IP', 
+                        price: 2400, stock: 8, image: 'https://m.media-amazon.com/images/I/311+gq+sI1L._SY300_SX300_.jpg', 
+                        desc: 'Weatherproof outdoor bullet camera with night vision.'
+                    },
+                    {
+                        _id: '3', name: 'WiFi Smart 360', category: 'WIFI', 
+                        price: 3500, stock: 12, image: 'https://m.media-amazon.com/images/I/31j-X11+bRL._SX300_SY300_QL70_FMwebp_.jpg', 
+                        desc: 'Wireless camera with mobile app control.'
+                    }
+                ];
+    
+                // Explicitly show toast if using mock data
+                if(app.showToast) app.showToast("Demo Mode: Using Test Data");
             },
 
             refreshUI: () => {
