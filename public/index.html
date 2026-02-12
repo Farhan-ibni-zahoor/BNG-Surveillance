@@ -97,6 +97,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -119,6 +124,7 @@
         .fade-in { animation: fadeIn 0.5s ease; }
         .slide-up { animation: slideUp 0.6s ease; }
         .slide-down { animation: slideDown 0.3s ease; }
+        .slide-in-right { animation: slideInRight 0.3s ease; }
         .float { animation: float 3s ease-in-out infinite; }
 
         /* ============================================================
@@ -354,6 +360,96 @@
         .user-dropdown-email {
             font-size: 0.75rem;
             color: var(--text-muted);
+        }
+
+        /* Admin Hamburger Menu (3 Lines) */
+        .admin-menu-container {
+            position: relative;
+        }
+
+        .admin-hamburger-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px;
+        }
+
+        .admin-hamburger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .admin-dropdown {
+            position: absolute;
+            top: 55px;
+            left: 0;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            min-width: 250px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+        }
+
+        .admin-dropdown.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .admin-dropdown-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            font-weight: 700;
+        }
+
+        .admin-dropdown-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        .admin-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .admin-dropdown-item:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+            padding-left: 25px;
+        }
+
+        .admin-dropdown-item.active {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-left: 4px solid var(--primary);
         }
 
         /* ============================================================
@@ -595,9 +691,10 @@
 
         #location-map {
             width: 100%;
-            height: 400px;
+            height: 450px;
             border-radius: var(--radius-md);
             margin: 20px 0;
+            border: 2px solid var(--border);
         }
 
         .map-instructions {
@@ -606,6 +703,27 @@
             border-radius: var(--radius-md);
             margin-bottom: 15px;
             border-left: 4px solid var(--info);
+        }
+
+        .location-status {
+            background: white;
+            border: 2px solid var(--border);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-status.loading {
+            border-color: var(--warning);
+            background: #fef3c7;
+        }
+
+        .location-status.success {
+            border-color: var(--success);
+            background: #d1fae5;
         }
 
         /* Cart Panel */
@@ -661,7 +779,7 @@
             background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
         }
 
-        /* Floating WhatsApp Button */
+        /* Floating WhatsApp Button (NOT shown for admin) */
         .whatsapp-float {
             position: fixed;
             bottom: 100px;
@@ -759,51 +877,8 @@
         /* ============================================================
            9. ADMIN PANEL
            ============================================================ */
-        .admin-layout { 
-            display: flex; 
-            min-height: calc(100vh - 70px); 
-        }
-        
-        .sidebar { 
-            width: 280px; 
-            background: white; 
-            border-right: 2px solid var(--border); 
-            padding: 30px 20px; 
-            position: fixed; 
-            height: calc(100vh - 70px); 
-            overflow-y: auto; 
-        }
-
-        .sidebar-btn { 
-            width: 100%; 
-            text-align: left; 
-            padding: 14px 18px; 
-            margin-bottom: 8px; 
-            background: transparent; 
-            border: none; 
-            color: var(--text-muted); 
-            cursor: pointer; 
-            border-radius: var(--radius-md); 
-            font-weight: 600; 
-            transition: all 0.3s; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-        }
-
-        .sidebar-btn:hover { 
-            background: var(--bg-light); 
-            color: var(--text-dark); 
-        }
-
-        .sidebar-btn.active { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); 
-            color: white; 
-        }
-
         .admin-content { 
-            margin-left: 280px; 
-            padding: 40px; 
+            padding: 40px 5%; 
             width: 100%; 
             background: var(--bg-main); 
             min-height: calc(100vh - 70px);
@@ -904,17 +979,6 @@
             .grid, .category-selection-grid, .product-grid-container .grid { 
                 grid-template-columns: 1fr; 
             }
-            .sidebar { 
-                position: static; 
-                width: 100%; 
-                border-right: none; 
-                border-bottom: 2px solid var(--border);
-                height: auto;
-            }
-            .admin-content { 
-                margin-left: 0; 
-                padding: 20px; 
-            }
             .whatsapp-float {
                 bottom: 80px;
                 right: 20px;
@@ -925,8 +989,11 @@
             .stat-grid {
                 grid-template-columns: 1fr;
             }
-            .user-dropdown {
+            .user-dropdown, .admin-dropdown {
                 right: -10px;
+            }
+            .admin-content {
+                padding: 20px;
             }
         }
 
@@ -966,31 +1033,7 @@
         .visible { display: block !important; }
 
         /* ============================================================
-           12. LOADING STATES
-           ============================================================ */
-        .skeleton {
-            background: linear-gradient(90deg, var(--bg-light) 25%, #e0e7ed 50%, var(--bg-light) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        /* ============================================================
-           13. ALERT BOXES
+           12. ALERT BOXES
            ============================================================ */
         .alert {
             padding: 15px 20px;
@@ -1026,55 +1069,7 @@
         }
 
         /* ============================================================
-           14. TABS
-           ============================================================ */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-            font-family: var(--font-display);
-        }
-
-        .tab:hover {
-            color: var(--primary);
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* ============================================================
-           15. PROGRESS BAR
-           ============================================================ */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-light);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            transition: width 0.3s ease;
-        }
-
-        /* ============================================================
-           16. EMPTY STATES
+           13. EMPTY STATES
            ============================================================ */
         .empty-state {
             text-align: center;
@@ -1100,67 +1095,7 @@
         }
 
         /* ============================================================
-           17. DIVIDERS
-           ============================================================ */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 30px 0;
-        }
-
-        .divider-text {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 30px 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .divider-text::before,
-        .divider-text::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        /* ============================================================
-           18. CARDS & CONTAINERS
-           ============================================================ */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 5%;
-        }
-
-        .section {
-            padding: 60px 0;
-        }
-
-        .info-card {
-            background: var(--bg-light);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .info-card-title {
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-card-content {
-            color: var(--text-main);
-            line-height: 1.6;
-        }
-
-        /* ============================================================
-           19. ORDER DETAILS
+           14. ORDER CARDS
            ============================================================ */
         .order-card {
             border: 2px solid var(--border);
@@ -1227,84 +1162,32 @@
         }
 
         /* ============================================================
-           20. ADDITIONAL COMPONENTS
+           15. INFO CARDS
            ============================================================ */
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
+        .info-card {
             background: var(--bg-light);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-dark);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .info-card-title {
             font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .input-group {
+            color: var(--text-dark);
+            margin-bottom: 10px;
             display: flex;
-            gap: 10px;
             align-items: center;
+            gap: 8px;
         }
 
-        .input-icon {
-            position: relative;
+        .info-card-content {
+            color: var(--text-main);
+            line-height: 1.6;
         }
 
-        .input-icon input {
-            padding-left: 45px;
-        }
-
-        .input-icon i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            background-color: var(--text-dark);
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px 12px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Back to Top Button */
+        /* ============================================================
+           16. BACK TO TOP BUTTON
+           ============================================================ */
         .back-to-top {
             position: fixed;
             bottom: 30px;
@@ -1338,13 +1221,15 @@
     <!-- Loader -->
     <div id="loader">
         <div class="spinner"></div>
-        <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">Loading BNG Surveillance...</div>
+        <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">
+            Loading BNG Surveillance...
+        </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast">Action Completed</div>
 
-    <!-- Floating WhatsApp Button -->
+    <!-- Floating WhatsApp Button (Hidden for admin) -->
     <a id="whatsapp-float" class="whatsapp-float" href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" target="_blank" title="Chat with us on WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
@@ -1459,7 +1344,8 @@
             userLocation: null,
             selectedCategory: null,
             map: null,
-            marker: null
+            marker: null,
+            locationPickerContext: null // 'checkout' or 'support'
         };
 
         // ================================================================
@@ -1493,9 +1379,9 @@
                 window.addEventListener('scroll', () => {
                     const backToTop = document.getElementById('back-to-top');
                     if (window.pageYOffset > 300) {
-                        backToTop.classList.add('show');
+                        backToTop?.classList.add('show');
                     } else {
-                        backToTop.classList.remove('show');
+                        backToTop?.classList.remove('show');
                     }
                 });
                 
@@ -1667,40 +1553,76 @@
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                 } else {
                     const isAdmin = APP_STATE.user.role === 'author';
-                    const userInitial = APP_STATE.user.name.charAt(0).toUpperCase();
                     
-                    nav.innerHTML = `
-                        ${isAdmin ? `
-                            <button onclick="app.renderAdminPortal()" class="btn btn-secondary">
-                                <i class="fa-solid fa-dashboard"></i> Admin Panel
+                    // Admin gets hamburger menu, NO WhatsApp
+                    if (isAdmin) {
+                        nav.innerHTML = `
+                            <div class="admin-menu-container">
+                                <div class="admin-hamburger-btn" onclick="app.toggleAdminMenu()">
+                                    <div class="hamburger-line"></div>
+                                    <div class="hamburger-line"></div>
+                                    <div class="hamburger-line"></div>
+                                </div>
+                                <div id="admin-dropdown" class="admin-dropdown">
+                                    <div class="admin-dropdown-header">
+                                        <i class="fa-solid fa-dashboard"></i> Admin Panel
+                                    </div>
+                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}" onclick="app.switchAdminTab('dashboard'); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                                    </div>
+                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}" onclick="app.switchAdminTab('orders'); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-shopping-bag"></i> All Orders
+                                    </div>
+                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}" onclick="app.switchAdminTab('cancelled'); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-ban"></i> Cancelled Orders
+                                    </div>
+                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}" onclick="app.switchAdminTab('queries'); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-headset"></i> Support Requests
+                                    </div>
+                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}" onclick="app.switchAdminTab('inventory'); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-box"></i> Inventory
+                                    </div>
+                                    <div class="admin-dropdown-item" onclick="app.showHome(); app.toggleAdminMenu();">
+                                        <i class="fa-solid fa-store"></i> Back to Store
+                                    </div>
+                                    <div class="admin-dropdown-item" onclick="app.executeLogout();">
+                                        <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        // NO WhatsApp for admin
+                        if (whatsappBtn) whatsappBtn.classList.remove('show');
+                    } else {
+                        // Regular customer gets 3-dot menu WITH WhatsApp
+                        nav.innerHTML = `
+                            <button onclick="app.toggleCart()" class="btn btn-primary">
+                                <i class="fa-solid fa-shopping-cart"></i>
+                                <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
                             </button>
-                        ` : ''}
-                        
-                        <button onclick="app.toggleCart()" class="btn btn-primary">
-                            <i class="fa-solid fa-shopping-cart"></i>
-                            <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
-                        </button>
-                        
-                        <div class="user-menu-container">
-                            <div class="user-menu-btn" onclick="app.toggleUserMenu()">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </div>
-                            <div id="user-dropdown" class="user-dropdown">
-                                <div class="user-dropdown-header">
-                                    <div class="user-dropdown-name">${APP_STATE.user.name}</div>
-                                    <div class="user-dropdown-email">${APP_STATE.user.email}</div>
+                            
+                            <div class="user-menu-container">
+                                <div class="user-menu-btn" onclick="app.toggleUserMenu()">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </div>
-                                <div class="user-dropdown-item" onclick="app.renderProfile(); app.toggleUserMenu();">
-                                    <i class="fa-solid fa-receipt"></i> My Orders
-                                </div>
-                                <div class="user-dropdown-item" onclick="app.executeLogout();">
-                                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                <div id="user-dropdown" class="user-dropdown">
+                                    <div class="user-dropdown-header">
+                                        <div class="user-dropdown-name">${APP_STATE.user.name}</div>
+                                        <div class="user-dropdown-email">${APP_STATE.user.email}</div>
+                                    </div>
+                                    <div class="user-dropdown-item" onclick="app.renderProfile(); app.toggleUserMenu();">
+                                        <i class="fa-solid fa-receipt"></i> My Orders
+                                    </div>
+                                    <div class="user-dropdown-item" onclick="app.executeLogout();">
+                                        <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    
-                    if (whatsappBtn) whatsappBtn.classList.add('show');
+                        `;
+                        
+                        // Show WhatsApp for customers only
+                        if (whatsappBtn) whatsappBtn.classList.add('show');
+                    }
                 }
             },
 
@@ -1714,6 +1636,22 @@
                 document.addEventListener('click', function closeMenu(e) {
                     const userMenu = document.querySelector('.user-menu-container');
                     if (userMenu && !userMenu.contains(e.target)) {
+                        dropdown?.classList.remove('active');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            },
+
+            toggleAdminMenu: () => {
+                const dropdown = document.getElementById('admin-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('active');
+                }
+                
+                // Close on click outside
+                document.addEventListener('click', function closeMenu(e) {
+                    const adminMenu = document.querySelector('.admin-menu-container');
+                    if (adminMenu && !adminMenu.contains(e.target)) {
                         dropdown?.classList.remove('active');
                         document.removeEventListener('click', closeMenu);
                     }
@@ -1750,7 +1688,6 @@
                 </footer>
             `,
 
-            // Continue in next part...
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
                 if(!p) return;
@@ -1939,7 +1876,7 @@
             },
 
             // ============================================================
-            // CHECKOUT WITH MAP LOCATION PICKER
+            // CHECKOUT WITH LIVE LOCATION MAP
             // ============================================================
             checkout: () => {
                 if(APP_STATE.cart.length === 0) {
@@ -1978,9 +1915,9 @@
 
                         <div class="form-group">
                             <label class="label">
-                                <i class="fa-solid fa-map-marker-alt"></i> Select Your Location on Map
+                                <i class="fa-solid fa-map-marker-alt"></i> Pin Your Location on Map
                             </label>
-                            <button onclick="app.showMapPicker()" id="location-btn" class="btn btn-secondary w-full">
+                            <button onclick="app.showMapPicker('checkout')" id="location-btn" class="btn btn-secondary w-full">
                                 <i class="fa-solid fa-map"></i> Pick Location from Map
                             </button>
                             <div id="location-display" class="alert alert-success mt-10" style="display: none;">
@@ -2006,18 +1943,27 @@
                 app.openModal(html);
             },
 
-            showMapPicker: () => {
+            // MAP LOCATION PICKER - Gets live location then lets user adjust
+            showMapPicker: (context) => {
+                APP_STATE.locationPickerContext = context;
+                
                 const html = `
                     <div class="fade-in">
                         <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
                             <i class="fa-solid fa-map-marked-alt"></i> Select Your Location
                         </h2>
                         
+                        <div class="location-status loading" id="location-status">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <span>Getting your current location...</span>
+                        </div>
+
                         <div class="map-instructions">
                             <strong><i class="fa-solid fa-info-circle"></i> Instructions:</strong>
                             <ul style="margin: 10px 0 0 25px; line-height: 1.8;">
-                                <li>Click on the map to pin your exact location</li>
-                                <li>You can drag the marker to adjust</li>
+                                <li>We're fetching your live location</li>
+                                <li>Click on the map to pin your exact house location</li>
+                                <li>Drag the marker to adjust if needed</li>
                                 <li>Zoom in for more accuracy</li>
                             </ul>
                         </div>
@@ -2025,7 +1971,7 @@
                         <div id="location-map"></div>
 
                         <div class="flex gap-10 mt-20">
-                            <button onclick="app.closeModal(); app.checkout();" class="btn btn-secondary" style="flex: 1;">
+                            <button onclick="app.cancelLocationPicker()" class="btn btn-secondary" style="flex: 1;">
                                 <i class="fa-solid fa-times"></i> Cancel
                             </button>
                             <button onclick="app.confirmLocation()" class="btn btn-primary" style="flex: 1;">
@@ -2038,48 +1984,100 @@
                 app.openModal(html);
                 document.getElementById('modal-body-content').classList.add('map-modal');
                 
-                // Initialize map after DOM is ready
+                // Initialize map and get live location
                 setTimeout(() => {
-                    // Default to India center
-                    const defaultLat = 20.5937;
-                    const defaultLng = 78.9629;
+                    app.initializeMap();
+                }, 300);
+            },
+
+            initializeMap: () => {
+                // Default to India center
+                const defaultLat = 20.5937;
+                const defaultLng = 78.9629;
+                
+                APP_STATE.map = L.map('location-map').setView([defaultLat, defaultLng], 5);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(APP_STATE.map);
+                
+                // Click to add/move marker
+                APP_STATE.map.on('click', function(e) {
+                    if (APP_STATE.marker) {
+                        APP_STATE.map.removeLayer(APP_STATE.marker);
+                    }
                     
-                    APP_STATE.map = L.map('location-map').setView([defaultLat, defaultLng], 5);
-                    
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
+                    APP_STATE.marker = L.marker([e.latlng.lat, e.latlng.lng], {
+                        draggable: true
                     }).addTo(APP_STATE.map);
                     
-                    // Click to add marker
-                    APP_STATE.map.on('click', function(e) {
-                        if (APP_STATE.marker) {
-                            APP_STATE.map.removeLayer(APP_STATE.marker);
-                        }
-                        
-                        APP_STATE.marker = L.marker([e.latlng.lat, e.latlng.lng], {
-                            draggable: true
-                        }).addTo(APP_STATE.map);
-                        
+                    APP_STATE.userLocation = {
+                        latitude: e.latlng.lat,
+                        longitude: e.latlng.lng
+                    };
+                    
+                    // Update marker position on drag
+                    APP_STATE.marker.on('dragend', function(event) {
+                        const position = event.target.getLatLng();
                         APP_STATE.userLocation = {
-                            latitude: e.latlng.lat,
-                            longitude: e.latlng.lng
+                            latitude: position.lat,
+                            longitude: position.lng
                         };
                     });
-                    
-                    // Try to get user's current position for better UX
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                const lat = position.coords.latitude;
-                                const lng = position.coords.longitude;
-                                APP_STATE.map.setView([lat, lng], 13);
-                            },
-                            (error) => {
-                                console.log("Geolocation not available, using default view");
+                });
+                
+                // Try to get user's LIVE location
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            // Center map on live location
+                            APP_STATE.map.setView([lat, lng], 15);
+                            
+                            // Add marker at live location
+                            APP_STATE.marker = L.marker([lat, lng], {
+                                draggable: true
+                            }).addTo(APP_STATE.map);
+                            
+                            APP_STATE.userLocation = {
+                                latitude: lat,
+                                longitude: lng
+                            };
+                            
+                            // Update status
+                            const statusEl = document.getElementById('location-status');
+                            if (statusEl) {
+                                statusEl.className = 'location-status success';
+                                statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Live location found! Adjust marker if needed.</span>';
                             }
-                        );
+                            
+                            // Update marker position on drag
+                            APP_STATE.marker.on('dragend', function(event) {
+                                const position = event.target.getLatLng();
+                                APP_STATE.userLocation = {
+                                    latitude: position.lat,
+                                    longitude: position.lng
+                                };
+                            });
+                        },
+                        (error) => {
+                            console.log("Geolocation error:", error);
+                            const statusEl = document.getElementById('location-status');
+                            if (statusEl) {
+                                statusEl.className = 'location-status';
+                                statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Could not get live location. Click on map to select manually.</span>';
+                            }
+                        }
+                    );
+                } else {
+                    const statusEl = document.getElementById('location-status');
+                    if (statusEl) {
+                        statusEl.className = 'location-status';
+                        statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Geolocation not supported. Click on map to select location.</span>';
                     }
-                }, 300);
+                }
             },
 
             confirmLocation: () => {
@@ -2090,18 +2088,51 @@
                 
                 app.closeModal();
                 document.getElementById('modal-body-content').classList.remove('map-modal');
-                app.checkout();
                 
-                // Show success message
-                const display = document.getElementById('location-display');
-                const locationBtn = document.getElementById('location-btn');
+                // Return to appropriate form
+                if (APP_STATE.locationPickerContext === 'checkout') {
+                    app.checkout();
+                    
+                    // Show success message
+                    const display = document.getElementById('location-display');
+                    const locationBtn = document.getElementById('location-btn');
+                    
+                    if (display && locationBtn) {
+                        display.style.display = 'flex';
+                        locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
+                        locationBtn.classList.remove('btn-secondary');
+                        locationBtn.classList.add('btn-success');
+                        locationBtn.disabled = true;
+                    }
+                } else if (APP_STATE.locationPickerContext === 'support') {
+                    app.renderRaiseRequest();
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        const display = document.getElementById('req-location-display');
+                        const locationBtn = document.getElementById('req-location-btn');
+                        
+                        if (display && locationBtn) {
+                            display.style.display = 'flex';
+                            locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
+                            locationBtn.classList.remove('btn-secondary');
+                            locationBtn.classList.add('btn-success');
+                            locationBtn.disabled = true;
+                        }
+                    }, 100);
+                }
+            },
+
+            cancelLocationPicker: () => {
+                APP_STATE.userLocation = null;
+                app.closeModal();
+                document.getElementById('modal-body-content').classList.remove('map-modal');
                 
-                if (display && locationBtn) {
-                    display.style.display = 'flex';
-                    locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
-                    locationBtn.classList.remove('btn-secondary');
-                    locationBtn.classList.add('btn-success');
-                    locationBtn.disabled = true;
+                // Return to appropriate form
+                if (APP_STATE.locationPickerContext === 'checkout') {
+                    app.checkout();
+                } else if (APP_STATE.locationPickerContext === 'support') {
+                    app.renderRaiseRequest();
                 }
             },
 
@@ -2188,8 +2219,12 @@
                     });
 
                     if(res.ok) {
+                        const data = await res.json();
+                        
                         // Send WhatsApp message to admin
-                        app.sendOrderToWhatsApp(response.razorpay_order_id, APP_STATE.user.name, APP_STATE.cart, total, address, phone, pincode);
+                        if (data.whatsappUrl) {
+                            window.open(data.whatsappUrl, '_blank');
+                        }
                         
                         APP_STATE.cart = [];
                         APP_STATE.userLocation = null;
@@ -2203,30 +2238,6 @@
                 } catch(e) {
                     app.showToast("Server error. Please contact support.", 'error');
                 }
-            },
-
-            sendOrderToWhatsApp: (orderId, customerName, items, total, address, phone, pincode) => {
-                // Build WhatsApp message
-                let message = `🛍️ *NEW ORDER RECEIVED*\n\n`;
-                message += `📋 *Order ID:* ${orderId.substr(-8)}\n`;
-                message += `👤 *Customer:* ${customerName}\n`;
-                message += `📞 *Phone:* ${phone}\n`;
-                message += `📍 *Address:* ${address}, ${pincode}\n\n`;
-                message += `🛒 *Products:*\n`;
-                
-                items.forEach(item => {
-                    message += `• ${item.qty}× ${item.name} @ ₹${item.price.toLocaleString()}\n`;
-                });
-                
-                message += `\n💰 *Total Amount:* ₹${total.toLocaleString()}\n\n`;
-                
-                if (APP_STATE.userLocation) {
-                    const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
-                    message += `📍 *Location:* ${gmapsLink}\n`;
-                }
-                
-                const whatsappUrl = `https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
             },
 
             renderOrderSuccess: (id, amount) => {
@@ -2252,9 +2263,119 @@
                 app.openModal(html);
             },
 
-            // Continuing with PROFILE, ADMIN PANEL, AUTH, and other functions...
-            // Due to character limit, I'll provide the complete file in parts
+            // SUPPORT REQUEST WITH LOCATION MAP
+            renderRaiseRequest: () => {
+                if(!APP_STATE.user) {
+                    app.showToast("Please login to raise a support request", 'error');
+                    app.showAuth('login');
+                    return;
+                }
 
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            <i class="fa-solid fa-headset"></i> Request Support
+                        </h2>
+                        
+                        <div class="form-group">
+                            <label class="label">Request Type</label>
+                            <select id="req-type-select">
+                                <option value="Installation">New System Installation</option>
+                                <option value="Maintenance">Maintenance & Repair</option>
+                                <option value="Fault">Technical Issue</option>
+                                <option value="Upgrade">System Upgrade</option>
+                                <option value="General">General Inquiry</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Installation/Service Address</label>
+                            <textarea id="req-addr-field" placeholder="Enter complete address" rows="2" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Pincode</label>
+                            <input type="text" id="req-pin-field" placeholder="6-digit pincode" maxlength="6">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">
+                                <i class="fa-solid fa-map-marker-alt"></i> Pin Your Location on Map
+                            </label>
+                            <button onclick="app.showMapPicker('support')" id="req-location-btn" class="btn btn-secondary w-full">
+                                <i class="fa-solid fa-map"></i> Pick Location from Map
+                            </button>
+                            <div id="req-location-display" class="alert alert-success mt-10" style="display: none;">
+                                <i class="fa-solid fa-check-circle"></i>
+                                <span>Location selected successfully</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Describe Your Request</label>
+                            <textarea id="req-msg-field" placeholder="Please provide details about your requirement or issue..." rows="4" required></textarea>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fa-solid fa-info-circle"></i>
+                            Our support team will contact you via WhatsApp within 24 hours.
+                        </div>
+
+                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Request
+                        </button>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            executeSubmitRequest: async () => {
+                const type = document.getElementById('req-type-select').value;
+                const msg = document.getElementById('req-msg-field').value;
+                const addr = document.getElementById('req-addr-field').value;
+                const pin = document.getElementById('req-pin-field').value;
+
+                if(!msg || !addr || !pin) {
+                    app.showToast("Please fill all required fields", 'error');
+                    return;
+                }
+
+                const data = {
+                    customerName: APP_STATE.user.name,
+                    email: APP_STATE.user.email,
+                    type: type,
+                    message: `${msg}\n\nAddress: ${addr}\nPincode: ${pin}`,
+                    location: APP_STATE.userLocation
+                };
+
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    });
+
+                    if(res.ok) {
+                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
+                        
+                        if (APP_STATE.userLocation) {
+                            const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
+                            waText += `\n\nLocation: ${gmapsLink}`;
+                        }
+                        
+                        window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
+                        
+                        APP_STATE.userLocation = null;
+                        app.showToast("Request submitted successfully!", 'success');
+                        app.closeModal();
+                    }
+                } catch(e) { 
+                    app.showToast("Failed to submit request. Please try again.", 'error'); 
+                }
+            },
+
+            // Continue with profile, admin, auth methods in next comment due to length...
+            
             renderProfile: async () => {
                 const root = document.getElementById('app-root-view');
                 if(!APP_STATE.user) { app.showAuth('login'); return; }
@@ -2266,7 +2387,7 @@
                 } catch(e) {}
 
                 root.innerHTML = `
-                    <div class="container section fade-in">
+                    <div class="container section fade-in" style="max-width: 1000px; padding: 60px 5%;">
                         <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
                             <i class="fa-solid fa-user-circle"></i> My Account
                         </h1>
@@ -2311,7 +2432,7 @@
                                 </div>` 
                                 : 
                                 orders.map(o => `
-                                    <div class="order-card ${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity-60' : ''}">
+                                    <div class="order-card" style="${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity: 0.6;' : ''}">
                                         <div class="order-header">
                                             <div>
                                                 <div class="order-id">Order #${o._id.substr(-8)}</div>
@@ -2489,6 +2610,9 @@
                         app.renderHeader();
                         if(APP_STATE.user.role !== 'author') {
                             app.showHome();
+                        } else {
+                            // Admin goes to admin panel
+                            app.renderAdminPortal();
                         }
                     } else {
                         app.showToast(data.error || "Login failed", 'error');
@@ -2573,98 +2697,7 @@
                 }
             },
 
-            renderRaiseRequest: () => {
-                if(!APP_STATE.user) {
-                    app.showToast("Please login to raise a support request", 'error');
-                    app.showAuth('login');
-                    return;
-                }
-
-                const html = `
-                    <div class="fade-in">
-                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
-                            <i class="fa-solid fa-headset"></i> Request Support
-                        </h2>
-                        
-                        <div class="form-group">
-                            <label class="label">Request Type</label>
-                            <select id="req-type-select">
-                                <option value="Installation">New System Installation</option>
-                                <option value="Maintenance">Maintenance & Repair</option>
-                                <option value="Fault">Technical Issue</option>
-                                <option value="Upgrade">System Upgrade</option>
-                                <option value="General">General Inquiry</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="label">Installation/Service Address</label>
-                            <textarea id="req-addr-field" placeholder="Enter complete address" rows="2" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="label">Pincode</label>
-                            <input type="text" id="req-pin-field" placeholder="6-digit pincode" maxlength="6">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="label">Describe Your Request</label>
-                            <textarea id="req-msg-field" placeholder="Please provide details about your requirement or issue..." rows="4" required></textarea>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="fa-solid fa-info-circle"></i>
-                            Our support team will contact you via WhatsApp within 24 hours.
-                        </div>
-
-                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-paper-plane"></i> Submit Request
-                        </button>
-                    </div>
-                `;
-                app.openModal(html);
-            },
-
-            executeSubmitRequest: async () => {
-                const type = document.getElementById('req-type-select').value;
-                const msg = document.getElementById('req-msg-field').value;
-                const addr = document.getElementById('req-addr-field').value;
-                const pin = document.getElementById('req-pin-field').value;
-
-                if(!msg || !addr || !pin) {
-                    app.showToast("Please fill all required fields", 'error');
-                    return;
-                }
-
-                const data = {
-                    customerName: APP_STATE.user.name,
-                    email: APP_STATE.user.email,
-                    type: type,
-                    message: `${msg}\n\nAddress: ${addr}\nPincode: ${pin}`,
-                    location: null
-                };
-
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(data)
-                    });
-
-                    if(res.ok) {
-                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
-                        
-                        window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
-                        
-                        app.showToast("Request submitted successfully!", 'success');
-                        app.closeModal();
-                    }
-                } catch(e) { 
-                    app.showToast("Failed to submit request. Please try again.", 'error'); 
-                }
-            },
-
-            // ADMIN PANEL METHODS - Will continue in next part...
+            // ADMIN PANEL METHODS with Hamburger Navigation
             renderAdminPortal: async () => {
                 if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.showHome();
 
@@ -2684,40 +2717,10 @@
 
                 const root = document.getElementById('app-root-view');
                 root.innerHTML = `
-                    <div class="admin-layout fade-in">
-                        <aside class="sidebar">
-                            <h3 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark); padding: 0 10px;">
-                                <i class="fa-solid fa-dashboard"></i> Admin Panel
-                            </h3>
-                            
-                            <button onclick="app.switchAdminTab('dashboard')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}">
-                                <i class="fa-solid fa-chart-line"></i> Dashboard
-                            </button>
-                            <button onclick="app.switchAdminTab('orders')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}">
-                                <i class="fa-solid fa-shopping-bag"></i> All Orders
-                            </button>
-                            <button onclick="app.switchAdminTab('cancelled')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}">
-                                <i class="fa-solid fa-ban"></i> Cancelled Orders
-                            </button>
-                            <button onclick="app.switchAdminTab('queries')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}">
-                                <i class="fa-solid fa-headset"></i> Support Requests
-                            </button>
-                            <button onclick="app.switchAdminTab('inventory')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}">
-                                <i class="fa-solid fa-box"></i> Inventory
-                            </button>
-                            
-                            <div style="margin-top: 40px; padding: 0 10px;">
-                                <button onclick="app.showHome()" class="btn btn-secondary w-full">
-                                    <i class="fa-solid fa-store"></i> Back to Store
-                                </button>
-                            </div>
-                        </aside>
-
-                        <main class="admin-content">
-                            <div id="admin-tab-view">
-                                ${app.getTabContent(APP_STATE.currentAdminTab)}
-                            </div>
-                        </main>
+                    <div class="admin-content fade-in">
+                        <div id="admin-tab-view">
+                            ${app.getTabContent(APP_STATE.currentAdminTab)}
+                        </div>
                     </div>
                 `;
             },
@@ -2728,12 +2731,7 @@
                 if (tabView) {
                     tabView.innerHTML = app.getTabContent(tab);
                 }
-                
-                // Update active state
-                document.querySelectorAll('.sidebar-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelector(`.sidebar-btn[onclick*="'${tab}'"]`)?.classList.add('active');
+                app.renderHeader(); // Update active state in dropdown
             },
 
             getTabContent: (tab) => {
@@ -2913,6 +2911,7 @@
                                         <th>Customer</th>
                                         <th>Type</th>
                                         <th>Message</th>
+                                        <th>Location</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -2928,6 +2927,15 @@
                                             <td><span class="badge badge-primary">${q.type}</span></td>
                                             <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 ${q.message}
+                                            </td>
+                                            <td>
+                                                ${q.location && q.location.latitude ? `
+                                                    <a href="https://www.google.com/maps?q=${q.location.latitude},${q.location.longitude}" 
+                                                       target="_blank" 
+                                                       class="location-link">
+                                                        <i class="fa-solid fa-map-marker-alt"></i> View
+                                                    </a>
+                                                ` : '<span style="color: var(--text-muted);">-</span>'}
                                             </td>
                                             <td>
                                                 <span class="badge ${q.status === 'Solved' ? 'badge-success' : 'badge-warning'}">
