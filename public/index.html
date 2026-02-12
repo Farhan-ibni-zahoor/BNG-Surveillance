@@ -605,6 +605,46 @@
             transform: translateY(0);
         }
 
+        /* Floating WhatsApp Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 3500;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float.show {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .whatsapp-float {
+                bottom: 80px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
+            }
+        }
+
         /* Loader */
         #loader {
             position: fixed;
@@ -807,6 +847,11 @@
 
     <div id="toast" class="toast">Action Completed</div>
 
+    <!-- Floating WhatsApp Button -->
+    <a id="whatsapp-float" class="whatsapp-float" href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" target="_blank" title="Chat with us on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
     <!-- SUCCESS LOGIN MODAL -->
     <div id="success-modal" class="success-modal">
         <div class="success-content">
@@ -860,8 +905,8 @@
     </div>
 
     <nav>
-        <div class="logo" onclick="app.renderShop()">
-            <img src="data:image/svg+xml;base64,bngimage.jpg+PGNpcmNsZSBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iNDAiIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIwMCIvPjx0ZXh0IHg9IjI1MCIgeT0iMzIwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Qk5HPC90ZXh0PjwvZz48L3N2Zz4=" alt="BNG Logo" />
+        <div class="logo" onclick="app.rendataderShop()">
+            <img src="bngimage.jpg" alt="BNG Logo" />
             <span class="logo-text">BNG Surveillance</span>
         </div>
         <div class="nav-right" id="nav-actions-area"></div>
@@ -960,11 +1005,28 @@
                 app.renderShop();
             },
 
+            // Scroll to first product section
+            scrollToProducts: () => {
+                // Find first available category section
+                const categories = ['ANALOG', 'IP', 'WIFI', '4G', 'ACCESSORIES'];
+                for (const cat of categories) {
+                    const section = document.getElementById(`${cat}-section`);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        break;
+                    }
+                }
+            },
+
             // UI RENDERERS
             renderHeader: () => {
                 const nav = document.getElementById('nav-actions-area');
+                const whatsappBtn = document.getElementById('whatsapp-float');
+                
                 if (!APP_STATE.user) {
                     nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-primary"><i class="fa-solid fa-user"></i> Customer Login</button>`;
+                    // Hide WhatsApp button when not logged in
+                    if (whatsappBtn) whatsappBtn.classList.remove('show');
                 } else {
                     const isAdmin = APP_STATE.user.role === 'author';
                     nav.innerHTML = `
@@ -976,6 +1038,8 @@
                         </button>
                         <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-sign-out-alt"></i></button>
                     `;
+                    // Show WhatsApp button when logged in
+                    if (whatsappBtn) whatsappBtn.classList.add('show');
                 }
             },
 
@@ -997,9 +1061,9 @@
                     const productCards = products.map(p => {
                         const isSoldOut = p.stock <= 0;
                         return `
-                            <div class="card ${isSoldOut ? 'out-of-stock' : ''}" onclick="app.viewProductDetails('${p._id}')">
+                            <div class="card ${isSoldOut ? 'out-of-stock' : ''}">
                                 ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
-                                <div class="card-img-box">
+                                <div class="card-img-box" onclick="app.viewProductDetails('${p._id}')">
                                     <img src="${p.image}" alt="${p.name}">
                                 </div>
                                 <div class="card-info">
@@ -1008,7 +1072,7 @@
                                     <div class="price-tag">₹${p.price.toLocaleString('en-IN')}</div>
                                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0;">Stock: ${p.stock} units</p>
                                     ${!isSoldOut 
-                                        ? `<button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="event.stopPropagation(); app.viewProductDetails('${p._id}')">View Details</button>`
+                                        ? `<button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="app.viewProductDetails('${p._id}')">View Details</button>`
                                         : `<button class="btn btn-secondary" style="width:100%; margin-top: 10px;" disabled>Out of Stock</button>`
                                     }
                                 </div>
@@ -1047,7 +1111,7 @@
                                     Complete security solutions with professional installation and 24/7 support
                                 </p>
                                 <div style="display:flex; gap:15px; justify-content:center; flex-wrap: wrap;">
-                                    <button onclick="document.getElementById('ANALOG-section').scrollIntoView({behavior:'smooth'})" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+                                    <button onclick="app.scrollToProducts()" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
                                         <i class="fa-solid fa-video"></i> Browse Cameras
                                     </button>
                                     <button onclick="app.renderRaiseRequest()" class="btn btn-secondary" style="font-size: 1.1rem; padding: 16px 32px;">
@@ -1118,15 +1182,26 @@
                                     ${p.stock} Units
                                 </span>
                             </div>
-                            <div style="width: 120px;">
-                                <span class="label" style="margin: 0 0 5px 0; display: block; font-size: 0.85rem;">Quantity</span>
-                                <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="padding: 10px; text-align:center;">
-                            </div>
+                            ${APP_STATE.user ? `
+                                <div style="width: 120px;">
+                                    <span class="label" style="margin: 0 0 5px 0; display: block; font-size: 0.85rem;">Quantity</span>
+                                    <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="padding: 10px; text-align:center;">
+                                </div>
+                            ` : ''}
                         </div>
 
-                        <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                        </button>
+                        ${APP_STATE.user ? `
+                            <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                        ` : `
+                            <button onclick="app.closeModal(); app.showAuth('login');" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
+                                <i class="fa-solid fa-sign-in-alt"></i> Login to Purchase
+                            </button>
+                            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">
+                                Please login to add items to your cart
+                            </p>
+                        `}
 
                         <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid var(--border);">
                             <h4 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
@@ -1171,7 +1246,7 @@
                 }
 
                 const product = APP_STATE.inventory.find(x => x._id === id);
-                const qtyRequested = parseInt(document.getElementById('purchase-qty-input').value) || 1;
+                const qtyRequested = parseInt(document.getElementById('purchase-qty-input')?.value) || 1;
 
                 if(qtyRequested > product.stock) {
                     app.showToast("Requested quantity exceeds available stock");
@@ -1845,6 +1920,9 @@
 
             closeSuccessModal: () => {
                 document.getElementById('success-modal').classList.remove('active');
+                // Show WhatsApp button for logged in users
+                const whatsappBtn = document.getElementById('whatsapp-float');
+                if (whatsappBtn && APP_STATE.user) whatsappBtn.classList.add('show');
                 app.init();
             },
 
@@ -1892,6 +1970,11 @@
                 sessionStorage.removeItem('user');
                 APP_STATE.user = null;
                 APP_STATE.cart = [];
+                
+                // Hide WhatsApp button
+                const whatsappBtn = document.getElementById('whatsapp-float');
+                if (whatsappBtn) whatsappBtn.classList.remove('show');
+                
                 app.showToast("Logged out successfully");
                 app.init();
             },
@@ -2322,7 +2405,7 @@
             }
         };
 
-        // EVENT LISTENER
+        // EVENT LISTENERS
         document.getElementById('modal-overlay').addEventListener('click', (e) => {
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
