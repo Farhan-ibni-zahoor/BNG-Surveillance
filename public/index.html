@@ -6,7 +6,6 @@
     <title>BNG Surveillance | Premium CCTV Solutions</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,32 +13,29 @@
 
     <style>
         /* ============================================================
-           1. LIGHT & FRIENDLY DESIGN SYSTEM
+           1. DESIGN SYSTEM & VARIABLES
            ============================================================ */
         :root {
-            /* Light Color Palette */
+            /* Colors */
             --bg-main: #f8fafc;
             --bg-white: #ffffff;
             --bg-light: #f1f5f9;
-            --primary: #0ea5e9; /* Sky Blue */
+            --primary: #0ea5e9;
             --primary-dark: #0284c7;
             --primary-light: #7dd3fc;
             --secondary: #64748b;
-            --accent: #06b6d4; /* Cyan */
+            --accent: #06b6d4;
             
-            /* Semantic Colors */
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #3b82f6;
             
-            /* Text Colors */
             --text-dark: #1e293b;
             --text-main: #334155;
             --text-muted: #64748b;
             --text-light: #94a3b8;
             
-            /* Layout */
             --border: #e2e8f0;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -50,7 +46,6 @@
             --radius-lg: 16px;
             --radius-xl: 24px;
             
-            /* Typography */
             --font-main: 'Inter', sans-serif;
             --font-display: 'Poppins', sans-serif;
         }
@@ -98,14 +93,13 @@
             50% { transform: translateY(-10px); }
         }
 
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .fade-in { animation: fadeIn 0.5s ease; }
@@ -113,7 +107,7 @@
         .float { animation: float 3s ease-in-out infinite; }
 
         /* ============================================================
-           3. BUTTONS & COMPONENTS
+           3. BUTTONS & FORM COMPONENTS
            ============================================================ */
         .btn { 
             padding: 12px 24px; 
@@ -164,7 +158,6 @@
             color: white; 
         }
 
-        /* Form Controls */
         .form-group { margin-bottom: 20px; }
         
         .label { 
@@ -227,6 +220,7 @@
             gap: 12px; 
             cursor: pointer;
             transition: transform 0.3s ease;
+            user-select: none;
         }
 
         .logo:hover {
@@ -296,30 +290,12 @@
         }
 
         /* ============================================================
-           6. CATEGORY SECTIONS
+           6. CATEGORY & PRODUCT SECTIONS
            ============================================================ */
         .category-section {
             padding: 60px 5%;
             max-width: 1400px;
             margin: 0 auto;
-        }
-
-        .category-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .category-header h2 {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-        }
-
-        .category-header p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
         }
 
         .category-banner {
@@ -440,7 +416,7 @@
         }
 
         /* ============================================================
-           7. MODALS
+           7. MODALS & OVERLAYS
            ============================================================ */
         .overlay { 
             position: fixed; 
@@ -583,7 +559,7 @@
         }
         .cart-panel.open { right: 0; }
 
-        /* Toast */
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -624,6 +600,7 @@
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
             transition: all 0.3s ease;
             animation: float 3s ease-in-out infinite;
+            text-decoration: none;
         }
 
         .whatsapp-float:hover {
@@ -633,16 +610,6 @@
 
         .whatsapp-float.show {
             display: flex;
-        }
-
-        @media (max-width: 768px) {
-            .whatsapp-float {
-                bottom: 80px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.6rem;
-            }
         }
 
         /* Loader */
@@ -665,10 +632,6 @@
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         /* ============================================================
@@ -705,6 +668,7 @@
             color: white;
             font-size: 1.3rem;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .social-links a:hover {
@@ -712,13 +676,9 @@
             transform: translateY(-5px);
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 5%;
-        }
-
-        /* Admin Panel */
+        /* ============================================================
+           9. ADMIN PANEL
+           ============================================================ */
         .admin-layout { 
             display: flex; 
             min-height: calc(100vh - 70px); 
@@ -819,7 +779,9 @@
             background: var(--bg-light);
         }
 
-        /* Responsive */
+        /* ============================================================
+           10. RESPONSIVE DESIGN
+           ============================================================ */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .cart-panel { width: 100%; right: -100%; }
@@ -834,6 +796,13 @@
             .category-banner {
                 flex-direction: column;
                 text-align: center;
+            }
+            .whatsapp-float {
+                bottom: 80px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
             }
         }
     </style>
@@ -880,6 +849,7 @@
         </div>
     </div>
 
+    <!-- CART PANEL -->
     <div id="cart-panel" class="cart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);"><i class="fa-solid fa-shopping-cart"></i> Your Cart</h2>
@@ -904,25 +874,30 @@
         </div>
     </div>
 
+    <!-- NAVIGATION -->
     <nav>
-        <div class="logo" onclick="app.rendataderShop()">
+        <div class="logo" onclick="app.renderShop()" id="app-logo">
             <img src="bngimage.jpg" alt="BNG Logo" />
             <span class="logo-text">BNG Surveillance</span>
         </div>
         <div class="nav-right" id="nav-actions-area"></div>
     </nav>
 
+    <!-- MAIN CONTENT -->
     <main id="app-root-view"></main>
 
+    <!-- MODAL -->
     <div id="modal-overlay" class="overlay">
         <div id="modal-body-content" class="modal"></div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
+        // ================================================================
+        // CONFIGURATION
+        // ================================================================
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
-            RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ',
+            RAZORPAY_ID: 'rzphdjhwdjhwd',
             WHATSAPP_ID: '916006750581'
         };
 
@@ -960,7 +935,9 @@
             }
         };
 
-        // --- APPLICATION STATE ---
+        // ================================================================
+        // APPLICATION STATE
+        // ================================================================
         const APP_STATE = {
             user: JSON.parse(sessionStorage.getItem('user')) || null,
             cart: [],
@@ -972,10 +949,18 @@
             userLocation: null
         };
 
-        // --- SYSTEM ENGINE ---
+        // ================================================================
+        // MAIN APPLICATION OBJECT
+        // ================================================================
         const app = {
             
+            // ============================================================
+            // INITIALIZATION
+            // ============================================================
             init: async () => {
+                console.log('🚀 Initializing BNG Surveillance...');
+                
+                // Hide loader after 1.5 seconds
                 setTimeout(() => {
                     const loader = document.getElementById('loader');
                     if(loader) {
@@ -984,18 +969,25 @@
                     }
                 }, 1500);
 
+                // Load inventory from server
                 await app.syncInventory();
+                
+                // Render UI
                 app.refreshUI();
+                
+                console.log('✅ Application ready!');
             },
 
             syncInventory: async () => {
                 try {
+                    console.log('📦 Syncing inventory...');
                     const response = await fetch(`${COMMAND_CONFIG.API_BASE}/products`);
                     if(response.ok) {
                         APP_STATE.inventory = await response.json();
+                        console.log(`✅ Loaded ${APP_STATE.inventory.length} products`);
                     }
                 } catch(err) {
-                    console.error("Database Sync Failed", err);
+                    console.error("❌ Database Sync Failed", err);
                     app.showToast("Failed to load products");
                 }
             },
@@ -1005,27 +997,81 @@
                 app.renderShop();
             },
 
-            // Scroll to first product section
-            scrollToProducts: () => {
-                // Find first available category section
+            // ============================================================
+            // FIXED SCROLL TO PRODUCTS FUNCTION
+            // ============================================================
+            scrollToProducts: async () => {
+                console.log('📹 Browse Cameras button clicked!');
+                
+                // Ensure we're on the shop page
+                const root = document.getElementById('app-root-view');
+                if (!root) {
+                    console.error('❌ App root not found');
+                    return;
+                }
+                
+                // Check if shop content is rendered
+                const hasShopContent = root.innerHTML.includes('category-section');
+                
+                if (!hasShopContent || APP_STATE.inventory.length === 0) {
+                    console.log('🔄 Rendering shop first...');
+                    
+                    // Sync inventory if empty
+                    if (APP_STATE.inventory.length === 0) {
+                        await app.syncInventory();
+                    }
+                    
+                    // Render shop
+                    app.renderShop();
+                    
+                    // Wait for DOM update
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                // Now try to find and scroll to first product section
                 const categories = ['ANALOG', 'IP', 'WIFI', '4G', 'ACCESSORIES'];
+                let targetSection = null;
+                
                 for (const cat of categories) {
                     const section = document.getElementById(`${cat}-section`);
                     if (section) {
-                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        targetSection = section;
+                        console.log(`✅ Found section: ${cat}`);
                         break;
                     }
                 }
+                
+                if (targetSection) {
+                    // Smooth scroll with offset for fixed nav
+                    const navHeight = document.querySelector('nav')?.offsetHeight || 70;
+                    const yOffset = -navHeight - 20;
+                    const y = targetSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    
+                    window.scrollTo({ 
+                        top: y, 
+                        behavior: 'smooth' 
+                    });
+                    
+                    console.log('✅ Scrolling to products!');
+                } else {
+                    console.warn('⚠️ No product sections found');
+                    app.showToast("Loading products... Please wait!");
+                    
+                    // Try one more sync
+                    await app.syncInventory();
+                    app.renderShop();
+                }
             },
 
+            // ============================================================
             // UI RENDERERS
+            // ============================================================
             renderHeader: () => {
                 const nav = document.getElementById('nav-actions-area');
                 const whatsappBtn = document.getElementById('whatsapp-float');
                 
                 if (!APP_STATE.user) {
                     nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-primary"><i class="fa-solid fa-user"></i> Customer Login</button>`;
-                    // Hide WhatsApp button when not logged in
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                 } else {
                     const isAdmin = APP_STATE.user.role === 'author';
@@ -1038,7 +1084,6 @@
                         </button>
                         <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-sign-out-alt"></i></button>
                     `;
-                    // Show WhatsApp button when logged in
                     if (whatsappBtn) whatsappBtn.classList.add('show');
                 }
             },
@@ -1046,10 +1091,14 @@
             renderShop: () => {
                 const root = document.getElementById('app-root-view');
                 
+                console.log('🏪 Rendering shop...');
+                console.log(`📦 Inventory count: ${APP_STATE.inventory.length}`);
+                
                 // Group products by category
                 const productsByCategory = {};
                 Object.keys(CATEGORIES).forEach(key => {
                     productsByCategory[key] = APP_STATE.inventory.filter(p => p.category === key);
+                    console.log(`Category ${key}: ${productsByCategory[key].length} products`);
                 });
 
                 let categorySections = Object.keys(CATEGORIES).map(catKey => {
@@ -1144,6 +1193,8 @@
                         </footer>
                     </div>
                 `;
+                
+                console.log('✅ Shop rendered successfully');
             },
 
             viewProductDetails: (id) => {
@@ -1225,7 +1276,7 @@
                             ${APP_STATE.user ? `
                                 <div style="display: flex; gap: 10px;">
                                     <input type="text" id="review-comment-field" placeholder="Write your review..." style="flex: 1;">
-                                    <button onclick="app.postFieldReport('${p._id}')" class="btn btn-primary" style="padding: 0 24px;">
+                                    <button onclick="app.postReview('${p._id}')" class="btn btn-primary" style="padding: 0 24px;">
                                         <i class="fa-solid fa-paper-plane"></i>
                                     </button>
                                 </div>
@@ -1331,7 +1382,7 @@
                 app.showToast("Item removed from cart");
             },
 
-            // CHECKOUT WITH LOCATION
+            // CHECKOUT
             checkout: () => {
                 if(APP_STATE.cart.length === 0) {
                     app.showToast("Your cart is empty!");
@@ -1550,7 +1601,7 @@
                 app.openModal(html);
             },
 
-            // SUPPORT REQUEST WITH LOCATION
+            // SUPPORT REQUEST
             renderRaiseRequest: () => {
                 if(!APP_STATE.user) {
                     app.showToast("Please login to raise a support request");
@@ -1703,7 +1754,7 @@
                 }
             },
 
-            // PROFILE WITH ORDER CANCELLATION
+            // PROFILE
             renderProfile: async () => {
                 const root = document.getElementById('app-root-view');
                 let orders = [];
@@ -1713,7 +1764,7 @@
                 } catch(e) {}
 
                 root.innerHTML = `
-                    <div class="container fade-in" style="max-width: 1000px; padding: 60px 5%;">
+                    <div style="max-width: 1000px; padding: 60px 5%; margin: 0 auto;" class="fade-in">
                         <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
                             <i class="fa-solid fa-user-circle"></i> My Account
                         </h1>
@@ -1920,7 +1971,6 @@
 
             closeSuccessModal: () => {
                 document.getElementById('success-modal').classList.remove('active');
-                // Show WhatsApp button for logged in users
                 const whatsappBtn = document.getElementById('whatsapp-float');
                 if (whatsappBtn && APP_STATE.user) whatsappBtn.classList.add('show');
                 app.init();
@@ -1971,7 +2021,6 @@
                 APP_STATE.user = null;
                 APP_STATE.cart = [];
                 
-                // Hide WhatsApp button
                 const whatsappBtn = document.getElementById('whatsapp-float');
                 if (whatsappBtn) whatsappBtn.classList.remove('show');
                 
@@ -1979,7 +2028,7 @@
                 app.init();
             },
 
-            postFieldReport: async (id) => {
+            postReview: async (id) => {
                 const comment = document.getElementById('review-comment-field').value;
                 if(!comment || comment.trim() === '') {
                     app.showToast("Please write a review");
@@ -1998,7 +2047,7 @@
                 }
             },
 
-            // ADMIN PANEL (Simplified for brevity - add full admin features from previous code)
+            // ADMIN PANEL
             renderAdminPortal: async () => {
                 if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.renderShop();
 
@@ -2405,12 +2454,141 @@
             }
         };
 
+        // ================================================================
         // EVENT LISTENERS
+        // ================================================================
         document.getElementById('modal-overlay').addEventListener('click', (e) => {
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
 
-        // BOOT
+        // ================================================================
+        // EASTER EGG INITIALIZATION
+        // ================================================================
+        (function() {
+            'use strict';
+            
+            const bannerArt = `
+    ╔══════════════════════════════════════════════════════════════╗
+    ║      🛡️  BNG SURVEILLANCE - DEV MODE ACTIVATED  🛡️           ║
+    ║      "We see everything... including your code!" 👀          ║
+    ╚══════════════════════════════════════════════════════════════╝
+    `;
+
+            // CCTV Mode
+            const activateCCTVMode = () => {
+                document.body.style.filter = 'grayscale(100%) contrast(1.2)';
+                document.body.style.transition = 'filter 0.5s ease';
+                
+                const overlay = document.createElement('div');
+                overlay.innerHTML = `
+                    <div style="position: fixed; top: 20px; left: 20px; background: rgba(0,0,0,0.8); color: lime; padding: 15px; font-family: 'Courier New', monospace; border: 2px solid lime; z-index: 9999; border-radius: 5px;">
+                        <div style="font-size: 20px; font-weight: bold;">📹 CCTV MODE</div>
+                        <div style="font-size: 12px; color: #0f0;">● REC</div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                
+                console.log('%c🎬 CCTV MODE ACTIVATED! 🎬', 'color: lime; font-size: 20px; font-weight: bold; background: black; padding: 10px;');
+                
+                setTimeout(() => {
+                    document.body.style.filter = '';
+                    overlay.remove();
+                }, 10000);
+            };
+
+            // Matrix Rain
+            const matrixRain = () => {
+                const canvas = document.createElement('canvas');
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;pointer-events:none;';
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                document.body.appendChild(canvas);
+                
+                const ctx = canvas.getContext('2d');
+                const chars = 'BNGSURVEILLANCE01234@#$%';
+                const fontSize = 14;
+                const columns = canvas.width / fontSize;
+                const drops = Array(Math.floor(columns)).fill(1);
+                
+                const draw = () => {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#0F0';
+                    ctx.font = fontSize + 'px monospace';
+                    
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = chars[Math.floor(Math.random() * chars.length)];
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i]++;
+                    }
+                };
+                
+                const interval = setInterval(draw, 33);
+                console.log('%c🌧️ ENTERING THE MATRIX...', 'color: #0f0; font-size: 18px; font-family: monospace;');
+                
+                setTimeout(() => {
+                    clearInterval(interval);
+                    canvas.remove();
+                }, 15000);
+            };
+
+            // Global Commands
+            window.BNG = {
+                cctvMode: activateCCTVMode,
+                matrix: matrixRain,
+                
+                whoIsWatching: () => {
+                    console.log('%c👀 WHO IS WATCHING?', 'color: orange; font-size: 20px; font-weight: bold;');
+                    console.log('%cIt\'s us. The dev team. Hi! 👋', 'color: cyan; font-size: 14px;');
+                },
+                
+                secretStats: () => {
+                    console.table({
+                        'Coffee Consumed': Math.floor(Math.random() * 100) + ' cups ☕',
+                        'Bugs Fixed': Math.floor(Math.random() * 500) + ' bugs 🐛',
+                        'Late Nights': Math.floor(Math.random() * 50) + ' nights 🌙',
+                        'Lines of Code': (Math.random() * 10000).toFixed(0) + ' lines 💻'
+                    });
+                },
+                
+                help: () => {
+                    console.log(bannerArt);
+                    console.log('%c🎮 SECRET DEV COMMANDS', 'color: #0ea5e9; font-size: 18px; font-weight: bold;');
+                    console.log('%c  BNG.cctvMode()      - CCTV mode 📹', 'color: #f59e0b; font-weight: bold;');
+                    console.log('%c  BNG.matrix()        - Matrix effect 🌧️', 'color: #f59e0b; font-weight: bold;');
+                    console.log('%c  BNG.whoIsWatching() - Find out 👀', 'color: #f59e0b; font-weight: bold;');
+                    console.log('%c  BNG.secretStats()   - Dev stats 📊', 'color: #f59e0b; font-weight: bold;');
+                    console.log('%c💡 Tip: Triple-click the logo!', 'color: #8b5cf6;');
+                }
+            };
+
+            // Triple-click logo Easter egg
+            setTimeout(() => {
+                const logo = document.getElementById('app-logo');
+                if (logo) {
+                    let clicks = 0;
+                    logo.addEventListener('click', () => {
+                        clicks++;
+                        if (clicks === 3) {
+                            activateCCTVMode();
+                            if (app?.showToast) app.showToast("🎉 Easter egg unlocked!");
+                            clicks = 0;
+                        }
+                        setTimeout(() => clicks = 0, 500);
+                    });
+                }
+            }, 1000);
+
+            // Welcome message
+            console.log(bannerArt);
+            console.log('%cType %cBNG.help()%c for secret commands!', 'color: #94a3b8;', 'color: #f59e0b; font-weight: bold;', 'color: #94a3b8;');
+
+        })();
+
+        // ================================================================
+        // BOOT APPLICATION
+        // ================================================================
         window.onload = app.init;
     </script>
 </body>
