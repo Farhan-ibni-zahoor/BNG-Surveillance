@@ -160,11 +160,18 @@ const OrderSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     address: { type: String, required: true },
     pincode: { type: String, required: true },
+    location: {
+        latitude: Number,
+        longitude: Number,
+        accuracy: Number
+    },
     items: { type: Array, required: true },
     total: { type: Number, required: true },
-    status: { type: String, default: 'Processing' },
+    status: { type: String, default: 'Processing' }, // Processing, Delivered, Cancelled, Refund Processing
     date: { type: Date, default: Date.now },
-    deliveredAt: Date
+    deliveredAt: Date,
+    cancelledAt: Date,
+    refundProcessed: { type: Boolean, default: false }
 });
 
 // Service Request Model
@@ -173,6 +180,11 @@ const RequestSchema = new mongoose.Schema({
     email: { type: String, required: true },
     type: { type: String, required: true },
     message: { type: String, required: true },
+    location: {
+        latitude: Number,
+        longitude: Number,
+        accuracy: Number
+    },
     status: { type: String, default: 'Open' },
     date: { type: Date, default: Date.now },
     resolvedAt: Date
@@ -762,6 +774,7 @@ app.post('/api/verify-payment', async (req, res) => {
             phone: customerDetails.phone,
             address: customerDetails.address,
             pincode: customerDetails.pincode,
+            location: customerDetails.location || null,
             items: customerDetails.items,
             total: customerDetails.total,
             status: "Processing"
@@ -784,10 +797,16 @@ app.post('/api/verify-payment', async (req, res) => {
             `${i.qty}x ${i.name} @ ₹${i.price}`
         ).join('\n');
         
+        let locationInfo = '';
+        if (customerDetails.location) {
+            const gmapsLink = `https://www.google.com/maps?q=${customerDetails.location.latitude},${customerDetails.location.longitude}`;
+            locationInfo = `\n\n📍 Customer Location (Google Maps):\n${gmapsLink}`;
+        }
+        
         await sendEmail(
             process.env.EMAIL_USER, 
             `💰 NEW ORDER: ₹${customerDetails.total} - ${customerDetails.name}`, 
-            `YOU HAVE A NEW ORDER!\n\nOrder ID: ${orderCreationId}\n\nCustomer Details:\nName: ${customerDetails.name}\nEmail: ${customerDetails.email}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}\n\nItems:\n${itemList}\n\nTotal Amount: ₹${customerDetails.total}\n\nPayment Status: PAID\nPayment ID: ${razorpayPaymentId}\n\nCheck Admin Dashboard for full details.`
+            `YOU HAVE A NEW ORDER!\n\nOrder ID: ${orderCreationId}\n\nCustomer Details:\nName: ${customerDetails.name}\nEmail: ${customerDetails.email}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}${locationInfo}\n\nItems:\n${itemList}\n\nTotal Amount: ₹${customerDetails.total}\n\nPayment Status: PAID\nPayment ID: ${razorpayPaymentId}\n\nCheck Admin Dashboard for full details.`
         );
 
         res.json({ 
@@ -806,7 +825,7 @@ app.post('/api/verify-payment', async (req, res) => {
 // Submit Request (User)
 app.post('/api/requests', async (req, res) => {
     try {
-        const { customerName, email, type, message } = req.body;
+        const { customerName, email, type, message, location } = req.body;
 
         // Validation
         if (!customerName || !email || !type || !message) {
@@ -817,14 +836,26 @@ app.post('/api/requests', async (req, res) => {
             return res.status(400).json({ error: "Invalid email format" });
         }
 
-        const newRequest = new Request(req.body);
+        const newRequest = new Request({
+            customerName,
+            email,
+            type,
+            message,
+            location: location || null
+        });
         await newRequest.save();
 
-        // Email Admin
+        // Email Admin with location link if available
+        let locationInfo = '';
+        if (location && location.latitude && location.longitude) {
+            const gmapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+            locationInfo = `\n\n📍 Customer Location (Google Maps):\n${gmapsLink}`;
+        }
+
         await sendEmail(
             process.env.EMAIL_USER, 
             `🔔 NEW ${type.toUpperCase()} REQUEST - ${customerName}`, 
-            `NEW SERVICE REQUEST RECEIVED\n\nType: ${type}\nFrom: ${customerName}\nEmail: ${email}\n\nMessage:\n${message}\n\nPlease check the admin dashboard for details.`
+            `NEW SERVICE REQUEST RECEIVED\n\nType: ${type}\nFrom: ${customerName}\nEmail: ${email}\n\nMessage:\n${message}${locationInfo}\n\nPlease check the admin dashboard for details.`
         );
 
         console.log(`✅ Service request created: ${newRequest._id}`);
@@ -925,6 +956,70 @@ app.patch('/api/orders/:id/deliver', async (req, res) => {
     } catch (e) {
         console.error('Deliver Order Error:', e);
         res.status(500).json({ error: "Update failed" });
+    }
+});
+
+// Cancel Order with Refund (Customer)
+app.patch('/api/orders/:id/cancel', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        // Only allow cancellation if order is still processing
+        if (order.status !== 'Processing') {
+            return res.status(400).json({ 
+                error: "Only orders in 'Processing' status can be cancelled" 
+            });
+        }
+
+        // Restore stock for cancelled items
+        if (order.items && order.items.length > 0) {
+            for (const item of order.items) {
+                if (item._id && item.qty) {
+                    await Product.findByIdAndUpdate(item._id, { 
+                        $inc: { stock: item.qty } 
+                    });
+                    console.log(`✅ Stock restored: ${item.name} (+${item.qty})`);
+                }
+            }
+        }
+
+        // Update order status
+        const updated = await Order.findByIdAndUpdate(
+            req.params.id,
+            {
+                status: 'Refund Processing',
+                cancelledAt: new Date(),
+                refundProcessed: false
+            },
+            { new: true }
+        );
+
+        // Send email notifications
+        await sendEmail(
+            order.email,
+            '🔄 Order Cancellation - Refund Processing',
+            `Dear ${order.customer},\n\nYour order #${order.razorpay_order_id.substr(-8)} has been cancelled as requested.\n\nRefund Amount: ₹${order.total}\n\nThe refund will be processed to your original payment method within 7 business days.\n\nIf you have any questions, please contact our support team.\n\nThank you,\nBNG Surveillance Team`
+        );
+
+        await sendEmail(
+            process.env.EMAIL_USER,
+            `❌ Order Cancelled - Refund Required`,
+            `ORDER CANCELLATION ALERT\n\nOrder ID: ${order.razorpay_order_id}\nCustomer: ${order.customer}\nEmail: ${order.email}\nAmount: ₹${order.total}\n\nAction Required: Process refund within 7 days\n\nItems returned to stock successfully.`
+        );
+
+        console.log(`✅ Order cancelled & refund initiated: ${req.params.id}`);
+        res.json({ 
+            message: "Order cancelled. Refund will be processed within 7 business days.",
+            order: updated
+        });
+        
+    } catch (e) {
+        console.error('Cancel Order Error:', e);
+        res.status(500).json({ error: "Cancellation failed" });
     }
 });
 

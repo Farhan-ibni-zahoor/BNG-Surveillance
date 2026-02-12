@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNG Surveillance | Secure Systems Command</title>
+    <title>BNG Surveillance | Premium CCTV Solutions</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -14,112 +14,83 @@
 
     <style>
         /* ============================================================
-           1. CORE DESIGN SYSTEM & VARIABLES
+           1. LIGHT & FRIENDLY DESIGN SYSTEM
            ============================================================ */
         :root {
-            /* Color Palette */
-            --bg-deep: #020202;
-            --bg-panel: #0a0a0a;
-            --bg-glass: rgba(10, 10, 10, 0.95);
-            --primary: #f59e0b;
-            --primary-dim: rgba(245, 158, 11, 0.1);
-            --primary-glow: rgba(245, 158, 11, 0.4);
-            --secondary: #1a1a1a;
+            /* Light Color Palette */
+            --bg-main: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-light: #f1f5f9;
+            --primary: #0ea5e9; /* Sky Blue */
+            --primary-dark: #0284c7;
+            --primary-light: #7dd3fc;
+            --secondary: #64748b;
+            --accent: #06b6d4; /* Cyan */
             
-            /* UI Semantic Colors */
+            /* Semantic Colors */
             --success: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
             --info: #3b82f6;
             
             /* Text Colors */
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --text-dim: #555555;
+            --text-dark: #1e293b;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
             
-            /* Layout & Spacing */
-            --border: rgba(255, 255, 255, 0.08);
+            /* Layout */
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
             --radius-lg: 16px;
-            --radius-md: 8px;
-            --sidebar-width: 280px;
+            --radius-xl: 24px;
             
             /* Typography */
-            --font-main: 'Outfit', sans-serif;
-            --font-tech: 'Space Grotesk', monospace;
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Poppins', sans-serif;
         }
 
-        /* ============================================================
-           2. GLOBAL RESET & BASE STYLES
-           ============================================================ */
         * { 
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            outline: none; 
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background-color: var(--bg-deep);
+            background: var(--bg-main);
             color: var(--text-main);
             font-family: var(--font-main);
             min-height: 100vh;
             line-height: 1.6;
-            overflow-x: hidden;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
         }
 
-        /* Custom Scrollbar */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-track { background: var(--bg-light); }
         ::-webkit-scrollbar-thumb { 
-            background: #222; 
-            border: 2px solid var(--bg-deep); 
+            background: var(--primary); 
             border-radius: 10px; 
         }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
 
-        /* Typography Selection */
-        ::selection { background: var(--primary); color: #000; }
+        ::selection { background: var(--primary-light); color: var(--text-dark); }
 
         /* ============================================================
-           3. ENHANCED ANIMATIONS
+           2. ANIMATIONS
            ============================================================ */
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(40px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
         @keyframes fadeIn { 
             from { opacity: 0; } 
             to { opacity: 1; } 
         }
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        @keyframes pulseBorder {
-            0%, 100% { border-color: var(--border); }
-            50% { border-color: var(--primary); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(100px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
 
         @keyframes float {
@@ -127,427 +98,392 @@
             50% { transform: translateY(-10px); }
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px var(--primary-glow); }
-            50% { box-shadow: 0 0 40px var(--primary-glow), 0 0 60px var(--primary-glow); }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
-        .animate-enter { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        .scale-in { animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .slide-in-right { animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease; }
+        .slide-up { animation: slideUp 0.6s ease; }
+        .float { animation: float 3s ease-in-out infinite; }
 
         /* ============================================================
-           4. ENHANCED UI COMPONENTS
+           3. BUTTONS & COMPONENTS
            ============================================================ */
-        
-        /* Buttons with Better Interactions */
         .btn { 
-            padding: 14px 28px; 
+            padding: 12px 24px; 
             border-radius: var(--radius-md); 
-            font-family: var(--font-tech); 
-            font-weight: 700; 
-            text-transform: uppercase; 
+            font-family: var(--font-display); 
+            font-weight: 600; 
             cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: 1px solid transparent; 
+            transition: all 0.3s ease; 
+            border: none;
             display: inline-flex; 
             align-items: center; 
-            gap: 10px; 
+            gap: 8px; 
             justify-content: center; 
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:active::before {
-            width: 300px;
-            height: 300px;
+            font-size: 0.95rem;
+            text-decoration: none;
         }
 
         .btn-primary { 
-            background: var(--primary); 
-            color: #000; 
-            box-shadow: 0 10px 20px -10px var(--primary-glow); 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); 
+            color: white; 
+            box-shadow: var(--shadow); 
         }
         .btn-primary:hover { 
-            background: #fff; 
-            transform: translateY(-3px); 
-            box-shadow: 0 15px 30px -10px rgba(255,255,255,0.2);
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg);
         }
-        .btn-primary:active { transform: translateY(-1px); }
 
         .btn-secondary { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid var(--border); 
-            color: var(--text-main); 
-            backdrop-filter: blur(10px);
+            background: white; 
+            border: 2px solid var(--border); 
+            color: var(--text-dark); 
         }
         .btn-secondary:hover { 
             border-color: var(--primary); 
             color: var(--primary); 
-            background: var(--primary-dim);
-            transform: translateY(-2px);
         }
 
         .btn-danger { 
-            background: rgba(239, 68, 68, 0.1); 
-            color: var(--danger); 
-            border: 1px solid var(--danger); 
+            background: var(--danger); 
+            color: white; 
         }
         .btn-danger:hover { 
-            background: var(--danger); 
-            color: #fff; 
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -10px rgba(239, 68, 68, 0.5);
+            background: #dc2626; 
         }
 
         .btn-success { 
-            background: rgba(16, 185, 129, 0.1); 
-            color: var(--success); 
-            border: 1px solid var(--success); 
-        }
-        .btn-success:hover { 
             background: var(--success); 
-            color: #000; 
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -10px rgba(16, 185, 129, 0.5);
+            color: white; 
         }
 
-        /* Enhanced Form Controls */
-        .form-group { 
-            margin-bottom: 20px; 
-            position: relative;
-        }
+        /* Form Controls */
+        .form-group { margin-bottom: 20px; }
         
-        .label-tech { 
-            font-family: var(--font-tech); 
-            font-size: 0.75rem; 
-            color: var(--text-muted); 
+        .label { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--text-dark); 
             margin-bottom: 8px; 
             display: block; 
-            text-transform: uppercase;
-            transition: color 0.3s;
         }
         
         input, textarea, select { 
             width: 100%; 
-            background: #111; 
-            border: 1px solid var(--border); 
-            padding: 16px; 
-            color: #fff; 
+            background: white; 
+            border: 2px solid var(--border); 
+            padding: 12px 16px; 
+            color: var(--text-dark); 
             border-radius: var(--radius-md); 
             font-family: var(--font-main); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
             font-size: 1rem;
         }
         
         input:focus, textarea:focus, select:focus { 
+            outline: none;
             border-color: var(--primary); 
-            background: #151515;
-            box-shadow: 0 0 0 4px var(--primary-dim), 0 10px 30px -10px var(--primary-glow);
-            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
-        .form-group:focus-within .label-tech {
-            color: var(--primary);
-        }
-
-        /* Badges */
         .badge {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
-            font-family: var(--font-tech);
             display: inline-block;
-            animation: scaleIn 0.3s ease;
         }
-        .badge-solved { background: var(--success); color: #000; }
-        .badge-open { background: var(--primary); color: #000; }
+        .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
 
         /* ============================================================
-           5. ENHANCED NAVIGATION & HEADER
+           4. NAVIGATION
            ============================================================ */
         nav { 
             position: sticky; 
             top: 0; 
             z-index: 1000; 
+            background: white; 
+            box-shadow: var(--shadow-sm); 
+            padding: 1rem 5%; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 1.2rem 8%; 
-            background: var(--bg-glass); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid var(--border); 
-            transition: all 0.3s ease;
-        }
-
-        nav:hover {
-            background: rgba(10, 10, 10, 0.98);
         }
 
         .logo { 
-            font-size: 1.6rem; 
-            font-family: var(--font-tech); 
-            font-weight: 800; 
             display: flex; 
             align-items: center; 
             gap: 12px; 
-            letter-spacing: -1px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
-        
+
         .logo:hover {
             transform: scale(1.05);
         }
-        
-        .logo i { 
-            color: var(--primary); 
-            filter: drop-shadow(0 0 8px var(--primary-glow));
-            animation: float 3s ease-in-out infinite;
+
+        .logo img {
+            height: 50px;
+            width: auto;
         }
-        .logo span { color: #fff; }
+        
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
 
         .nav-right { 
             display: flex; 
             align-items: center; 
-            gap: 15px; 
+            gap: 12px; 
         }
 
         /* ============================================================
-           6. ENHANCED HERO & HOME SECTIONS
+           5. HERO SECTION
            ============================================================ */
         .hero { 
-            position: relative; 
-            height: 70vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center; 
-            margin: 2rem 5%; 
-            border-radius: 24px; 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
-            background: url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?q=80&w=1920&auto=format&fit=crop') center/cover; 
-        }
-        
-        .hero::before { 
-            content: ''; 
-            position: absolute; 
-            inset: 0; 
-            background: linear-gradient(0deg, var(--bg-deep) 10%, rgba(0,0,0,0.4) 100%); 
-        }
-        
-        .hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-deep) 100%);
-        }
-        
-        .hero-content { 
-            position: relative; 
-            z-index: 2; 
-            max-width: 900px; 
-            padding: 40px; 
-        }
-        
-        .hero-content h1 {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Service Banner */
-        .service-banner { 
-            background: linear-gradient(135deg, #0a0a0a 0%, #111 100%); 
-            border: 1px solid var(--border); 
-            border-left: 5px solid var(--primary); 
-            padding: 4rem; 
-            margin: 5rem 5% 3rem; 
-            border-radius: 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 30px; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            padding: 80px 5%;
+            text-align: center;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s ease;
         }
-        
-        .service-banner:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.8);
-        }
-        
-        .service-banner::after {
-            content: '\f3ed';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+
+        .hero::before {
+            content: '';
             position: absolute;
-            right: -20px;
-            bottom: -30px;
-            font-size: 15rem;
-            color: rgba(255,255,255,0.02);
-            transform: rotate(-15deg);
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
         }
 
         /* ============================================================
-           7. ENHANCED PRODUCT CATALOG STYLES
+           6. CATEGORY SECTIONS
            ============================================================ */
-        .catalog-header {
+        .category-section {
+            padding: 60px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .category-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .category-header h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .category-header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .category-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 30px;
+            border-radius: var(--radius-xl);
+            color: white;
+            margin-bottom: 40px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-banner-icon {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+
+        .category-banner-text h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .installation-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            backdrop-filter: blur(10px);
         }
 
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 2.5rem; 
-            margin-top: 3rem; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
         }
         
         .card { 
-            background: var(--bg-panel); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
+            background: white; 
+            border: 2px solid var(--border); 
+            border-radius: var(--radius-lg); 
             overflow: hidden; 
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            position: relative; 
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transition: left 0.5s;
-        }
-        
-        .card:hover::before {
-            left: 100%;
+            transition: all 0.3s ease; 
+            cursor: pointer;
         }
         
         .card:hover { 
-            transform: translateY(-15px) scale(1.02); 
-            border-color: var(--primary); 
-            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8), 0 0 0 1px var(--primary-glow);
+            transform: translateY(-8px); 
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
         }
 
         .card-img-box { 
-            height: 280px; 
-            background: #000; 
+            height: 250px; 
+            background: var(--bg-light); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 30px; 
-            position: relative; 
-            overflow: hidden; 
-        }
-        
-        /* Enhanced Scanline */
-        .card-img-box::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 2px;
-            background: var(--primary);
-            opacity: 0.3;
-            z-index: 2;
-            animation: scanline 4s linear infinite;
+            padding: 20px; 
+            position: relative;
+            overflow: hidden;
         }
         
         .card img { 
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain; 
-            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            transition: 0.3s ease;
         }
         .card:hover img { 
-            transform: scale(1.1) rotate(2deg); 
-            filter: drop-shadow(0 20px 40px rgba(245, 158, 11, 0.3));
+            transform: scale(1.1);
         }
         
-        .card-info { padding: 2rem; }
-        .price-tag { 
-            font-size: 1.8rem; 
-            font-family: var(--font-tech); 
-            font-weight: 800; 
-            margin: 10px 0;
-            color: var(--primary);
-            text-shadow: 0 0 20px var(--primary-glow);
+        .card-info { padding: 20px; }
+        
+        .card-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
         }
 
-        /* OUT OF STOCK OVERLAY */
-        .out-of-stock { 
-            filter: grayscale(1) contrast(0.8); 
-            pointer-events: none; 
+        .price-tag { 
+            font-size: 1.6rem; 
+            font-family: var(--font-display); 
+            font-weight: 700; 
+            color: var(--primary);
+            margin: 10px 0;
         }
+
         .stock-label { 
             position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            background: #ef4444; 
-            color: #fff; 
-            padding: 8px 15px; 
-            border-radius: 6px; 
+            top: 15px; 
+            right: 15px; 
+            background: var(--danger); 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
             font-size: 0.75rem; 
-            font-weight: 900; 
-            font-family: var(--font-tech);
+            font-weight: 700;
             z-index: 10;
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
-            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
         }
 
         /* ============================================================
-           8. SUCCESS LOGIN MODAL (NEW!)
+           7. MODALS
            ============================================================ */
+        .overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(4px);
+            z-index: 2000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s ease; 
+        }
+        .overlay.active { opacity: 1; pointer-events: all; }
+        
+        .modal { 
+            background: white; 
+            width: 95%; 
+            max-width: 600px; 
+            padding: 40px; 
+            border-radius: var(--radius-xl); 
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9); 
+            transition: 0.3s ease; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        .overlay.active .modal { transform: scale(1); }
+
+        /* Success Modal */
         .success-modal {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 3000;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
 
         .success-modal.active {
@@ -556,85 +492,61 @@
         }
 
         .success-content {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            border: 2px solid var(--primary);
-            border-radius: 30px;
-            padding: 4rem 3rem;
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 50px 40px;
             max-width: 500px;
             width: 90%;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-            transform: scale(0.8) translateY(50px);
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 40px 100px -20px var(--primary-glow), 0 0 0 1px rgba(245, 158, 11, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.4s ease;
+            box-shadow: var(--shadow-xl);
         }
 
         .success-modal.active .success-content {
-            transform: scale(1) translateY(0);
-        }
-
-        .success-content::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-            animation: glow 3s ease-in-out infinite;
+            transform: scale(1);
         }
 
         .success-icon {
             width: 100px;
             height: 100px;
-            margin: 0 auto 2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            color: #000;
-            position: relative;
-            z-index: 1;
-            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both;
-            box-shadow: 0 20px 40px -20px var(--primary-glow);
+            font-size: 3.5rem;
+            color: white;
+            animation: bounce 0.6s ease;
         }
 
         .success-title {
-            font-family: var(--font-tech);
+            font-family: var(--font-display);
             font-size: 2rem;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s ease 0.5s both;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
         }
 
         .success-subtitle {
             color: var(--text-muted);
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s ease 0.6s both;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
         }
 
         .user-info-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s ease 0.7s both;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
         }
 
         .user-info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
+            padding: 10px 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -643,10 +555,9 @@
         }
 
         .user-info-label {
-            font-family: var(--font-tech);
-            font-size: 0.75rem;
+            font-weight: 600;
             color: var(--text-muted);
-            text-transform: uppercase;
+            font-size: 0.85rem;
         }
 
         .user-info-value {
@@ -654,219 +565,63 @@
             color: var(--primary);
         }
 
-        /* ============================================================
-           9. ADMIN PANEL LAYOUT & DASHBOARD
-           ============================================================ */
-        .admin-layout { 
-            display: flex; 
-            min-height: calc(100vh - 75px); 
-        }
-        
-        .sidebar { 
-            width: var(--sidebar-width); 
-            background: #080808; 
-            border-right: 1px solid var(--border); 
-            padding: 2.5rem 1.5rem; 
-            position: fixed; 
-            height: 100%; 
-            top: 75px; 
-            left: 0; 
-            overflow-y: auto; 
-        }
-
-        .sidebar-btn { 
-            width: 100%; 
-            text-align: left; 
-            padding: 16px 20px; 
-            margin-bottom: 12px; 
-            background: transparent; 
-            border: 1px solid transparent; 
-            color: #777; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            font-family: var(--font-tech); 
-            font-size: 0.95rem; 
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .sidebar-btn::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: var(--primary);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .sidebar-btn:hover::before,
-        .sidebar-btn.active::before {
-            transform: scaleY(1);
-        }
-        
-        .sidebar-btn i { font-size: 1.1rem; width: 25px; }
-        .sidebar-btn:hover { 
-            background: rgba(255,255,255,0.03); 
-            color: #fff; 
-            transform: translateX(5px);
-        }
-        .sidebar-btn.active { 
-            background: var(--primary-dim); 
-            color: var(--primary); 
-            border-color: rgba(245, 158, 11, 0.2);
-        }
-
-        .admin-content { 
-            margin-left: var(--sidebar-width); 
-            padding: 4rem; 
-            width: 100%; 
-            background: var(--bg-deep);
-        }
-
-        /* Enhanced stat boxes */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-box {
-            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
-            transform: scaleX(0);
-            transition: transform 0.5s ease;
-        }
-
-        .stat-box:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px -20px var(--primary-glow);
-        }
-
-        .stat-box:hover::before {
-            transform: scaleX(1);
-        }
-
-        /* ============================================================
-           10. ENHANCED MODALS & UI OVERLAYS
-           ============================================================ */
-        .overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.92); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 2000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .overlay.active { opacity: 1; pointer-events: all; }
-        
-        .modal { 
-            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%); 
-            width: 95%; 
-            max-width: 600px; 
-            padding: 3.5rem; 
-            border-radius: 28px; 
-            border: 1px solid var(--border); 
-            transform: translateY(60px) scale(0.95); 
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            max-height: 85vh; 
-            overflow-y: auto; 
-            position: relative;
-            box-shadow: 0 40px 100px -30px rgba(0,0,0,0.8);
-        }
-        .overlay.active .modal { transform: translateY(0) scale(1); }
-
-        /* Enhanced Cart Panel */
+        /* Cart Panel */
         .cart-panel { 
             position: fixed; 
             top: 0; 
-            right: -500px; 
+            right: -450px; 
             width: 450px; 
             height: 100vh; 
-            background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%); 
-            border-left: 2px solid var(--primary); 
+            background: white; 
+            border-left: 2px solid var(--border); 
             z-index: 2100; 
-            padding: 3rem; 
-            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); 
+            padding: 30px; 
+            transition: 0.4s ease; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: -20px 0 60px rgba(0,0,0,0.8);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
         }
         .cart-panel.open { right: 0; }
 
-        /* Enhanced Toast */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(135deg, var(--primary) 0%, #fbbf24 100%);
-            color: #000;
-            padding: 18px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 16px 24px;
             border-radius: 50px;
-            font-family: var(--font-tech);
-            font-weight: 700;
-            font-size: 0.9rem;
+            font-weight: 600;
             opacity: 0;
-            transform: translateY(100px) scale(0.8);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(100px);
+            transition: all 0.4s ease;
             z-index: 4000;
-            box-shadow: 0 20px 40px -20px var(--primary-glow);
-            pointer-events: none;
-            letter-spacing: 1px;
+            box-shadow: var(--shadow-xl);
         }
 
         .toast.show {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
         }
 
-        /* Enhanced Loader */
+        /* Loader */
         #loader {
             position: fixed;
             inset: 0;
-            background: var(--bg-deep);
+            background: white;
             z-index: 9999;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
         }
 
         .spinner {
             width: 60px;
             height: 60px;
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 4px solid var(--primary-light);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -876,136 +631,169 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Enhanced Tag */
-        .tag {
-            display: inline-block;
-            background: var(--primary-dim);
-            color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-family: var(--font-tech);
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        /* Enhanced Data Table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table thead tr {
-            border-bottom: 2px solid var(--border);
-        }
-
-        .data-table th {
-            padding: 1rem;
-            text-align: left;
-            font-family: var(--font-tech);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .data-table td {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s ease;
-        }
-
-        .data-table tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        .data-table tbody tr:hover {
-            background: rgba(255,255,255,0.02);
-            transform: scale(1.01);
-        }
-
         /* ============================================================
-           11. FOOTER
+           8. FOOTER
            ============================================================ */
         footer {
-            text-align: center;
-            padding: 6rem 2rem;
-            margin-top: 8rem;
-            background: #050505;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
+            background: var(--text-dark);
+            color: white;
+            padding: 60px 5%;
+            margin-top: 80px;
         }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        .social-links a {
-            font-size: 1.8rem;
-            color: #fff;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-        .social-links a:hover { 
-            color: var(--primary); 
-            transform: translateY(-5px) scale(1.1);
+            gap: 20px;
+            margin: 30px 0;
         }
 
-        /* Container utility */
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 5%;
         }
 
-        /* ============================================================
-           12. RESPONSIVE MEDIA QUERIES
-           ============================================================ */
-        @media (max-width: 1024px) {
-            .admin-content { padding: 2rem; }
-            .hero-content h1 { font-size: 3rem; }
+        /* Admin Panel */
+        .admin-layout { 
+            display: flex; 
+            min-height: calc(100vh - 70px); 
+        }
+        
+        .sidebar { 
+            width: 280px; 
+            background: white; 
+            border-right: 2px solid var(--border); 
+            padding: 30px 20px; 
+            position: fixed; 
+            height: 100%; 
+            overflow-y: auto; 
         }
 
+        .sidebar-btn { 
+            width: 100%; 
+            text-align: left; 
+            padding: 14px 18px; 
+            margin-bottom: 8px; 
+            background: transparent; 
+            border: none;
+            color: var(--text-muted); 
+            cursor: pointer; 
+            border-radius: var(--radius-md); 
+            font-weight: 600;
+            transition: all 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-btn:hover { 
+            background: var(--bg-light); 
+            color: var(--text-dark); 
+        }
+
+        .sidebar-btn.active { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); 
+            color: white; 
+        }
+
+        .admin-content { 
+            margin-left: 280px; 
+            padding: 40px; 
+            width: 100%; 
+            background: var(--bg-main);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .data-table thead {
+            background: var(--bg-light);
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            :root { --sidebar-width: 100%; }
+            .hero h1 { font-size: 2.5rem; }
             .cart-panel { width: 100%; right: -100%; }
+            .grid { grid-template-columns: 1fr; }
             .sidebar { 
                 position: static; 
                 width: 100%; 
-                height: auto; 
-                display: flex; 
-                overflow-x: auto; 
-                padding: 1rem; 
-                border-right: none; 
-                border-bottom: 1px solid var(--border); 
-                margin-top: 0;
+                border-right: none;
+                border-bottom: 2px solid var(--border);
             }
-            .sidebar-btn { 
-                width: auto; 
-                white-space: nowrap; 
-                margin-bottom: 0; 
-                flex-shrink: 0;
-            }
-            .admin-layout { flex-direction: column; }
-            .admin-content { margin-left: 0; padding: 1.5rem; }
-            nav { padding: 1rem 5%; }
-            .service-banner { 
-                padding: 2rem; 
-                text-align: center; 
-                justify-content: center; 
-            }
-            .hero-content h1 { font-size: 2.5rem; }
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            .stat-grid {
-                grid-template-columns: 1fr;
-            }
-            .success-content {
-                padding: 3rem 2rem;
+            .admin-content { margin-left: 0; padding: 20px; }
+            .category-banner {
+                flex-direction: column;
+                text-align: center;
             }
         }
     </style>
@@ -1014,87 +802,120 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <div style="margin-top: 25px; font-family: var(--font-tech); letter-spacing: 5px; color: var(--primary); font-weight: 600;">INITIALIZING COMMAND CENTER...</div>
+        <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">Loading BNG Surveillance...</div>
     </div>
 
-    <div id="toast" class="toast">Action Logged Successfully</div>
+    <div id="toast" class="toast">Action Completed</div>
 
-    <!-- SUCCESS LOGIN MODAL (NEW!) -->
+    <!-- SUCCESS LOGIN MODAL -->
     <div id="success-modal" class="success-modal">
         <div class="success-content">
             <div class="success-icon">
-                <i class="fa-solid fa-shield-halved"></i>
+                <i class="fa-solid fa-circle-check"></i>
             </div>
-            <h2 class="success-title">ACCESS GRANTED</h2>
-            <p class="success-subtitle">Welcome to the command center, Agent.</p>
+            <h2 class="success-title">Welcome Back!</h2>
+            <p class="success-subtitle">You've successfully logged in to your account</p>
             <div class="user-info-card">
                 <div class="user-info-row">
-                    <span class="user-info-label">Agent Name</span>
+                    <span class="user-info-label">Name</span>
                     <span class="user-info-value" id="success-user-name">-</span>
                 </div>
                 <div class="user-info-row">
-                    <span class="user-info-label">Clearance Level</span>
-                    <span class="user-info-value" id="success-user-role">-</span>
-                </div>
-                <div class="user-info-row">
-                    <span class="user-info-label">Secure Channel</span>
+                    <span class="user-info-label">Email</span>
                     <span class="user-info-value" id="success-user-email">-</span>
                 </div>
+                <div class="user-info-row">
+                    <span class="user-info-label">Account Type</span>
+                    <span class="user-info-value" id="success-user-role">-</span>
+                </div>
             </div>
-            <button onclick="app.closeSuccessModal()" class="btn btn-primary" style="width: 100%; position: relative; z-index: 1;">
-                <i class="fa-solid fa-rocket"></i> Enter System
+            <button onclick="app.closeSuccessModal()" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-store"></i> Start Shopping
             </button>
         </div>
     </div>
 
     <div id="cart-panel" class="cart-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
-            <h2 style="font-family: var(--font-tech);"><i class="fa-solid fa-cart-arrow-down"></i> LOGISTICS CART</h2>
-            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 10px 15px;"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);"><i class="fa-solid fa-shopping-cart"></i> Your Cart</h2>
+            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         
-        <div id="cart-items-container" style="flex: 1; overflow-y: auto; padding-right: 10px;">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 100px; opacity: 0.5;">
-                <i class="fa-solid fa-box-open" style="font-size: 4rem; margin-bottom: 20px;"></i>
-                <p>No hardware staged for deployment.</p>
+        <div id="cart-items-container" style="flex: 1; overflow-y: auto;">
+            <div style="text-align: center; color: var(--text-muted); margin-top: 100px;">
+                <i class="fa-solid fa-shopping-basket" style="font-size: 4rem; opacity: 0.3; margin-bottom: 20px;"></i>
+                <p>Your cart is empty</p>
             </div>
         </div>
 
-        <div style="border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 1rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 1.4rem; font-weight: 800; font-family: var(--font-tech);">
-                <span>NET TOTAL</span>
-                <span id="cart-total-display" class="text-gradient">₹0</span>
+        <div style="border-top: 2px solid var(--border); padding-top: 20px; margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.4rem; font-weight: 700; font-family: var(--font-display);">
+                <span>Total</span>
+                <span id="cart-total-display" style="color: var(--primary);">₹0</span>
             </div>
-            <button onclick="app.checkout()" id="checkout-main-btn" class="btn btn-primary" style="width: 100%; padding: 20px;">Execute Acquisition</button>
+            <button onclick="app.checkout()" class="btn btn-primary" style="width: 100%; padding: 16px;">
+                <i class="fa-solid fa-credit-card"></i> Proceed to Checkout
+            </button>
         </div>
     </div>
 
     <nav>
         <div class="logo" onclick="app.renderShop()">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>BNG <span style="font-weight:300; opacity:0.7;">SURVEILLANCE</span></span>
+            <img src="data:image/svg+xml;base64,bngimage.jpg+PGNpcmNsZSBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iNDAiIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjIwMCIvPjx0ZXh0IHg9IjI1MCIgeT0iMzIwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Qk5HPC90ZXh0PjwvZz48L3N2Zz4=" alt="BNG Logo" />
+            <span class="logo-text">BNG Surveillance</span>
         </div>
-        <div class="nav-right" id="nav-actions-area">
-        </div>
+        <div class="nav-right" id="nav-actions-area"></div>
     </nav>
 
-    <main id="app-root-view">
-    </main>
+    <main id="app-root-view"></main>
 
     <div id="modal-overlay" class="overlay">
-        <div id="modal-body-content" class="modal">
-        </div>
+        <div id="modal-body-content" class="modal"></div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
+        // --- CONFIGURATION ---
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
             RAZORPAY_ID: 'rzp_live_SDiqNk2jPMuXQQ',
             WHATSAPP_ID: '916006750581'
         };
 
-        // --- 2. APPLICATION STATE ---
+        // Product Categories
+        const CATEGORIES = {
+            ANALOG: { 
+                name: 'CCTV Camera Analog', 
+                icon: 'fa-video',
+                badge: 'Professional Installation Included',
+                color: '#0ea5e9'
+            },
+            IP: { 
+                name: 'IP Camera', 
+                icon: 'fa-network-wired',
+                badge: 'Professional Installation Included',
+                color: '#06b6d4'
+            },
+            WIFI: { 
+                name: 'WiFi Camera', 
+                icon: 'fa-wifi',
+                badge: 'Professional Installation Included',
+                color: '#8b5cf6'
+            },
+            '4G': { 
+                name: '4G Camera', 
+                icon: 'fa-signal',
+                badge: 'Professional Installation Included',
+                color: '#f59e0b'
+            },
+            ACCESSORIES: { 
+                name: 'Camera Accessories', 
+                icon: 'fa-toolbox',
+                badge: 'Free Delivery',
+                color: '#10b981'
+            }
+        };
+
+        // --- APPLICATION STATE ---
         const APP_STATE = {
             user: JSON.parse(sessionStorage.getItem('user')) || null,
             cart: [],
@@ -1102,31 +923,26 @@
             orders: [],
             queries: [],
             currentAdminTab: 'dashboard',
-            registrationEmail: null
+            registrationEmail: null,
+            userLocation: null
         };
 
-        // --- 3. SYSTEM ENGINE ---
+        // --- SYSTEM ENGINE ---
         const app = {
             
-            /**
-             * Boot sequence
-             */
             init: async () => {
                 setTimeout(() => {
                     const loader = document.getElementById('loader');
                     if(loader) {
                         loader.style.opacity = '0';
-                        setTimeout(() => loader.remove(), 600);
+                        setTimeout(() => loader.remove(), 500);
                     }
-                }, 1800);
+                }, 1500);
 
                 await app.syncInventory();
                 app.refreshUI();
             },
 
-            /**
-             * Fetch latest products and stock from DB
-             */
             syncInventory: async () => {
                 try {
                     const response = await fetch(`${COMMAND_CONFIG.API_BASE}/products`);
@@ -1135,36 +951,30 @@
                     }
                 } catch(err) {
                     console.error("Database Sync Failed", err);
-                    app.showToast("Critical: Sync Failure");
+                    app.showToast("Failed to load products");
                 }
             },
 
-            /**
-             * Primary UI Router
-             */
             refreshUI: () => {
                 app.renderHeader();
                 app.renderShop();
             },
 
-            // ============================================================
             // UI RENDERERS
-            // ============================================================
-
             renderHeader: () => {
                 const nav = document.getElementById('nav-actions-area');
                 if (!APP_STATE.user) {
-                    nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i> Agent Login</button>`;
+                    nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-primary"><i class="fa-solid fa-user"></i> Customer Login</button>`;
                 } else {
                     const isAdmin = APP_STATE.user.role === 'author';
                     nav.innerHTML = `
-                        ${isAdmin ? `<button onclick="app.renderAdminPortal()" class="btn btn-secondary"><i class="fa-solid fa-terminal"></i> Command Panel</button>` : ''}
-                        <button onclick="app.renderProfile()" class="btn btn-secondary" title="View Profile"><i class="fa-solid fa-id-card-clip"></i></button>
+                        ${isAdmin ? `<button onclick="app.renderAdminPortal()" class="btn btn-secondary"><i class="fa-solid fa-dashboard"></i> Admin Panel</button>` : ''}
+                        <button onclick="app.renderProfile()" class="btn btn-secondary" title="My Orders"><i class="fa-solid fa-user-circle"></i></button>
                         <button onclick="app.toggleCart()" class="btn btn-primary">
-                            <i class="fa-solid fa-cart-flatbed-suitcases"></i>
-                            <span id="header-cart-count" style="background:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${APP_STATE.cart.length}</span>
+                            <i class="fa-solid fa-shopping-cart"></i>
+                            <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
                         </button>
-                        <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-power-off"></i></button>
+                        <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-sign-out-alt"></i></button>
                     `;
                 }
             },
@@ -1172,148 +982,166 @@
             renderShop: () => {
                 const root = document.getElementById('app-root-view');
                 
-                let productCards = APP_STATE.inventory.map(p => {
-                    const isSoldOut = p.stock <= 0;
-                    return `
-                        <div class="card ${isSoldOut ? 'out-of-stock' : ''}">
-                            ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
-                            <div class="card-img-box">
-                                <img src="${p.image}" alt="${p.name}">
+                // Group products by category
+                const productsByCategory = {};
+                Object.keys(CATEGORIES).forEach(key => {
+                    productsByCategory[key] = APP_STATE.inventory.filter(p => p.category === key);
+                });
+
+                let categorySections = Object.keys(CATEGORIES).map(catKey => {
+                    const cat = CATEGORIES[catKey];
+                    const products = productsByCategory[catKey] || [];
+                    
+                    if (products.length === 0) return '';
+
+                    const productCards = products.map(p => {
+                        const isSoldOut = p.stock <= 0;
+                        return `
+                            <div class="card ${isSoldOut ? 'out-of-stock' : ''}" onclick="app.viewProductDetails('${p._id}')">
+                                ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
+                                <div class="card-img-box">
+                                    <img src="${p.image}" alt="${p.name}">
+                                </div>
+                                <div class="card-info">
+                                    <div class="tag">${cat.name}</div>
+                                    <h3 class="card-title">${p.name}</h3>
+                                    <div class="price-tag">₹${p.price.toLocaleString('en-IN')}</div>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0;">Stock: ${p.stock} units</p>
+                                    ${!isSoldOut 
+                                        ? `<button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="event.stopPropagation(); app.viewProductDetails('${p._id}')">View Details</button>`
+                                        : `<button class="btn btn-secondary" style="width:100%; margin-top: 10px;" disabled>Out of Stock</button>`
+                                    }
+                                </div>
                             </div>
-                            <div class="card-info">
-                                <div class="tag">${p.category}</div>
-                                <h3 style="font-family: var(--font-tech); margin-bottom: 5px;">${p.name}</h3>
-                                <div class="price-tag">₹${p.price.toLocaleString('en-IN')}</div>
-                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Available Stock: ${p.stock} Units</p>
-                                ${!isSoldOut 
-                                    ? `<button onclick="app.viewProductDetails('${p._id}')" class="btn btn-secondary" style="width:100%;">View Specifications</button>`
-                                    : `<button class="btn btn-secondary" style="width:100%;" disabled>Hardware Depleted</button>`
-                                }
+                        `;
+                    }).join('');
+
+                    return `
+                        <div class="category-section slide-up" id="${catKey}-section">
+                            <div class="category-banner">
+                                <div class="category-banner-text">
+                                    <h3><i class="fa-solid ${cat.icon}"></i> ${cat.name}</h3>
+                                    <div class="installation-badge">
+                                        <i class="fa-solid ${catKey === 'ACCESSORIES' ? 'fa-truck-fast' : 'fa-tools'}"></i> 
+                                        ${cat.badge}
+                                    </div>
+                                </div>
+                                <i class="fa-solid ${cat.icon} category-banner-icon float"></i>
+                            </div>
+                            <div class="grid">
+                                ${productCards}
                             </div>
                         </div>
                     `;
                 }).join('');
 
                 root.innerHTML = `
-                    <div class="animate-enter">
+                    <div class="fade-in">
                         <section class="hero">
                             <div class="hero-content">
-                                <div class="badge-open" style="display:inline-block; padding:5px 15px; border-radius:50px; margin-bottom:20px; font-size:0.7rem; letter-spacing:2px; font-weight:bold;">MILITARY GRADE SECURITY</div>
-                                <h1>NEXT GENERATION <br><span class="text-gradient">SURVEILLANCE SYSTEMS</span></h1>
-                                <p style="color: #bbb; margin: 2rem auto; font-size: 1.2rem; max-width: 600px; font-weight: 300;">
-                                    Deploying high-fidelity optics and AI-integrated recording arrays for total environment control.
+                                <div class="badge badge-primary" style="font-size: 0.9rem; padding: 8px 16px; margin-bottom: 20px;">
+                                    <i class="fa-solid fa-shield-halved"></i> Trusted Security Solutions
+                                </div>
+                                <h1>Premium CCTV & <span style="background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Surveillance Systems</span></h1>
+                                <p class="subtitle">
+                                    Complete security solutions with professional installation and 24/7 support
                                 </p>
-                                <div style="display:flex; gap:15px; justify-content:center;">
-                                    <button onclick="document.getElementById('catalog-anchor').scrollIntoView({behavior:'smooth'})" class="btn btn-primary">Initialize Access</button>
-                                    <button onclick="app.renderRaiseRequest()" class="btn btn-secondary">Request Support</button>
+                                <div style="display:flex; gap:15px; justify-content:center; flex-wrap: wrap;">
+                                    <button onclick="document.getElementById('ANALOG-section').scrollIntoView({behavior:'smooth'})" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+                                        <i class="fa-solid fa-video"></i> Browse Cameras
+                                    </button>
+                                    <button onclick="app.renderRaiseRequest()" class="btn btn-secondary" style="font-size: 1.1rem; padding: 16px 32px;">
+                                        <i class="fa-solid fa-headset"></i> Get Support
+                                    </button>
                                 </div>
                             </div>
                         </section>
 
-                        <div class="container" id="catalog-anchor">
-                            <div class="catalog-header">
-                                <div>
-                                    <h2 style="font-size: 2.2rem;">HARDWARE <span class="text-gradient">INVENTORY</span></h2>
-                                    <p style="color: var(--text-muted);">Browse current tactical equipment availability.</p>
-                                </div>
-                                <div style="font-family: var(--font-tech); font-size: 0.8rem; opacity: 0.6;">
-                                    STATUS: ONLINE | STREAMS: ENCRYPTED
-                                </div>
-                            </div>
-
-                            <div class="grid">
-                                ${productCards || '<div style="grid-column: 1/-1; text-align:center; padding:5rem;">No hardware currently listed in the database.</div>'}
-                            </div>
-                        </div>
-
-                        <div class="service-banner animate-enter">
-                            <div style="max-width: 600px;">
-                                <h2 style="font-size: 2.2rem; margin-bottom: 10px;"><i class="fa-solid fa-headset" style="color:var(--primary)"></i> TECHNICAL SUPPORT</h2>
-                                <p style="color:#aaa; font-size: 1.1rem;">
-                                    Facing system downtime or require professional installation? Raise a high-priority service request and our engineers will respond within 24 hours.
-                                </p>
-                            </div>
-                            <div>
-                                <button onclick="app.renderRaiseRequest()" class="btn btn-primary" style="padding: 20px 40px;">Open Service Query</button>
-                            </div>
-                        </div>
+                        ${categorySections}
 
                         <footer>
-                            <div class="social-links">
-                                <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="mailto:bngsurveillance@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+                            <div class="footer-content">
+                                <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; margin-bottom: 20px;">BNG Surveillance</div>
+                                <p style="max-width: 600px; margin: 0 auto 30px; opacity: 0.8;">
+                                    Your trusted partner for complete CCTV and surveillance solutions. Professional installation and 24/7 customer support.
+                                </p>
+                                <div class="social-links">
+                                    <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                                    <a href="mailto:bngsurveillance@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+                                </div>
+                                <p style="opacity: 0.6; font-size: 0.9rem; margin-top: 30px;">
+                                    © 2024 BNG Surveillance Systems. All Rights Reserved.
+                                </p>
+                                <p style="font-size: 0.85rem; margin-top: 10px;">
+                                    Developed by <a href="https://farhanzahoor.info" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 600;">Farhan Zahoor</a>
+                                </p>
                             </div>
-                            <div style="font-family: var(--font-tech); font-size: 1.2rem; margin-bottom: 20px; letter-spacing: 3px;">BNG SURVEILLANCE SYSTEMS</div>
-                            <p style="margin-bottom: 15px; opacity: 0.5; font-size: 0.8rem;">
-                                ALL SYSTEMS RECORDED & ENCRYPTED. UNAUTHORIZED ACCESS IS PROHIBITED.
-                            </p>
-                            <p style="font-size: 0.9rem;">
-                                Infrastructure Developed by 
-                                <a href="https://farhanzahoor.info" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">
-                                    FARHAN ZAHOOR
-                                </a>
-                            </p>
                         </footer>
                     </div>
                 `;
             },
 
-            // ============================================================
-            // PRODUCT & CART LOGIC
-            // ============================================================
-
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
                 if(!p) return;
 
+                const category = CATEGORIES[p.category] || { badge: '', name: p.category };
                 const hasReviews = p.reviews && p.reviews.length > 0;
 
                 const html = `
                     <div class="fade-in">
-                        <img src="${p.image}" style="width:100%; height:320px; object-fit:contain; background:#000; border-radius:20px; margin-bottom:2rem; border: 1px solid var(--border);">
+                        <img src="${p.image}" style="width:100%; height:300px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">
                         
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 15px;">
                             <div>
-                                <div class="tag">${p.category}</div>
-                                <h2 style="font-size: 2rem; font-family: var(--font-tech);">${p.name}</h2>
+                                <div class="tag">${category.name}</div>
+                                <h2 style="font-size: 1.8rem; font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">${p.name}</h2>
                             </div>
-                            <div class="price-tag" style="font-size: 2.2rem; margin:0;">₹${p.price.toLocaleString('en-IN')}</div>
+                            <div class="price-tag" style="font-size: 2rem; margin:0;">₹${p.price.toLocaleString('en-IN')}</div>
                         </div>
 
-                        <p style="color: #aaa; margin: 1.5rem 0; line-height: 1.8; font-size: 1.1rem; border-left: 2px solid var(--primary); padding-left: 20px;">
+                        ${category.badge ? `
+                            <div class="badge badge-success" style="margin: 15px 0; font-size: 0.85rem; padding: 8px 16px;">
+                                <i class="fa-solid ${p.category === 'ACCESSORIES' ? 'fa-truck-fast' : 'fa-tools'}"></i> ${category.badge}
+                            </div>
+                        ` : ''}
+
+                        <p style="color: var(--text-main); margin: 20px 0; line-height: 1.8; font-size: 1rem; padding: 20px; background: var(--bg-light); border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
                             ${p.desc}
                         </p>
 
-                        <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--bg-light); padding: 20px; border-radius: var(--radius-md); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <div>
-                                <span class="label-tech">Inventory Status</span>
-                                <span style="font-weight: 800; font-size: 1.1rem; color: ${p.stock < 5 ? 'var(--danger)' : 'var(--success)'}">
-                                    ${p.stock} Units in Reserve
+                                <span class="label" style="margin: 0; display: block; font-size: 0.85rem;">Available Stock</span>
+                                <span style="font-weight: 800; font-size: 1.2rem; color: ${p.stock < 5 ? 'var(--danger)' : 'var(--success)'}">
+                                    ${p.stock} Units
                                 </span>
                             </div>
                             <div style="width: 120px;">
-                                <span class="label-tech">Select Qty</span>
-                                <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="margin:0; padding: 10px; text-align:center;">
+                                <span class="label" style="margin: 0 0 5px 0; display: block; font-size: 0.85rem;">Quantity</span>
+                                <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="padding: 10px; text-align:center;">
                             </div>
                         </div>
 
-                        <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 20px;">
-                            <i class="fa-solid fa-plus-circle"></i> Add to Logistics Cart
+                        <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-cart-plus"></i> Add to Cart
                         </button>
 
-                        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
-                            <h4 style="font-family: var(--font-tech); margin-bottom: 1.5rem;"><i class="fa-solid fa-clipboard-check"></i> FIELD OPERATION REPORTS</h4>
+                        <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid var(--border);">
+                            <h4 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
+                                <i class="fa-solid fa-star"></i> Customer Reviews
+                            </h4>
                             
-                            <div id="review-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 2rem; padding-right: 10px;">
-                                ${!hasReviews ? '<p style="color: var(--text-dim); text-align:center;">No field reports available for this hardware.</p>' : 
+                            <div id="review-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">
+                                ${!hasReviews ? '<p style="color: var(--text-muted); text-align:center; padding: 30px;">No reviews yet. Be the first to review!</p>' : 
                                     p.reviews.map(r => `
-                                        <div style="background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border);">
-                                            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-                                                <strong style="color: var(--primary); font-size: 0.8rem; text-transform:uppercase;">${r.user}</strong>
-                                                <small style="opacity:0.4; font-size:0.7rem;">${new Date(r.date).toLocaleDateString()}</small>
+                                        <div style="background: var(--bg-light); padding: 18px; border-radius: var(--radius-md); margin-bottom: 12px; border-left: 3px solid var(--primary);">
+                                            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                                                <strong style="color: var(--primary); font-weight: 700;">${r.user}</strong>
+                                                <small style="color: var(--text-muted); font-size:0.8rem;">${new Date(r.date).toLocaleDateString()}</small>
                                             </div>
-                                            <div style="font-size: 0.95rem; color: #ccc;">${r.comment}</div>
+                                            <div style="color: var(--text-main);">${r.comment}</div>
                                         </div>
                                     `).join('')
                                 }
@@ -1321,10 +1149,12 @@
 
                             ${APP_STATE.user ? `
                                 <div style="display: flex; gap: 10px;">
-                                    <input type="text" id="review-comment-field" placeholder="Draft a field report..." style="margin:0;">
-                                    <button onclick="app.postFieldReport('${p._id}')" class="btn btn-secondary" style="padding: 0 20px;"><i class="fa-solid fa-paper-plane"></i></button>
+                                    <input type="text" id="review-comment-field" placeholder="Write your review..." style="flex: 1;">
+                                    <button onclick="app.postFieldReport('${p._id}')" class="btn btn-primary" style="padding: 0 24px;">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
                                 </div>
-                            ` : '<p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">Login required to post reports.</p>'}
+                            ` : '<p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 15px; background: var(--bg-light); border-radius: var(--radius-md);">Please login to write a review</p>'}
                         </div>
                     </div>
                 `;
@@ -1334,7 +1164,8 @@
 
             executeAddToCart: (id) => {
                 if(!APP_STATE.user) {
-                    app.showToast("Access Denied: Please Login First");
+                    app.showToast("Please login to add items to cart");
+                    app.closeModal();
                     app.showAuth('login');
                     return;
                 }
@@ -1343,7 +1174,7 @@
                 const qtyRequested = parseInt(document.getElementById('purchase-qty-input').value) || 1;
 
                 if(qtyRequested > product.stock) {
-                    app.showToast("Error: Requested quantity exceeds stock level.");
+                    app.showToast("Requested quantity exceeds available stock");
                     return;
                 }
 
@@ -1352,7 +1183,7 @@
                 if(existingIndex !== -1) {
                     const newTotalQty = APP_STATE.cart[existingIndex].qty + qtyRequested;
                     if(newTotalQty > product.stock) {
-                        app.showToast("Limit Reached: Cannot add more to cart.");
+                        app.showToast("Cannot add more items - stock limit reached");
                         return;
                     }
                     APP_STATE.cart[existingIndex].qty = newTotalQty;
@@ -1360,7 +1191,7 @@
                     APP_STATE.cart.push({ ...product, qty: qtyRequested });
                 }
 
-                app.showToast(`${product.name} staged for acquisition.`);
+                app.showToast(`${product.name} added to cart!`);
                 app.closeModal();
                 app.renderHeader();
             },
@@ -1381,9 +1212,10 @@
                 
                 if(APP_STATE.cart.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); margin-top: 100px; opacity: 0.5;">
-                            <i class="fa-solid fa-box-open" style="font-size: 4rem; margin-bottom: 20px;"></i>
-                            <p>No hardware staged for deployment.</p>
+                        <div style="text-align: center; color: var(--text-muted); margin-top: 100px;">
+                            <i class="fa-solid fa-shopping-basket" style="font-size: 4rem; opacity: 0.3; margin-bottom: 20px;"></i>
+                            <p>Your cart is empty</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Add some products to get started!</p>
                         </div>
                     `;
                     totalDisplay.innerText = "₹0";
@@ -1395,17 +1227,17 @@
                     const rowTotal = item.price * item.qty;
                     total += rowTotal;
                     return `
-                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; position: relative;" class="animate-enter">
+                        <div style="background: var(--bg-light); border: 2px solid var(--border); padding: 18px; border-radius: var(--radius-md); margin-bottom: 15px;" class="slide-up">
                             <div style="display:flex; gap: 15px; align-items:center;">
-                                <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; background: #000; border-radius: 8px;">
+                                <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; background: white; border-radius: var(--radius-sm); padding: 5px;">
                                 <div style="flex: 1;">
-                                    <h4 style="font-family: var(--font-tech); font-size: 0.9rem;">${item.name}</h4>
-                                    <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                        ₹${item.price.toLocaleString()} x ${item.qty} units
+                                    <h4 style="font-weight: 600; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px;">${item.name}</h4>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                        ₹${item.price.toLocaleString()} × ${item.qty}
                                     </div>
-                                    <div style="color: var(--primary); font-weight: 800; font-family: var(--font-tech);">₹${rowTotal.toLocaleString()}</div>
+                                    <div style="color: var(--primary); font-weight: 700; margin-top: 4px;">₹${rowTotal.toLocaleString()}</div>
                                 </div>
-                                <button onclick="app.removeCartItem(${idx})" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 1.2rem;">
+                                <button onclick="app.removeCartItem(${idx})" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 1.3rem; padding: 8px;">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
@@ -1421,53 +1253,106 @@
                 APP_STATE.cart.splice(idx, 1);
                 app.renderCartContents();
                 app.renderHeader();
+                app.showToast("Item removed from cart");
             },
 
-            // ============================================================
-            // CHECKOUT & PAYMENT FLOW
-            // ============================================================
-
+            // CHECKOUT WITH LOCATION
             checkout: () => {
-                if(APP_STATE.cart.length === 0) return;
+                if(APP_STATE.cart.length === 0) {
+                    app.showToast("Your cart is empty!");
+                    return;
+                }
                 app.toggleCart();
 
                 const finalTotal = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;"><i class="fa-solid fa-truck-ramp-box"></i> DISPATCH LOGISTICS</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            <i class="fa-solid fa-shopping-bag"></i> Checkout
+                        </h2>
                         
                         <div class="form-group">
-                            <label class="label-tech">Operations Agent</label>
-                            <input type="text" value="${APP_STATE.user.name}" readonly style="opacity: 0.6; cursor: not-allowed;">
+                            <label class="label">Full Name</label>
+                            <input type="text" value="${APP_STATE.user.name}" readonly style="background: var(--bg-light); cursor: not-allowed;">
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Communication Line (Phone)</label>
-                            <input type="tel" id="checkout-phone" placeholder="+91 XXXXX XXXXX" required>
+                            <label class="label">Phone Number</label>
+                            <input type="tel" id="checkout-phone" placeholder="Enter your phone number" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Deployment Coordinates (Address)</label>
-                            <textarea id="checkout-address" placeholder="Full installation address..." rows="3" required></textarea>
+                            <label class="label">Delivery Address</label>
+                            <textarea id="checkout-address" placeholder="Enter complete address with landmarks" rows="3" required></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Regional Code (Pincode)</label>
-                            <input type="text" id="checkout-pincode" placeholder="6-Digit Code" maxlength="6" required>
+                            <label class="label">Pincode</label>
+                            <input type="text" id="checkout-pincode" placeholder="6-digit pincode" maxlength="6" required>
                         </div>
 
-                        <div style="background: var(--primary-dim); border: 1px solid var(--primary); padding: 20px; border-radius: 12px; margin: 2rem 0; text-align: center;">
-                            <div class="label-tech" style="color: var(--primary);">Total Authorization Amount</div>
-                            <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-tech);">₹${finalTotal.toLocaleString('en-IN')}</div>
+                        <div class="form-group">
+                            <label class="label">
+                                <i class="fa-solid fa-location-dot"></i> Share Your Location (Optional)
+                            </label>
+                            <button onclick="app.getLocation()" id="location-btn" class="btn btn-secondary" style="width: 100%;">
+                                <i class="fa-solid fa-map-marker-alt"></i> Get My Current Location
+                            </button>
+                            <div id="location-display" style="margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none;">
+                                <i class="fa-solid fa-check-circle"></i> Location captured successfully
+                            </div>
                         </div>
 
-                        <button onclick="app.initiatePayment(${finalTotal})" class="btn btn-primary" style="width: 100%; padding: 20px;">
-                            <i class="fa-solid fa-credit-card"></i> Finalize Secure Payment
+                        <div style="background: linear-gradient(135deg, var(--primary-light) 0%, rgba(14, 165, 233, 0.1) 100%); padding: 25px; border-radius: var(--radius-lg); margin: 25px 0; text-align: center; border: 2px solid var(--primary);">
+                            <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 5px;">Total Amount</div>
+                            <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display); color: var(--primary);">₹${finalTotal.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <button onclick="app.initiatePayment(${finalTotal})" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-lock"></i> Proceed to Payment
                         </button>
+
+                        <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 15px;">
+                            <i class="fa-solid fa-shield-halved"></i> Your payment is 100% secure
+                        </p>
                     </div>
                 `;
                 app.openModal(html);
+            },
+
+            getLocation: () => {
+                const btn = document.getElementById('location-btn');
+                const display = document.getElementById('location-display');
+                
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting location...';
+                btn.disabled = true;
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            APP_STATE.userLocation = {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            };
+                            btn.innerHTML = '<i class="fa-solid fa-check"></i> Location Captured';
+                            btn.classList.remove('btn-secondary');
+                            btn.classList.add('btn-success');
+                            display.style.display = 'block';
+                            app.showToast("Location captured successfully!");
+                        },
+                        (error) => {
+                            btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
+                            btn.disabled = false;
+                            app.showToast("Unable to get location. Please enter manually.");
+                        }
+                    );
+                } else {
+                    btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
+                    btn.disabled = false;
+                    app.showToast("Geolocation not supported by your browser");
+                }
             },
 
             initiatePayment: async (amount) => {
@@ -1476,12 +1361,22 @@
                 const pincode = document.getElementById('checkout-pincode').value;
 
                 if(!phone || !address || !pincode) {
-                    app.showToast("Error: Missing deployment details.");
+                    app.showToast("Please fill all required fields");
+                    return;
+                }
+
+                if(!/^[0-9]{10}$/.test(phone.replace(/\D/g, ''))) {
+                    app.showToast("Please enter a valid 10-digit phone number");
+                    return;
+                }
+
+                if(!/^[0-9]{6}$/.test(pincode)) {
+                    app.showToast("Please enter a valid 6-digit pincode");
                     return;
                 }
 
                 try {
-                    app.showToast("Connecting to Secure Gateway...");
+                    app.showToast("Connecting to payment gateway...");
                     
                     const response = await fetch(`${COMMAND_CONFIG.API_BASE}/create-order`, {
                         method: 'POST',
@@ -1495,11 +1390,11 @@
                         "key": COMMAND_CONFIG.RAZORPAY_ID,
                         "amount": orderData.amount,
                         "currency": "INR",
-                        "name": "BNG SURVEILLANCE",
-                        "description": "Tactical Hardware Acquisition",
+                        "name": "BNG Surveillance",
+                        "description": "CCTV & Security Equipment",
                         "order_id": orderData.id,
                         "handler": (resp) => app.verifyPaymentResponse(resp, amount, phone, address, pincode),
-                        "theme": { "color": "#f59e0b" },
+                        "theme": { "color": "#0ea5e9" },
                         "prefill": {
                             "name": APP_STATE.user.name,
                             "email": APP_STATE.user.email,
@@ -1512,13 +1407,13 @@
                     app.closeModal();
 
                 } catch(e) {
-                    app.showToast("Gateway Connection Failure");
+                    app.showToast("Payment gateway error. Please try again.");
                 }
             },
 
             verifyPaymentResponse: async (response, total, phone, address, pincode) => {
                 try {
-                    app.showToast("Verifying Transaction...");
+                    app.showToast("Verifying payment...");
                     
                     const payload = {
                         orderCreationId: response.razorpay_order_id,
@@ -1531,7 +1426,8 @@
                             address,
                             pincode,
                             items: APP_STATE.cart,
-                            total
+                            total,
+                            location: APP_STATE.userLocation
                         }
                     };
 
@@ -1543,81 +1439,141 @@
 
                     if(res.ok) {
                         APP_STATE.cart = [];
-                        app.showToast("Authorization Confirmed.");
+                        APP_STATE.userLocation = null;
+                        app.showToast("Payment successful!");
                         app.renderOrderSuccess(response.razorpay_order_id, total);
                         app.syncInventory();
+                        app.renderHeader();
                     } else {
-                        app.showToast("Payment Verification Failed");
+                        app.showToast("Payment verification failed");
                     }
                 } catch(e) {
-                    app.showToast("Server Synchronization Error");
+                    app.showToast("Server error. Please contact support.");
                 }
             },
 
             renderOrderSuccess: (id, amount) => {
                 const html = `
-                    <div style="text-align: center; padding: 2rem;">
-                        <i class="fa-solid fa-circle-check" style="font-size: 5rem; color: var(--success); margin-bottom: 2rem;"></i>
-                        <h2 style="font-family: var(--font-tech);">ACQUISITION COMPLETE</h2>
-                        <p style="color: var(--text-muted); margin: 1rem 0;">Transaction ID: #${id.substr(-8)}</p>
-                        <p style="margin-bottom: 2rem;">Hardware deployment initialized. An operative will contact you at your coordinates.</p>
+                    <div style="text-align: center; padding: 30px 20px;">
+                        <div style="width: 100px; height: 100px; margin: 0 auto 25px; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; animation: bounce 0.6s ease;">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark); margin-bottom: 15px;">Order Confirmed!</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 10px;">Order ID: <strong>#${id.substr(-8)}</strong></p>
+                        <p style="color: var(--text-main); margin-bottom: 30px; line-height: 1.6;">
+                            Thank you for your purchase! Our team will contact you shortly to schedule the installation.
+                        </p>
                         
-                        <button onclick="app.closeModal()" class="btn btn-primary" style="width: 100%;">Return to Command</button>
+                        <button onclick="app.closeModal(); app.renderProfile();" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                            <i class="fa-solid fa-receipt"></i> View My Orders
+                        </button>
+                        <button onclick="app.closeModal(); app.renderShop();" class="btn btn-secondary" style="width: 100%;">
+                            <i class="fa-solid fa-store"></i> Continue Shopping
+                        </button>
                     </div>
                 `;
                 app.openModal(html);
             },
 
-            // ============================================================
-            // SERVICE & SUPPORT
-            // ============================================================
-
+            // SUPPORT REQUEST WITH LOCATION
             renderRaiseRequest: () => {
                 if(!APP_STATE.user) {
-                    app.showToast("Security Alert: System access required for Support.");
+                    app.showToast("Please login to raise a support request");
                     app.showAuth('login');
                     return;
                 }
 
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;"><i class="fa-solid fa-headset"></i> RAISE SERVICE REQUEST</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            <i class="fa-solid fa-headset"></i> Request Support
+                        </h2>
                         
                         <div class="form-group">
-                            <label class="label-tech">Request Category</label>
+                            <label class="label">Request Type</label>
                             <select id="req-type-select">
                                 <option value="Installation">New System Installation</option>
-                                <option value="Maintenance">Routine Maintenance</option>
-                                <option value="Fault">Hardware Fault / Issue</option>
-                                <option value="Upgrade">System Upgrade Query</option>
+                                <option value="Maintenance">Maintenance & Repair</option>
+                                <option value="Fault">Technical Issue</option>
+                                <option value="Upgrade">System Upgrade</option>
+                                <option value="General">General Inquiry</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Deployment Address</label>
-                            <textarea id="req-addr-field" placeholder="Where is the system located?" rows="2" required></textarea>
+                            <label class="label">Installation/Service Address</label>
+                            <textarea id="req-addr-field" placeholder="Enter complete address" rows="2" required></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Pincode</label>
-                            <input type="text" id="req-pin-field" placeholder="6-Digit Pin" maxlength="6">
+                            <label class="label">Pincode</label>
+                            <input type="text" id="req-pin-field" placeholder="6-digit pincode" maxlength="6">
                         </div>
 
                         <div class="form-group">
-                            <label class="label-tech">Detailed Intelligence (Message)</label>
-                            <textarea id="req-msg-field" placeholder="Describe the specific issue or requirement..." rows="4" required></textarea>
+                            <label class="label">
+                                <i class="fa-solid fa-location-dot"></i> Share Your Location (Optional)
+                            </label>
+                            <button onclick="app.getRequestLocation()" id="req-location-btn" class="btn btn-secondary" style="width: 100%;">
+                                <i class="fa-solid fa-map-marker-alt"></i> Get My Current Location
+                            </button>
+                            <div id="req-location-display" style="margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none;">
+                                <i class="fa-solid fa-check-circle"></i> Location captured successfully
+                            </div>
                         </div>
 
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2rem;">
-                            Clicking submit will log this query to our database and initiate a WhatsApp handshake.
-                        </p>
+                        <div class="form-group">
+                            <label class="label">Describe Your Request</label>
+                            <textarea id="req-msg-field" placeholder="Please provide details about your requirement or issue..." rows="4" required></textarea>
+                        </div>
 
-                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary" style="width: 100%; padding: 18px;">
-                            <i class="fa-solid fa-paper-plane"></i> Submit Query & Open WhatsApp
+                        <div style="background: var(--bg-light); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; border-left: 4px solid var(--info);">
+                            <p style="font-size: 0.9rem; color: var(--text-main); margin: 0;">
+                                <i class="fa-solid fa-info-circle" style="color: var(--info);"></i>
+                                Our support team will contact you via WhatsApp within 24 hours.
+                            </p>
+                        </div>
+
+                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Request
                         </button>
                     </div>
                 `;
                 app.openModal(html);
+            },
+
+            getRequestLocation: () => {
+                const btn = document.getElementById('req-location-btn');
+                const display = document.getElementById('req-location-display');
+                
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting location...';
+                btn.disabled = true;
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            APP_STATE.userLocation = {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            };
+                            btn.innerHTML = '<i class="fa-solid fa-check"></i> Location Captured';
+                            btn.classList.remove('btn-secondary');
+                            btn.classList.add('btn-success');
+                            display.style.display = 'block';
+                            app.showToast("Location captured successfully!");
+                        },
+                        (error) => {
+                            btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
+                            btn.disabled = false;
+                            app.showToast("Unable to get location");
+                        }
+                    );
+                } else {
+                    btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
+                    btn.disabled = false;
+                    app.showToast("Geolocation not supported");
+                }
             },
 
             executeSubmitRequest: async () => {
@@ -1627,17 +1583,23 @@
                 const pin = document.getElementById('req-pin-field').value;
 
                 if(!msg || !addr || !pin) {
-                    app.showToast("Validation Error: All fields mandatory.");
+                    app.showToast("Please fill all required fields");
                     return;
                 }
 
-                const fullMessage = `${msg}\n\n[Location Data]\nAddr: ${addr}\nPin: ${pin}`;
+                let fullMessage = `${msg}\n\n📍 Location Details:\nAddress: ${addr}\nPincode: ${pin}`;
+                
+                if(APP_STATE.userLocation) {
+                    const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
+                    fullMessage += `\n\n🗺️ Google Maps: ${gmapsLink}`;
+                }
 
                 const data = {
                     customerName: APP_STATE.user.name,
                     email: APP_STATE.user.email,
                     type: type,
-                    message: fullMessage
+                    message: fullMessage,
+                    location: APP_STATE.userLocation
                 };
 
                 try {
@@ -1648,24 +1610,317 @@
                     });
 
                     if(res.ok) {
-                        const waText = `*NEW ${type.toUpperCase()} REQUEST*%0AFrom: ${APP_STATE.user.name}%0AEmail: ${APP_STATE.user.email}%0A-----------------%0A${encodeURIComponent(fullMessage)}`;
+                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
+                        
+                        if(APP_STATE.userLocation) {
+                            const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
+                            waText += `\n\nLocation: ${gmapsLink}`;
+                        }
+                        
                         window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
                         
-                        app.showToast("Query Logged. Handshake initiated.");
+                        APP_STATE.userLocation = null;
+                        app.showToast("Request submitted successfully!");
                         app.closeModal();
                     }
-                } catch(e) { app.showToast("Server Request Failed"); }
+                } catch(e) { 
+                    app.showToast("Failed to submit request. Please try again."); 
+                }
             },
 
-            // ============================================================
-            // ADMIN PORTAL
-            // ============================================================
+            // PROFILE WITH ORDER CANCELLATION
+            renderProfile: async () => {
+                const root = document.getElementById('app-root-view');
+                let orders = [];
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/my-orders?email=${APP_STATE.user.email}`);
+                    if(res.ok) orders = await res.json();
+                } catch(e) {}
 
+                root.innerHTML = `
+                    <div class="container fade-in" style="max-width: 1000px; padding: 60px 5%;">
+                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
+                            <i class="fa-solid fa-user-circle"></i> My Account
+                        </h1>
+                        <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem;">Manage your orders and account details</p>
+                        
+                        <div style="background: white; border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 30px; margin-bottom: 30px;">
+                            <h3 style="font-family: var(--font-display); font-weight: 600; margin-bottom: 20px; color: var(--text-dark);">
+                                <i class="fa-solid fa-id-card"></i> Profile Information
+                            </h3>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div>
+                                    <span class="label" style="margin: 0 0 5px 0;">Full Name</span>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${APP_STATE.user.name}</div>
+                                </div>
+                                <div>
+                                    <span class="label" style="margin: 0 0 5px 0;">Email Address</span>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${APP_STATE.user.email}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 30px;">
+                            <h3 style="font-family: var(--font-display); font-weight: 600; margin-bottom: 20px; color: var(--text-dark);">
+                                <i class="fa-solid fa-receipt"></i> Order History
+                            </h3>
+                            ${orders.length === 0 ? 
+                                '<div style="text-align: center; padding: 50px 20px; color: var(--text-muted);"><i class="fa-solid fa-shopping-bag" style="font-size: 4rem; opacity: 0.3; margin-bottom: 15px;"></i><p style="font-size: 1.1rem;">No orders yet</p><button onclick="app.renderShop()" class="btn btn-primary" style="margin-top: 20px;"><i class="fa-solid fa-store"></i> Start Shopping</button></div>' 
+                                : 
+                                orders.map(o => `
+                                    <div style="border: 2px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 15px; ${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity: 0.6;' : ''}">
+                                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                                            <div>
+                                                <div style="font-family: var(--font-display); font-weight: 700; color: var(--primary); font-size: 1.1rem;">
+                                                    Order #${o._id.substr(-8)}
+                                                </div>
+                                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">
+                                                    ${new Date(o.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-weight: 800; font-size: 1.3rem; color: var(--text-dark);">₹${o.total.toLocaleString()}</div>
+                                                <div class="badge ${
+                                                    o.status === 'Delivered' ? 'badge-success' : 
+                                                    o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'badge-danger' : 
+                                                    'badge-warning'
+                                                }" style="margin-top: 5px;">${o.status}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="background: var(--bg-light); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 15px;">
+                                            <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 8px; font-size: 0.9rem;">
+                                                <i class="fa-solid fa-box"></i> Items:
+                                            </div>
+                                            <div style="font-size: 0.9rem; color: var(--text-main); line-height: 1.6;">
+                                                ${o.items.map(i => `${i.qty}× ${i.name}`).join('<br>')}
+                                            </div>
+                                        </div>
+
+                                        ${o.status === 'Processing' ? `
+                                            <button onclick="app.cancelOrder('${o._id}')" class="btn btn-danger" style="width: 100%;">
+                                                <i class="fa-solid fa-times-circle"></i> Cancel Order & Request Refund
+                                            </button>
+                                            <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 8px;">
+                                                Refund will be processed to your account within 7 business days
+                                            </p>
+                                        ` : ''}
+
+                                        ${o.status === 'Refund Processing' ? `
+                                            <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 12px; border-radius: var(--radius-sm); text-align: center;">
+                                                <i class="fa-solid fa-clock" style="color: #f59e0b;"></i>
+                                                <strong style="color: #92400e;">Refund in progress</strong> - Amount will be credited within 7 days
+                                            </div>
+                                        ` : ''}
+
+                                        ${o.status === 'Cancelled' && o.refundProcessed ? `
+                                            <div style="background: #fee2e2; border: 2px solid #ef4444; padding: 12px; border-radius: var(--radius-sm); text-align: center; color: #991b1b;">
+                                                <i class="fa-solid fa-ban"></i> Order Cancelled - Refund Completed
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+            },
+
+            cancelOrder: async (orderId) => {
+                if(!confirm('⚠️ Cancel Order?\n\nAre you sure you want to cancel this order?\n\n• Refund will be processed to your account\n• Amount will be credited within 7 business days\n• This action cannot be undone')) {
+                    return;
+                }
+
+                try {
+                    app.showToast("Processing cancellation...");
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${orderId}/cancel`, { 
+                        method: 'PATCH' 
+                    });
+                    
+                    if(res.ok) {
+                        app.showToast("Order cancelled. Refund will be processed within 7 days.");
+                        app.renderProfile();
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error || "Cancellation failed");
+                    }
+                } catch(e) { 
+                    app.showToast("Server error. Please contact support."); 
+                }
+            },
+
+            // AUTH
+            showAuth: (mode = 'login') => {
+                let content = '';
+                if(mode === 'login') {
+                    content = `
+                        <form onsubmit="app.handleLogin(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Customer Login</h2>
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" name="email" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Password</label>
+                                <input type="password" name="password" placeholder="Enter your password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">
+                                <i class="fa-solid fa-sign-in-alt"></i> Login to Account
+                            </button>
+                            <p style="text-align:center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
+                                Don't have an account? <a href="#" onclick="app.showAuth('register')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create Account</a>
+                            </p>
+                        </form>
+                    `;
+                } else if (mode === 'register') {
+                    content = `
+                        <form onsubmit="app.handleRegister(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Create Account</h2>
+                            <div class="form-group">
+                                <label class="label">Full Name</label>
+                                <input type="text" name="name" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" name="email" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Password</label>
+                                <input type="password" name="password" placeholder="Create a password (min 6 characters)" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">
+                                <i class="fa-solid fa-user-plus"></i> Create Account
+                            </button>
+                            <p style="text-align:center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
+                                Already have an account? <a href="#" onclick="app.showAuth('login')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Login Here</a>
+                            </p>
+                        </form>
+                    `;
+                } else if (mode === 'verify') {
+                    content = `
+                        <form onsubmit="app.handleVerifyOTP(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 15px; color: var(--text-dark); text-align: center;">Verify Your Email</h2>
+                            <p style="color: var(--text-muted); margin-bottom: 25px; text-align: center;">We've sent a 6-digit code to your email</p>
+                            <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 700;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; margin-top: 20px;">
+                                <i class="fa-solid fa-check-circle"></i> Verify Email
+                            </button>
+                        </form>
+                    `;
+                }
+
+                app.openModal(`<div class="fade-in">${content}</div>`);
+            },
+
+            handleLogin: async (e) => {
+                e.preventDefault();
+                app.showToast("Logging in...");
+                const fd = Object.fromEntries(new FormData(e.target));
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/login`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
+                    });
+                    const data = await res.json();
+                    if(res.ok) {
+                        APP_STATE.user = data;
+                        sessionStorage.setItem('user', JSON.stringify(data));
+                        app.closeModal();
+                        app.showSuccessModal(data);
+                    } else {
+                        app.showToast(data.error || "Login failed");
+                    }
+                } catch(e) { app.showToast("Connection error"); }
+            },
+
+            showSuccessModal: (user) => {
+                const modal = document.getElementById('success-modal');
+                document.getElementById('success-user-name').textContent = user.name;
+                document.getElementById('success-user-email').textContent = user.email;
+                document.getElementById('success-user-role').textContent = user.role === 'author' ? 'Administrator' : 'Customer';
+                
+                modal.classList.add('active');
+            },
+
+            closeSuccessModal: () => {
+                document.getElementById('success-modal').classList.remove('active');
+                app.init();
+            },
+
+            handleRegister: async (e) => {
+                e.preventDefault();
+                app.showToast("Creating account...");
+                const fd = Object.fromEntries(new FormData(e.target));
+                APP_STATE.registrationEmail = fd.email;
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/register`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
+                    });
+                    if(res.ok) {
+                        app.showToast("Verification code sent to your email!");
+                        app.showAuth('verify');
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error);
+                    }
+                } catch(e) { app.showToast("Registration failed"); }
+            },
+
+            handleVerifyOTP: async (e) => {
+                e.preventDefault();
+                const otp = e.target.otp.value;
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: APP_STATE.registrationEmail, otp })
+                    });
+                    if(res.ok) {
+                        app.showToast("Email verified! Please login.");
+                        app.showAuth('login');
+                    } else {
+                        app.showToast("Invalid verification code");
+                    }
+                } catch(e) { app.showToast("Verification failed"); }
+            },
+
+            executeLogout: () => {
+                if(!confirm('Are you sure you want to logout?')) return;
+                sessionStorage.removeItem('user');
+                APP_STATE.user = null;
+                APP_STATE.cart = [];
+                app.showToast("Logged out successfully");
+                app.init();
+            },
+
+            postFieldReport: async (id) => {
+                const comment = document.getElementById('review-comment-field').value;
+                if(!comment || comment.trim() === '') {
+                    app.showToast("Please write a review");
+                    return;
+                }
+                try {
+                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
+                    });
+                    app.showToast("Review posted successfully!");
+                    app.syncInventory().then(() => app.viewProductDetails(id));
+                } catch(e) {
+                    app.showToast("Failed to post review");
+                }
+            },
+
+            // ADMIN PANEL (Simplified for brevity - add full admin features from previous code)
             renderAdminPortal: async () => {
                 if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.renderShop();
 
                 try {
-                    app.showToast("Accessing Secure Database...");
+                    app.showToast("Loading admin dashboard...");
                     const [ordersRes, inventoryRes, queriesRes] = await Promise.all([
                         fetch(`${COMMAND_CONFIG.API_BASE}/orders`),
                         fetch(`${COMMAND_CONFIG.API_BASE}/products`),
@@ -1682,24 +1937,26 @@
                 root.innerHTML = `
                     <div class="admin-layout fade-in">
                         <aside class="sidebar">
-                            <h3 style="font-family: var(--font-tech); margin-bottom: 2rem; padding: 0 10px; color: var(--primary);">COMMAND SYSTEM</h3>
+                            <h3 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark); padding: 0 10px;">
+                                <i class="fa-solid fa-dashboard"></i> Admin Panel
+                            </h3>
                             
                             <button onclick="app.switchAdminTab('dashboard')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}">
-                                <i class="fa-solid fa-chart-line"></i> Analytics
+                                <i class="fa-solid fa-chart-line"></i> Dashboard
                             </button>
                             <button onclick="app.switchAdminTab('orders')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}">
-                                <i class="fa-solid fa-folder-open"></i> Orders
+                                <i class="fa-solid fa-shopping-bag"></i> Orders
                             </button>
                             <button onclick="app.switchAdminTab('queries')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}">
-                                <i class="fa-solid fa-headset"></i> Support Queries
+                                <i class="fa-solid fa-headset"></i> Support Requests
                             </button>
                             <button onclick="app.switchAdminTab('inventory')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}">
-                                <i class="fa-solid fa-boxes-stacked"></i> Stock Control
+                                <i class="fa-solid fa-box"></i> Inventory
                             </button>
                             
-                            <div style="margin-top: 4rem; padding: 0 10px;">
+                            <div style="margin-top: 40px; padding: 0 10px;">
                                 <button onclick="app.renderShop()" class="btn btn-secondary" style="width:100%;">
-                                    <i class="fa-solid fa-house"></i> Exit Terminal
+                                    <i class="fa-solid fa-store"></i> Back to Store
                                 </button>
                             </div>
                         </aside>
@@ -1720,26 +1977,27 @@
 
             getTabContent: (tab) => {
                 const totalRevenue = APP_STATE.orders.reduce((sum, o) => sum + (o.total || 0), 0);
+                const activeOrders = APP_STATE.orders.filter(o => o.status === 'Processing').length;
 
                 if(tab === 'dashboard') {
                     return `
-                        <h1 style="font-family: var(--font-tech); margin-bottom: 3rem;">SYSTEM ANALYTICS</h1>
+                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 40px; color: var(--text-dark);">Dashboard Overview</h1>
                         <div class="stat-grid">
                             <div class="stat-box">
-                                <div class="label-tech">Gross Acquisition Value</div>
-                                <div class="text-gradient" style="font-size: 3rem; font-weight: 900; font-family: var(--font-tech);">₹${totalRevenue.toLocaleString()}</div>
+                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Total Revenue</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display); background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹${totalRevenue.toLocaleString()}</div>
                             </div>
                             <div class="stat-box">
-                                <div class="label-tech">Order Volume</div>
-                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.orders.length}</div>
+                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Total Orders</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark);">${APP_STATE.orders.length}</div>
                             </div>
                             <div class="stat-box">
-                                <div class="label-tech">Active Support Tickets</div>
-                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.queries.filter(q => q.status !== 'Solved').length}</div>
+                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Active Orders</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--warning);">${activeOrders}</div>
                             </div>
                             <div class="stat-box">
-                                <div class="label-tech">Hardware SKUs</div>
-                                <div style="font-size: 3rem; font-weight: 900;">${APP_STATE.inventory.length}</div>
+                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Products</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark);">${APP_STATE.inventory.length}</div>
                             </div>
                         </div>
                     `;
@@ -1747,24 +2005,38 @@
 
                 if(tab === 'orders') {
                     return `
-                        <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">ORDER LOGS</h1>
+                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 30px; color: var(--text-dark);">Order Management</h1>
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Date</th><th>Client</th><th>Details</th><th>Value</th><th>Status</th><th>Ops</th></tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     ${APP_STATE.orders.map(o => `
                                         <tr>
                                             <td>${new Date(o.date).toLocaleDateString()}</td>
-                                            <td><strong>${o.customer}</strong><br><small>${o.phone}</small></td>
-                                            <td>${o.items.length} units</td>
-                                            <td style="color: var(--primary);">₹${o.total}</td>
-                                            <td><span class="badge ${o.status === 'Delivered' ? 'badge-solved' : 'badge-open'}">${o.status}</span></td>
                                             <td>
-                                                ${o.status !== 'Delivered' 
-                                                    ? `<button onclick="app.executeOrderDelivery('${o._id}')" class="btn btn-secondary" style="padding:5px 10px; font-size:0.7rem;">Deploy</button>` 
-                                                    : '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i>'
+                                                <strong>${o.customer}</strong><br>
+                                                <small style="color: var(--text-muted);">${o.phone}</small>
+                                            </td>
+                                            <td>${o.items.length} items</td>
+                                            <td style="font-weight: 700; color: var(--primary);">₹${o.total.toLocaleString()}</td>
+                                            <td><span class="badge ${
+                                                o.status === 'Delivered' ? 'badge-success' : 
+                                                o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'badge-danger' : 
+                                                'badge-warning'
+                                            }">${o.status}</span></td>
+                                            <td>
+                                                ${o.status === 'Processing' 
+                                                    ? `<button onclick="app.executeOrderDelivery('${o._id}')" class="btn btn-success" style="padding:6px 12px; font-size:0.8rem;">Mark Delivered</button>` 
+                                                    : '<i class="fa-solid fa-check-circle" style="color:var(--success); font-size: 1.2rem;"></i>'
                                                 }
                                             </td>
                                         </tr>
@@ -1777,59 +2049,82 @@
 
                 if(tab === 'queries') {
                     return `
-                        <h1 style="font-family: var(--font-tech); margin-bottom: 2rem;">SUPPORT TICKETS</h1>
+                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 30px; color: var(--text-dark);">Support Requests</h1>
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Date</th><th>Agent</th><th>Briefing</th><th>Status</th><th>Protocol</th></tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Type</th>
+                                        <th>Message</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     ${APP_STATE.queries.map(q => `
-                                        <tr class="${q.status === 'Solved' ? 'fade-in' : ''}">
+                                        <tr>
                                             <td>${new Date(q.date).toLocaleDateString()}</td>
-                                            <td><strong>${q.customerName}</strong><br><small>${q.email}</small></td>
-                                            <td><div style="max-width:300px; white-space:pre-wrap; font-size:0.85rem; font-family:monospace;">${q.message}</div></td>
-                                            <td><span class="badge ${q.status === 'Solved' ? 'badge-solved' : 'badge-open'}">${q.status}</span></td>
+                                            <td>
+                                                <strong>${q.customerName}</strong><br>
+                                                <small style="color: var(--text-muted);">${q.email}</small>
+                                            </td>
+                                            <td><span class="badge badge-primary">${q.type}</span></td>
+                                            <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${q.message}</td>
+                                            <td><span class="badge ${q.status === 'Solved' ? 'badge-success' : 'badge-warning'}">${q.status}</span></td>
                                             <td>
                                                 ${q.status !== 'Solved' 
-                                                    ? `<button onclick="app.executeSolveQuery('${q._id}')" class="btn btn-success" style="padding: 5px 15px; font-size: 0.7rem;">Mark Solved</button>`
-                                                    : `<button onclick="app.executeDeleteQuery('${q._id}')" class="btn btn-danger" style="padding: 5px 15px; font-size: 0.7rem;">Delete Log</button>`
+                                                    ? `<button onclick="app.executeSolveQuery('${q._id}')" class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;">Resolve</button>`
+                                                    : `<button onclick="app.executeDeleteQuery('${q._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">Delete</button>`
                                                 }
                                             </td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
-                            ${APP_STATE.queries.length === 0 ? '<div style="padding:2rem; text-align:center; opacity:0.5;">No active tickets found.</div>' : ''}
                         </div>
                     `;
                 }
 
                 if(tab === 'inventory') {
                     return `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
-                            <h1 style="font-family: var(--font-tech);">HARDWARE RESERVE</h1>
-                            <button onclick="app.showAddProduct()" class="btn btn-primary">+ Register New Unit</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">Product Inventory</h1>
+                            <button onclick="app.showAddProduct()" class="btn btn-primary">
+                                <i class="fa-solid fa-plus"></i> Add Product
+                            </button>
                         </div>
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Unit</th><th>Price</th><th>Reserve Stock</th><th>Category</th><th>Actions</th></tr>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     ${APP_STATE.inventory.map(p => `
                                         <tr>
-                                            <td><img src="${p.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; vertical-align:middle; margin-right:10px;"> <strong>${p.name}</strong></td>
-                                            <td>₹${p.price}</td>
-                                            <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--text-main)'}; font-weight: 800;">${p.stock}</td>
-                                            <td>${p.category}</td>
                                             <td>
-                                                <div style="display: flex; gap: 10px;">
-                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 5px 15px; font-size: 0.7rem;">
-                                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                                <div style="display: flex; align-items: center; gap: 12px;">
+                                                    <img src="${p.image}" style="width:50px; height:50px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-sm); padding: 4px;">
+                                                    <strong>${p.name}</strong>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge badge-primary">${CATEGORIES[p.category]?.name || p.category}</span></td>
+                                            <td style="font-weight: 700;">₹${p.price.toLocaleString()}</td>
+                                            <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">${p.stock}</td>
+                                            <td>
+                                                <div style="display: flex; gap: 8px;">
+                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">
+                                                        <i class="fa-solid fa-pen"></i> Edit
                                                     </button>
-                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger" style="padding: 5px 15px; font-size: 0.7rem;">
-                                                        <i class="fa-solid fa-trash-can"></i> Delete
+                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
+                                                        <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -1847,53 +2142,62 @@
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}/solve`, { method: 'PATCH' });
                     if(res.ok) {
-                        app.showToast("Status Updated: Solved");
+                        app.showToast("Request marked as resolved");
                         app.renderAdminPortal();
                     }
-                } catch(e) { app.showToast("Operation Failed"); }
+                } catch(e) { app.showToast("Operation failed"); }
             },
 
             executeDeleteQuery: async (id) => {
-                if(!confirm("Permanently remove this record from command logs?")) return;
+                if(!confirm("Delete this support request?")) return;
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}`, { method: 'DELETE' });
                     if(res.ok) {
-                        app.showToast("Record Purged Successfully");
+                        app.showToast("Request deleted");
                         app.renderAdminPortal();
                     }
-                } catch(e) { app.showToast("Delete Operation Failed"); }
+                } catch(e) { app.showToast("Delete failed"); }
             },
 
             showAddProduct: () => {
+                const categoryOptions = Object.keys(CATEGORIES).map(key => 
+                    `<option value="${key}">${CATEGORIES[key].name}</option>`
+                ).join('');
+
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">REGISTER NEW HARDWARE</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Add New Product</h2>
                         <form id="add-product-form" onsubmit="app.executeAddProduct(event)">
                             <div class="form-group">
-                                <label class="label-tech">Hardware Name</label>
-                                <input name="name" required>
+                                <label class="label">Product Name</label>
+                                <input name="name" placeholder="Enter product name" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Acquisition Price (INR)</label>
-                                <input name="price" type="number" required>
+                                <label class="label">Category</label>
+                                <select name="category" required>
+                                    <option value="">Select Category</option>
+                                    ${categoryOptions}
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Initial Reserve Quantity (Stock)</label>
-                                <input name="stock" type="number" required>
+                                <label class="label">Price (₹)</label>
+                                <input name="price" type="number" placeholder="Enter price" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Classification (Category)</label>
-                                <input name="category" required>
+                                <label class="label">Stock Quantity</label>
+                                <input name="stock" type="number" placeholder="Enter stock quantity" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Hardware Specs / Briefing</label>
-                                <textarea name="desc" required rows="3"></textarea>
+                                <label class="label">Description</label>
+                                <textarea name="desc" placeholder="Enter product description" required rows="3"></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Schematic Upload (Image)</label>
-                                <input type="file" name="image" required style="padding: 10px;">
+                                <label class="label">Product Image</label>
+                                <input type="file" name="image" required accept="image/*" style="padding: 10px;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 18px;">Upload to Reserve</button>
+                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 16px;">
+                                <i class="fa-solid fa-plus"></i> Add Product
+                            </button>
                         </form>
                     </div>
                 `;
@@ -1902,48 +2206,56 @@
 
             executeAddProduct: async (e) => {
                 e.preventDefault();
-                app.showToast("Uploading Hardware Data...");
+                app.showToast("Adding product...");
                 const fd = new FormData(e.target);
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { method: 'POST', body: fd });
                     if(res.ok) {
-                        app.showToast("Hardware Online.");
+                        app.showToast("Product added successfully!");
                         app.closeModal();
                         app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Database Write Error"); }
+                } catch(err) { app.showToast("Failed to add product"); }
             },
 
             showEditProduct: (p) => {
+                const categoryOptions = Object.keys(CATEGORIES).map(key => 
+                    `<option value="${key}" ${p.category === key ? 'selected' : ''}>${CATEGORIES[key].name}</option>`
+                ).join('');
+
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">MODIFY HARDWARE UNIT</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Edit Product</h2>
                         <form onsubmit="app.executeEditProduct(event, '${p._id}')">
                             <div class="form-group">
-                                <label class="label-tech">Unit Name</label>
+                                <label class="label">Product Name</label>
                                 <input name="name" value="${p.name}" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Unit Price (INR)</label>
+                                <label class="label">Category</label>
+                                <select name="category" required>
+                                    ${categoryOptions}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Price (₹)</label>
                                 <input name="price" type="number" value="${p.price}" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Current Reserve (Stock)</label>
+                                <label class="label">Stock</label>
                                 <input name="stock" type="number" value="${p.stock}" required>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Classification</label>
-                                <input name="category" value="${p.category}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label-tech">Unit Specifications</label>
+                                <label class="label">Description</label>
                                 <textarea name="desc" required rows="3">${p.desc}</textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label-tech">Replace Schematic (Optional Image)</label>
-                                <input type="file" name="image" style="padding: 10px;">
+                                <label class="label">New Image (Optional)</label>
+                                <input type="file" name="image" accept="image/*" style="padding: 10px;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 18px;">Apply Modifications</button>
+                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 16px;">
+                                <i class="fa-solid fa-save"></i> Save Changes
+                            </button>
                         </form>
                     </div>
                 `;
@@ -1952,250 +2264,47 @@
 
             executeEditProduct: async (e, id) => {
                 e.preventDefault();
-                app.showToast("Applying System Changes...");
+                app.showToast("Updating product...");
                 const fd = new FormData(e.target);
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'PUT', body: fd });
                     if(res.ok) {
-                        app.showToast("Modifications Authenticated.");
+                        app.showToast("Product updated successfully!");
                         app.closeModal();
                         app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Update Failed"); }
+                } catch(err) { app.showToast("Update failed"); }
             },
 
             executeDeleteProduct: async (id, name) => {
-                if(!confirm(`⚠️ CRITICAL WARNING\n\nPermanently delete "${name}" from the system?\n\nThis action cannot be undone and will remove:\n• Product listing\n• All reviews\n• Image data\n\nConfirm deletion?`)) {
-                    return;
-                }
+                if(!confirm(`Delete "${name}"?\n\nThis action cannot be undone.`)) return;
 
                 try {
-                    app.showToast("Initiating Product Deletion...");
+                    app.showToast("Deleting product...");
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'DELETE' });
                     
                     if(res.ok) {
-                        app.showToast("Hardware Unit Deleted Successfully");
+                        app.showToast("Product deleted successfully");
                         app.renderAdminPortal();
                     } else {
-                        const data = await res.json();
-                        app.showToast(data.error || "Deletion Failed");
+                        app.showToast("Failed to delete product");
                     }
                 } catch(e) { 
-                    console.error('Delete Error:', e);
-                    app.showToast("System Error: Deletion Failed"); 
+                    app.showToast("Delete operation failed"); 
                 }
             },
 
             executeOrderDelivery: async (id) => {
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
-                    if(res.ok) { app.showToast("Order Status: Deployed"); app.renderAdminPortal(); }
-                } catch(e) { app.showToast("Deployment Error"); }
-            },
-
-            // ============================================================
-            // PROFILE & AUTH
-            // ============================================================
-
-            renderProfile: async () => {
-                const root = document.getElementById('app-root-view');
-                let orders = [];
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/my-orders?email=${APP_STATE.user.email}`);
-                    if(res.ok) orders = await res.json();
-                } catch(e) {}
-
-                root.innerHTML = `
-                    <div class="container animate-enter" style="max-width: 900px; padding: 5rem 2rem;">
-                        <h1 style="font-family: var(--font-tech); margin-bottom: 1rem;">ORDER HISTORY</h1>
-                        <p style="color: var(--primary); font-weight: 700; margin-bottom: 3rem;">AUTHORIZED PERSONNEL ONLY</p>
-                        
-                        <div class="stat-box" style="margin-bottom: 3rem; background: rgba(255,255,255,0.02);">
-                            <h3 style="margin-bottom: 20px;">Personal Briefing</h3>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <div><span class="label-tech">Full Name</span><div style="font-size: 1.2rem;">${APP_STATE.user.name}</div></div>
-                                <div><span class="label-tech">Encryption Email</span><div style="font-size: 1.2rem;">${APP_STATE.user.email}</div></div>
-                            </div>
-                        </div>
-
-                        <div class="stat-box">
-                            <h3 style="margin-bottom: 20px;">Deployment History (Orders)</h3>
-                            ${orders.length === 0 ? '<p style="opacity: 0.5;">No system acquisitions recorded.</p>' : 
-                                orders.map(o => `
-                                    <div style="border-bottom: 1px solid var(--border); padding: 20px 0;">
-                                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                                            <div>
-                                                <div style="font-family: var(--font-tech); color: var(--primary);">ORDER #${o._id.substr(-8)}</div>
-                                                <div style="font-size: 0.9rem; opacity: 0.7;">${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</div>
-                                            </div>
-                                            <div style="text-align: right;">
-                                                <div style="font-weight: 800;">₹${o.total.toLocaleString()}</div>
-                                                <div class="badge ${o.status === 'Delivered' ? 'badge-solved' : 'badge-open'}">${o.status}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')
-                            }
-                        </div>
-                    </div>
-                `;
-            },
-
-            showAuth: (mode = 'login') => {
-                let content = '';
-                if(mode === 'login') {
-                    content = `
-                        <form onsubmit="app.handleLogin(event)">
-                            <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">TERMINAL ACCESS</h2>
-                            <div class="form-group">
-                                <label class="label-tech">Identifier (Email)</label>
-                                <input type="email" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label-tech">Secure Passcode</label>
-                                <input type="password" name="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Verify Credentials</button>
-                            <p style="text-align:center; margin-top: 1.5rem; font-size: 0.9rem; opacity:0.7;">
-                                New Operative? <a href="#" onclick="app.showAuth('register')" style="color: var(--primary);">Register Unit</a>
-                            </p>
-                        </form>
-                    `;
-                } else if (mode === 'register') {
-                    content = `
-                        <form onsubmit="app.handleRegister(event)">
-                            <h2 style="font-family: var(--font-tech); margin-bottom: 2rem;">OPERATIVE REGISTRATION</h2>
-                            <div class="form-group">
-                                <label class="label-tech">Legal Name</label>
-                                <input type="text" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label-tech">Email Contact</label>
-                                <input type="email" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label-tech">Establish Passcode</label>
-                                <input type="password" name="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Initiate Verification</button>
-                        </form>
-                    `;
-                } else if (mode === 'verify') {
-                    content = `
-                        <form onsubmit="app.handleVerifyOTP(event)">
-                            <h2 style="font-family: var(--font-tech); margin-bottom: 1rem;">OTP AUTHENTICATION</h2>
-                            <p style="color: var(--text-muted); margin-bottom: 2rem; text-align: center;">Enter the 6-digit code sent to your encrypted line.</p>
-                            <input type="text" name="otp" placeholder="000000" maxlength="6" style="text-align: center; font-size: 2rem; letter-spacing: 10px;">
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px;">Finalize Identity</button>
-                        </form>
-                    `;
-                }
-
-                app.openModal(`<div class="fade-in">${content}</div>`);
-            },
-
-            handleLogin: async (e) => {
-                e.preventDefault();
-                app.showToast("Authenticating...");
-                const fd = Object.fromEntries(new FormData(e.target));
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/login`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(fd)
-                    });
-                    const data = await res.json();
-                    if(res.ok) {
-                        APP_STATE.user = data;
-                        sessionStorage.setItem('user', JSON.stringify(data));
-                        app.closeModal();
-                        app.showSuccessModal(data);
-                    } else {
-                        app.showToast(data.error || "Access Denied");
+                    if(res.ok) { 
+                        app.showToast("Order marked as delivered"); 
+                        app.renderAdminPortal(); 
                     }
-                } catch(e) { app.showToast("Connection Interrupted"); }
+                } catch(e) { app.showToast("Operation failed"); }
             },
 
-            // NEW SUCCESS MODAL LOGIC
-            showSuccessModal: (user) => {
-                const modal = document.getElementById('success-modal');
-                document.getElementById('success-user-name').textContent = user.name;
-                document.getElementById('success-user-email').textContent = user.email;
-                document.getElementById('success-user-role').textContent = user.role === 'author' ? 'ADMIN' : 'OPERATIVE';
-                
-                modal.classList.add('active');
-            },
-
-            closeSuccessModal: () => {
-                document.getElementById('success-modal').classList.remove('active');
-                app.init();
-            },
-
-            handleRegister: async (e) => {
-                e.preventDefault();
-                app.showToast("Transmitting Protocol...");
-                const fd = Object.fromEntries(new FormData(e.target));
-                APP_STATE.registrationEmail = fd.email;
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/register`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(fd)
-                    });
-                    if(res.ok) {
-                        app.showToast("OTP Transmitted to Email.");
-                        app.showAuth('verify');
-                    } else {
-                        const data = await res.json();
-                        app.showToast(data.error);
-                    }
-                } catch(e) { app.showToast("Registration Failed"); }
-            },
-
-            handleVerifyOTP: async (e) => {
-                e.preventDefault();
-                const otp = e.target.otp.value;
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-otp`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ email: APP_STATE.registrationEmail, otp })
-                    });
-                    if(res.ok) {
-                        app.showToast("Agent Verified. Proceed to Login.");
-                        app.showAuth('login');
-                    } else {
-                        app.showToast("Checksum Invalid (Incorrect OTP)");
-                    }
-                } catch(e) { app.showToast("Verification Logic Failure"); }
-            },
-
-            executeLogout: () => {
-                sessionStorage.removeItem('user');
-                APP_STATE.user = null;
-                APP_STATE.cart = [];
-                app.showToast("Session Terminated Safely.");
-                app.init();
-            },
-
-            postFieldReport: async (id) => {
-                const comment = document.getElementById('review-comment-field').value;
-                if(!comment) return;
-                try {
-                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
-                    });
-                    app.showToast("Field Report Logged.");
-                    app.syncInventory().then(() => app.viewProductDetails(id));
-                } catch(e) {}
-            },
-
-            // ============================================================
             // UTILITIES
-            // ============================================================
-
             openModal: (html) => {
                 document.getElementById('modal-body-content').innerHTML = html;
                 document.getElementById('modal-overlay').classList.add('active');
@@ -2218,7 +2327,7 @@
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
 
-        // BOOT THE ENGINE
+        // BOOT
         window.onload = app.init;
     </script>
 </body>
