@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -64,7 +68,7 @@
             line-height: 1.6;
         }
 
-        /* Scrollbar */
+        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-light); }
         ::-webkit-scrollbar-thumb { 
@@ -88,6 +92,11 @@
             to { opacity: 1; transform: translateY(0); } 
         }
 
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -102,8 +111,14 @@
             to { transform: rotate(360deg); }
         }
 
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .fade-in { animation: fadeIn 0.5s ease; }
         .slide-up { animation: slideUp 0.6s ease; }
+        .slide-down { animation: slideDown 0.3s ease; }
         .float { animation: float 3s ease-in-out infinite; }
 
         /* ============================================================
@@ -158,6 +173,16 @@
             color: white; 
         }
 
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
         .form-group { margin-bottom: 20px; }
         
         .label { 
@@ -198,6 +223,7 @@
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
 
         /* ============================================================
            4. NAVIGATION
@@ -243,6 +269,91 @@
             display: flex; 
             align-items: center; 
             gap: 12px; 
+        }
+
+        /* User Menu Dropdown (3 Dots) */
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-menu-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+        }
+
+        .user-menu-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            min-width: 220px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown-item:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .user-dropdown-header {
+            padding: 15px 20px;
+            background: var(--bg-light);
+            border-bottom: 2px solid var(--border);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .user-dropdown-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .user-dropdown-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         /* ============================================================
@@ -292,7 +403,6 @@
         /* ============================================================
            6. CATEGORY & PRODUCT SECTIONS
            ============================================================ */
-        /* Styles for the new Category Cards view */
         .category-selection-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -355,7 +465,6 @@
             font-weight: 600;
         }
 
-        /* Standard Product Grid */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -478,98 +587,25 @@
         }
         .overlay.active .modal { transform: scale(1); }
 
-        /* Success Modal */
-        .success-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 3000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
+        /* Map Modal */
+        .map-modal {
+            max-width: 800px;
+            width: 95%;
         }
 
-        .success-modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .success-content {
-            background: white;
-            border-radius: var(--radius-xl);
-            padding: 50px 40px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            transform: scale(0.8);
-            transition: transform 0.4s ease;
-            box-shadow: var(--shadow-xl);
-        }
-
-        .success-modal.active .success-content {
-            transform: scale(1);
-        }
-
-        .success-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 25px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
-            color: white;
-            animation: bounce 0.6s ease;
-        }
-
-        .success-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 15px;
-        }
-
-        .success-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        .user-info-card {
-            background: var(--bg-light);
+        #location-map {
+            width: 100%;
+            height: 400px;
             border-radius: var(--radius-md);
-            padding: 20px;
-            margin-bottom: 25px;
-            text-align: left;
+            margin: 20px 0;
         }
 
-        .user-info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .user-info-row:last-child {
-            border-bottom: none;
-        }
-
-        .user-info-label {
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .user-info-value {
-            font-weight: 600;
-            color: var(--primary);
+        .map-instructions {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--info);
         }
 
         /* Cart Panel */
@@ -605,11 +641,24 @@
             transition: all 0.4s ease;
             z-index: 4000;
             box-shadow: var(--shadow-xl);
+            max-width: 400px;
         }
 
         .toast.show {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
         }
 
         /* Floating WhatsApp Button */
@@ -721,7 +770,7 @@
             border-right: 2px solid var(--border); 
             padding: 30px 20px; 
             position: fixed; 
-            height: 100%; 
+            height: calc(100vh - 70px); 
             overflow-y: auto; 
         }
 
@@ -757,6 +806,16 @@
             padding: 40px; 
             width: 100%; 
             background: var(--bg-main); 
+            min-height: calc(100vh - 70px);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .stat-grid {
@@ -778,6 +837,19 @@
             transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
             border-color: var(--primary);
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-display);
         }
 
         .data-table {
@@ -810,23 +882,38 @@
             background: var(--bg-light);
         }
 
+        .location-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .location-link:hover {
+            text-decoration: underline;
+        }
+
         /* ============================================================
            10. RESPONSIVE DESIGN
            ============================================================ */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .cart-panel { width: 100%; right: -100%; }
-            .grid, .category-selection-grid, .product-grid-container .grid { grid-template-columns: 1fr; }
+            .grid, .category-selection-grid, .product-grid-container .grid { 
+                grid-template-columns: 1fr; 
+            }
             .sidebar { 
                 position: static; 
                 width: 100%; 
                 border-right: none; 
-                border-bottom: 2px solid var(--border); 
+                border-bottom: 2px solid var(--border);
+                height: auto;
             }
-            .admin-content { margin-left: 0; padding: 20px; }
-            .category-banner {
-                flex-direction: column;
-                text-align: center;
+            .admin-content { 
+                margin-left: 0; 
+                padding: 20px; 
             }
             .whatsapp-float {
                 bottom: 80px;
@@ -835,59 +922,454 @@
                 height: 50px;
                 font-size: 1.6rem;
             }
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+            .user-dropdown {
+                right: -10px;
+            }
+        }
+
+        /* ============================================================
+           11. UTILITY CLASSES
+           ============================================================ */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        
+        .mt-10 { margin-top: 10px; }
+        .mt-20 { margin-top: 20px; }
+        .mt-30 { margin-top: 30px; }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-20 { margin-bottom: 20px; }
+        .mb-30 { margin-bottom: 30px; }
+        
+        .p-10 { padding: 10px; }
+        .p-20 { padding: 20px; }
+        .p-30 { padding: 30px; }
+        
+        .flex { display: flex; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-10 { gap: 10px; }
+        .gap-15 { gap: 15px; }
+        .gap-20 { gap: 20px; }
+        
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        
+        .cursor-pointer { cursor: pointer; }
+        .no-select { user-select: none; }
+        
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
+
+        /* ============================================================
+           12. LOADING STATES
+           ============================================================ */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-light) 25%, #e0e7ed 50%, var(--bg-light) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* ============================================================
+           13. ALERT BOXES
+           ============================================================ */
+        .alert {
+            padding: 15px 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid var(--info);
+        }
+
+        /* ============================================================
+           14. TABS
+           ============================================================ */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            font-family: var(--font-display);
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* ============================================================
+           15. PROGRESS BAR
+           ============================================================ */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* ============================================================
+           16. EMPTY STATES
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .empty-state-text {
+            font-size: 0.95rem;
+        }
+
+        /* ============================================================
+           17. DIVIDERS
+           ============================================================ */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 30px 0;
+        }
+
+        .divider-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .divider-text::before,
+        .divider-text::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ============================================================
+           18. CARDS & CONTAINERS
+           ============================================================ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .info-card {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card-content {
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           19. ORDER DETAILS
+           ============================================================ */
+        .order-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .order-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .order-total {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+        }
+
+        .order-items-box {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 15px;
+        }
+
+        .order-items-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-items-list {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.8;
+        }
+
+        /* ============================================================
+           20. ADDITIONAL COMPONENTS
+           ============================================================ */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-light);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon input {
+            padding-left: 45px;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: var(--text-dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3000;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-5px);
+        }
+
+        .back-to-top.show {
+            display: flex;
         }
     </style>
 </head>
 <body>
 
+    <!-- Loader -->
     <div id="loader">
         <div class="spinner"></div>
         <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">Loading BNG Surveillance...</div>
     </div>
 
+    <!-- Toast Notification -->
     <div id="toast" class="toast">Action Completed</div>
 
+    <!-- Floating WhatsApp Button -->
     <a id="whatsapp-float" class="whatsapp-float" href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" target="_blank" title="Chat with us on WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
-    <div id="success-modal" class="success-modal">
-        <div class="success-content">
-            <div class="success-icon">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <h2 class="success-title">Welcome Back!</h2>
-            <p class="success-subtitle">You've successfully logged in to your account</p>
-            <div class="user-info-card">
-                <div class="user-info-row">
-                    <span class="user-info-label">Name</span>
-                    <span class="user-info-value" id="success-user-name">-</span>
-                </div>
-                <div class="user-info-row">
-                    <span class="user-info-label">Email</span>
-                    <span class="user-info-value" id="success-user-email">-</span>
-                </div>
-                <div class="user-info-row">
-                    <span class="user-info-label">Account Type</span>
-                    <span class="user-info-value" id="success-user-role">-</span>
-                </div>
-            </div>
-            <button onclick="app.closeSuccessModal()" class="btn btn-primary" style="width: 100%;">
-                <i class="fa-solid fa-store"></i> Start Shopping
-            </button>
-        </div>
+    <!-- Back to Top Button -->
+    <div id="back-to-top" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-arrow-up"></i>
     </div>
 
+    <!-- Cart Panel -->
     <div id="cart-panel" class="cart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);"><i class="fa-solid fa-shopping-cart"></i> Your Cart</h2>
-            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                <i class="fa-solid fa-shopping-cart"></i> Your Cart
+            </h2>
+            <button onclick="app.toggleCart()" class="btn btn-secondary" style="padding: 8px 12px;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
         
         <div id="cart-items-container" style="flex: 1; overflow-y: auto;">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 100px;">
-                <i class="fa-solid fa-shopping-basket" style="font-size: 4rem; opacity: 0.3; margin-bottom: 20px;"></i>
-                <p>Your cart is empty</p>
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-shopping-basket"></i></div>
+                <p class="empty-state-title">Your cart is empty</p>
+                <p class="empty-state-text">Add some products to get started!</p>
             </div>
         </div>
 
@@ -902,6 +1384,7 @@
         </div>
     </div>
 
+    <!-- Navigation -->
     <nav>
         <div class="logo" onclick="app.init()" id="app-logo">
             <img src="bngimage.jpg" alt="BNG Logo" />
@@ -910,8 +1393,10 @@
         <div class="nav-right" id="nav-actions-area"></div>
     </nav>
 
+    <!-- Main Content -->
     <main id="app-root-view"></main>
 
+    <!-- Modal Overlay -->
     <div id="modal-overlay" class="overlay">
         <div id="modal-body-content" class="modal"></div>
     </div>
@@ -926,7 +1411,7 @@
             WHATSAPP_ID: '916006750581'
         };
 
-        // Product Categories (Strict List as requested)
+        // Product Categories
         const CATEGORIES = {
             ANALOG: { 
                 name: 'CCTV Camera Analog', 
@@ -972,7 +1457,9 @@
             currentAdminTab: 'dashboard',
             registrationEmail: null,
             userLocation: null,
-            selectedCategory: null // Controls view state
+            selectedCategory: null,
+            map: null,
+            marker: null
         };
 
         // ================================================================
@@ -986,7 +1473,7 @@
             init: async () => {
                 console.log('🚀 Initializing BNG Surveillance...');
                 
-                // Hide loader after 1.5 seconds
+                // Hide loader
                 setTimeout(() => {
                     const loader = document.getElementById('loader');
                     if(loader) {
@@ -995,11 +1482,22 @@
                     }
                 }, 1500);
 
-                // Load inventory from server
+                // Load inventory
                 await app.syncInventory();
                 
-                // Render UI (Starts with Home View)
+                // Render UI
                 app.showHome();
+                app.renderHeader();
+                
+                // Show back to top on scroll
+                window.addEventListener('scroll', () => {
+                    const backToTop = document.getElementById('back-to-top');
+                    if (window.pageYOffset > 300) {
+                        backToTop.classList.add('show');
+                    } else {
+                        backToTop.classList.remove('show');
+                    }
+                });
                 
                 console.log('✅ Application ready!');
             },
@@ -1014,27 +1512,26 @@
                     }
                 } catch(err) {
                     console.warn("❌ Database Sync Failed", err);
-                    app.showToast("Failed to connect to server");
+                    app.showToast("Failed to connect to server", 'error');
                     APP_STATE.inventory = [];
                 }
             },
 
             // ============================================================
-            // VIEW CONTROLLERS (New Logic for "Category First")
+            // VIEW CONTROLLERS
             // ============================================================
-            
-            // 1. Landing View (Hero + Categories)
             showHome: () => {
                 APP_STATE.selectedCategory = null;
                 app.renderHeader();
                 const root = document.getElementById('app-root-view');
 
-                // Generate Category Cards
                 const categoryCards = Object.keys(CATEGORIES).map(key => {
                     const cat = CATEGORIES[key];
                     return `
-                        <div class="category-card-main" onclick="app.showCategoryPage('${key}')">
-                            <div class="cat-icon-circle" style="color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></div>
+                        <div class="category-card-main slide-up" onclick="app.showCategoryPage('${key}')">
+                            <div class="cat-icon-circle" style="color:${cat.color}">
+                                <i class="fa-solid ${cat.icon}"></i>
+                            </div>
                             <h3 class="cat-title-main">${cat.name}</h3>
                             <div class="cat-badge-main">
                                 <i class="fa-solid ${key === 'ACCESSORIES' ? 'fa-truck' : 'fa-tools'}"></i> 
@@ -1075,7 +1572,6 @@
                 `;
             },
 
-            // 2. Category Specific Page View
             showCategoryPage: (categoryKey) => {
                 APP_STATE.selectedCategory = categoryKey;
                 app.renderHeader();
@@ -1084,21 +1580,22 @@
                 const cat = CATEGORIES[categoryKey];
                 const products = APP_STATE.inventory.filter(p => p.category === categoryKey);
 
-                // Generate Product Cards
                 let productsHtml;
                 if(products.length === 0) {
                     productsHtml = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted);">
-                            <i class="fa-solid fa-box-open" style="font-size: 4rem; opacity: 0.3; margin-bottom: 20px;"></i>
-                            <h3>No products found in this category.</h3>
-                            <p>Please check back later.</p>
+                        <div style="grid-column: 1/-1;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="fa-solid fa-box-open"></i></div>
+                                <p class="empty-state-title">No products found</p>
+                                <p class="empty-state-text">Please check back later</p>
+                            </div>
                         </div>
                     `;
                 } else {
                     productsHtml = products.map(p => {
                         const isSoldOut = p.stock <= 0;
                         return `
-                            <div class="card ${isSoldOut ? 'out-of-stock' : ''}">
+                            <div class="card slide-up ${isSoldOut ? 'out-of-stock' : ''}">
                                 ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
                                 <div class="card-img-box" onclick="app.viewProductDetails('${p._id}')">
                                     <img src="${p.image}" alt="${p.name}">
@@ -1107,7 +1604,9 @@
                                     <div class="tag">${cat.name}</div>
                                     <h3 class="card-title">${p.name}</h3>
                                     <div class="price-tag">₹${p.price.toLocaleString('en-IN')}</div>
-                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0;">Stock: ${p.stock} units</p>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0;">
+                                        Stock: ${p.stock} units
+                                    </p>
                                     ${!isSoldOut 
                                         ? `<button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="app.viewProductDetails('${p._id}')">View Details</button>`
                                         : `<button class="btn btn-secondary" style="width:100%; margin-top: 10px;" disabled>Out of Stock</button>`
@@ -1144,15 +1643,10 @@
                     </div>
                 `;
                 
-                // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             },
 
-            // ============================================================
-            // UI HELPERS
-            // ============================================================
             renderShop: () => {
-                // If user was on a category page, go back to it, else home
                 if(APP_STATE.selectedCategory) {
                     app.showCategoryPage(APP_STATE.selectedCategory);
                 } else {
@@ -1165,34 +1659,86 @@
                 const whatsappBtn = document.getElementById('whatsapp-float');
                 
                 if (!APP_STATE.user) {
-                    nav.innerHTML = `<button onclick="app.showAuth('login')" class="btn btn-primary"><i class="fa-solid fa-user"></i> Customer Login</button>`;
+                    nav.innerHTML = `
+                        <button onclick="app.showAuth('login')" class="btn btn-primary">
+                            <i class="fa-solid fa-user"></i> Customer Login
+                        </button>
+                    `;
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                 } else {
                     const isAdmin = APP_STATE.user.role === 'author';
+                    const userInitial = APP_STATE.user.name.charAt(0).toUpperCase();
+                    
                     nav.innerHTML = `
-                        ${isAdmin ? `<button onclick="app.renderAdminPortal()" class="btn btn-secondary"><i class="fa-solid fa-dashboard"></i> Admin Panel</button>` : ''}
-                        <button onclick="app.renderProfile()" class="btn btn-secondary" title="My Orders"><i class="fa-solid fa-user-circle"></i></button>
+                        ${isAdmin ? `
+                            <button onclick="app.renderAdminPortal()" class="btn btn-secondary">
+                                <i class="fa-solid fa-dashboard"></i> Admin Panel
+                            </button>
+                        ` : ''}
+                        
                         <button onclick="app.toggleCart()" class="btn btn-primary">
                             <i class="fa-solid fa-shopping-cart"></i>
                             <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
                         </button>
-                        <button onclick="app.executeLogout()" class="btn btn-danger" style="padding: 10px 15px;"><i class="fa-solid fa-sign-out-alt"></i></button>
+                        
+                        <div class="user-menu-container">
+                            <div class="user-menu-btn" onclick="app.toggleUserMenu()">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </div>
+                            <div id="user-dropdown" class="user-dropdown">
+                                <div class="user-dropdown-header">
+                                    <div class="user-dropdown-name">${APP_STATE.user.name}</div>
+                                    <div class="user-dropdown-email">${APP_STATE.user.email}</div>
+                                </div>
+                                <div class="user-dropdown-item" onclick="app.renderProfile(); app.toggleUserMenu();">
+                                    <i class="fa-solid fa-receipt"></i> My Orders
+                                </div>
+                                <div class="user-dropdown-item" onclick="app.executeLogout();">
+                                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                </div>
+                            </div>
+                        </div>
                     `;
+                    
                     if (whatsappBtn) whatsappBtn.classList.add('show');
                 }
+            },
+
+            toggleUserMenu: () => {
+                const dropdown = document.getElementById('user-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('active');
+                }
+                
+                // Close on click outside
+                document.addEventListener('click', function closeMenu(e) {
+                    const userMenu = document.querySelector('.user-menu-container');
+                    if (userMenu && !userMenu.contains(e.target)) {
+                        dropdown?.classList.remove('active');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
             },
 
             renderFooter: () => `
                 <footer>
                     <div class="footer-content">
-                        <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; margin-bottom: 20px;">BNG Surveillance</div>
+                        <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; margin-bottom: 20px;">
+                            BNG Surveillance
+                        </div>
                         <p style="max-width: 600px; margin: 0 auto 30px; opacity: 0.8;">
                             Your trusted partner for complete CCTV and surveillance solutions. Professional installation and 24/7 customer support.
                         </p>
                         <div class="social-links">
-                            <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                            <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href="mailto:bngsurveillance@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+                            <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="mailto:bngsurveillance@gmail.com">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
                         </div>
                         <p style="opacity: 0.6; font-size: 0.9rem; margin-top: 30px;">
                             © 2024 BNG Surveillance Systems. All Rights Reserved.
@@ -1204,6 +1750,7 @@
                 </footer>
             `,
 
+            // Continue in next part...
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
                 if(!p) return;
@@ -1215,10 +1762,12 @@
                     <div class="fade-in">
                         <img src="${p.image}" style="width:100%; height:300px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">
                         
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 15px;">
+                        <div class="flex-between flex-wrap gap-15">
                             <div>
                                 <div class="tag">${category.name}</div>
-                                <h2 style="font-size: 1.8rem; font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">${p.name}</h2>
+                                <h2 style="font-size: 1.8rem; font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                    ${p.name}
+                                </h2>
                             </div>
                             <div class="price-tag" style="font-size: 2rem; margin:0;">₹${p.price.toLocaleString('en-IN')}</div>
                         </div>
@@ -1265,6 +1814,7 @@
                             <h4 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
                                 <i class="fa-solid fa-star"></i> Customer Reviews
                             </h4>
+                            
                             <div id="review-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">
                                 ${!hasReviews ? '<p style="color: var(--text-muted); text-align:center; padding: 30px;">No reviews yet. Be the first to review!</p>' : 
                                     p.reviews.map(r => `
@@ -1278,8 +1828,9 @@
                                     `).join('')
                                 }
                             </div>
+
                             ${APP_STATE.user ? `
-                                <div style="display: flex; gap: 10px;">
+                                <div class="flex gap-10">
                                     <input type="text" id="review-comment-field" placeholder="Write your review..." style="flex: 1;">
                                     <button onclick="app.postReview('${p._id}')" class="btn btn-primary" style="padding: 0 24px;">
                                         <i class="fa-solid fa-paper-plane"></i>
@@ -1289,12 +1840,13 @@
                         </div>
                     </div>
                 `;
+
                 app.openModal(html);
             },
 
             executeAddToCart: (id) => {
                 if(!APP_STATE.user) {
-                    app.showToast("Please login to add items to cart");
+                    app.showToast("Please login to add items to cart", 'error');
                     app.closeModal();
                     app.showAuth('login');
                     return;
@@ -1304,7 +1856,7 @@
                 const qtyRequested = parseInt(document.getElementById('purchase-qty-input')?.value) || 1;
 
                 if(qtyRequested > product.stock) {
-                    app.showToast("Requested quantity exceeds available stock");
+                    app.showToast("Requested quantity exceeds available stock", 'error');
                     return;
                 }
 
@@ -1313,7 +1865,7 @@
                 if(existingIndex !== -1) {
                     const newTotalQty = APP_STATE.cart[existingIndex].qty + qtyRequested;
                     if(newTotalQty > product.stock) {
-                        app.showToast("Cannot add more items - stock limit reached");
+                        app.showToast("Cannot add more items - stock limit reached", 'error');
                         return;
                     }
                     APP_STATE.cart[existingIndex].qty = newTotalQty;
@@ -1321,7 +1873,7 @@
                     APP_STATE.cart.push({ ...product, qty: qtyRequested });
                 }
 
-                app.showToast(`${product.name} added to cart!`);
+                app.showToast(`${product.name} added to cart!`, 'success');
                 app.closeModal();
                 app.renderHeader();
             },
@@ -1342,10 +1894,10 @@
                 
                 if(APP_STATE.cart.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); margin-top: 100px;">
-                            <i class="fa-solid fa-shopping-basket" style="font-size: 4rem; opacity: 0.3; margin-bottom: 20px;"></i>
-                            <p>Your cart is empty</p>
-                            <p style="font-size: 0.9rem; margin-top: 10px;">Add some products to get started!</p>
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fa-solid fa-shopping-basket"></i></div>
+                            <p class="empty-state-title">Your cart is empty</p>
+                            <p class="empty-state-text">Add some products to get started!</p>
                         </div>
                     `;
                     totalDisplay.innerText = "₹0";
@@ -1358,7 +1910,7 @@
                     total += rowTotal;
                     return `
                         <div style="background: var(--bg-light); border: 2px solid var(--border); padding: 18px; border-radius: var(--radius-md); margin-bottom: 15px;" class="slide-up">
-                            <div style="display:flex; gap: 15px; align-items:center;">
+                            <div class="flex gap-15" style="align-items:center;">
                                 <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; background: white; border-radius: var(--radius-sm); padding: 5px;">
                                 <div style="flex: 1;">
                                     <h4 style="font-weight: 600; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px;">${item.name}</h4>
@@ -1383,15 +1935,15 @@
                 APP_STATE.cart.splice(idx, 1);
                 app.renderCartContents();
                 app.renderHeader();
-                app.showToast("Item removed from cart");
+                app.showToast("Item removed from cart", 'success');
             },
 
             // ============================================================
-            // CHECKOUT
+            // CHECKOUT WITH MAP LOCATION PICKER
             // ============================================================
             checkout: () => {
                 if(APP_STATE.cart.length === 0) {
-                    app.showToast("Your cart is empty!");
+                    app.showToast("Your cart is empty!", 'error');
                     return;
                 }
                 app.toggleCart();
@@ -1426,13 +1978,14 @@
 
                         <div class="form-group">
                             <label class="label">
-                                <i class="fa-solid fa-location-dot"></i> Share Your Location (Optional)
+                                <i class="fa-solid fa-map-marker-alt"></i> Select Your Location on Map
                             </label>
-                            <button onclick="app.getLocation()" id="location-btn" class="btn btn-secondary" style="width: 100%;">
-                                <i class="fa-solid fa-map-marker-alt"></i> Get My Current Location
+                            <button onclick="app.showMapPicker()" id="location-btn" class="btn btn-secondary w-full">
+                                <i class="fa-solid fa-map"></i> Pick Location from Map
                             </button>
-                            <div id="location-display" style="margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none;">
-                                <i class="fa-solid fa-check-circle"></i> Location captured successfully
+                            <div id="location-display" class="alert alert-success mt-10" style="display: none;">
+                                <i class="fa-solid fa-check-circle"></i>
+                                <span id="location-text">Location selected successfully</span>
                             </div>
                         </div>
 
@@ -1441,7 +1994,7 @@
                             <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display); color: var(--primary);">₹${finalTotal.toLocaleString('en-IN')}</div>
                         </div>
 
-                        <button onclick="app.initiatePayment(${finalTotal})" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem;">
+                        <button onclick="app.initiatePayment(${finalTotal})" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
                             <i class="fa-solid fa-lock"></i> Proceed to Payment
                         </button>
 
@@ -1453,37 +2006,102 @@
                 app.openModal(html);
             },
 
-            getLocation: () => {
-                const btn = document.getElementById('location-btn');
-                const display = document.getElementById('location-display');
-                
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting location...';
-                btn.disabled = true;
+            showMapPicker: () => {
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
+                            <i class="fa-solid fa-map-marked-alt"></i> Select Your Location
+                        </h2>
+                        
+                        <div class="map-instructions">
+                            <strong><i class="fa-solid fa-info-circle"></i> Instructions:</strong>
+                            <ul style="margin: 10px 0 0 25px; line-height: 1.8;">
+                                <li>Click on the map to pin your exact location</li>
+                                <li>You can drag the marker to adjust</li>
+                                <li>Zoom in for more accuracy</li>
+                            </ul>
+                        </div>
 
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            APP_STATE.userLocation = {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy
-                            };
-                            btn.innerHTML = '<i class="fa-solid fa-check"></i> Location Captured';
-                            btn.classList.remove('btn-secondary');
-                            btn.classList.add('btn-success');
-                            display.style.display = 'block';
-                            app.showToast("Location captured successfully!");
-                        },
-                        (error) => {
-                            btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
-                            btn.disabled = false;
-                            app.showToast("Unable to get location. Please enter manually.");
+                        <div id="location-map"></div>
+
+                        <div class="flex gap-10 mt-20">
+                            <button onclick="app.closeModal(); app.checkout();" class="btn btn-secondary" style="flex: 1;">
+                                <i class="fa-solid fa-times"></i> Cancel
+                            </button>
+                            <button onclick="app.confirmLocation()" class="btn btn-primary" style="flex: 1;">
+                                <i class="fa-solid fa-check"></i> Confirm Location
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                app.openModal(html);
+                document.getElementById('modal-body-content').classList.add('map-modal');
+                
+                // Initialize map after DOM is ready
+                setTimeout(() => {
+                    // Default to India center
+                    const defaultLat = 20.5937;
+                    const defaultLng = 78.9629;
+                    
+                    APP_STATE.map = L.map('location-map').setView([defaultLat, defaultLng], 5);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(APP_STATE.map);
+                    
+                    // Click to add marker
+                    APP_STATE.map.on('click', function(e) {
+                        if (APP_STATE.marker) {
+                            APP_STATE.map.removeLayer(APP_STATE.marker);
                         }
-                    );
-                } else {
-                    btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
-                    btn.disabled = false;
-                    app.showToast("Geolocation not supported by your browser");
+                        
+                        APP_STATE.marker = L.marker([e.latlng.lat, e.latlng.lng], {
+                            draggable: true
+                        }).addTo(APP_STATE.map);
+                        
+                        APP_STATE.userLocation = {
+                            latitude: e.latlng.lat,
+                            longitude: e.latlng.lng
+                        };
+                    });
+                    
+                    // Try to get user's current position for better UX
+                    if ("geolocation" in navigator) {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                APP_STATE.map.setView([lat, lng], 13);
+                            },
+                            (error) => {
+                                console.log("Geolocation not available, using default view");
+                            }
+                        );
+                    }
+                }, 300);
+            },
+
+            confirmLocation: () => {
+                if (!APP_STATE.userLocation) {
+                    app.showToast("Please select a location on the map", 'error');
+                    return;
+                }
+                
+                app.closeModal();
+                document.getElementById('modal-body-content').classList.remove('map-modal');
+                app.checkout();
+                
+                // Show success message
+                const display = document.getElementById('location-display');
+                const locationBtn = document.getElementById('location-btn');
+                
+                if (display && locationBtn) {
+                    display.style.display = 'flex';
+                    locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
+                    locationBtn.classList.remove('btn-secondary');
+                    locationBtn.classList.add('btn-success');
+                    locationBtn.disabled = true;
                 }
             },
 
@@ -1493,22 +2111,22 @@
                 const pincode = document.getElementById('checkout-pincode').value;
 
                 if(!phone || !address || !pincode) {
-                    app.showToast("Please fill all required fields");
+                    app.showToast("Please fill all required fields", 'error');
                     return;
                 }
 
                 if(!/^[0-9]{10}$/.test(phone.replace(/\D/g, ''))) {
-                    app.showToast("Please enter a valid 10-digit phone number");
+                    app.showToast("Please enter a valid 10-digit phone number", 'error');
                     return;
                 }
 
                 if(!/^[0-9]{6}$/.test(pincode)) {
-                    app.showToast("Please enter a valid 6-digit pincode");
+                    app.showToast("Please enter a valid 6-digit pincode", 'error');
                     return;
                 }
 
                 try {
-                    app.showToast("Connecting to payment gateway...");
+                    app.showToast("Connecting to payment gateway...", 'warning');
                     
                     const response = await fetch(`${COMMAND_CONFIG.API_BASE}/create-order`, {
                         method: 'POST',
@@ -1539,13 +2157,13 @@
                     app.closeModal();
 
                 } catch(e) {
-                    app.showToast("Payment gateway error. Please try again.");
+                    app.showToast("Payment gateway error. Please try again.", 'error');
                 }
             },
 
             verifyPaymentResponse: async (response, total, phone, address, pincode) => {
                 try {
-                    app.showToast("Verifying payment...");
+                    app.showToast("Verifying payment...", 'warning');
                     
                     const payload = {
                         orderCreationId: response.razorpay_order_id,
@@ -1570,23 +2188,50 @@
                     });
 
                     if(res.ok) {
+                        // Send WhatsApp message to admin
+                        app.sendOrderToWhatsApp(response.razorpay_order_id, APP_STATE.user.name, APP_STATE.cart, total, address, phone, pincode);
+                        
                         APP_STATE.cart = [];
                         APP_STATE.userLocation = null;
-                        app.showToast("Payment successful!");
+                        app.showToast("Payment successful! Order confirmed.", 'success');
                         app.renderOrderSuccess(response.razorpay_order_id, total);
                         app.syncInventory();
                         app.renderHeader();
                     } else {
-                        app.showToast("Payment verification failed");
+                        app.showToast("Payment verification failed", 'error');
                     }
                 } catch(e) {
-                    app.showToast("Server error. Please contact support.");
+                    app.showToast("Server error. Please contact support.", 'error');
                 }
+            },
+
+            sendOrderToWhatsApp: (orderId, customerName, items, total, address, phone, pincode) => {
+                // Build WhatsApp message
+                let message = `🛍️ *NEW ORDER RECEIVED*\n\n`;
+                message += `📋 *Order ID:* ${orderId.substr(-8)}\n`;
+                message += `👤 *Customer:* ${customerName}\n`;
+                message += `📞 *Phone:* ${phone}\n`;
+                message += `📍 *Address:* ${address}, ${pincode}\n\n`;
+                message += `🛒 *Products:*\n`;
+                
+                items.forEach(item => {
+                    message += `• ${item.qty}× ${item.name} @ ₹${item.price.toLocaleString()}\n`;
+                });
+                
+                message += `\n💰 *Total Amount:* ₹${total.toLocaleString()}\n\n`;
+                
+                if (APP_STATE.userLocation) {
+                    const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
+                    message += `📍 *Location:* ${gmapsLink}\n`;
+                }
+                
+                const whatsappUrl = `https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
             },
 
             renderOrderSuccess: (id, amount) => {
                 const html = `
-                    <div style="text-align: center; padding: 30px 20px;">
+                    <div class="text-center" style="padding: 30px 20px;">
                         <div style="width: 100px; height: 100px; margin: 0 auto 25px; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; animation: bounce 0.6s ease;">
                             <i class="fa-solid fa-check"></i>
                         </div>
@@ -1596,10 +2241,10 @@
                             Thank you for your purchase! Our team will contact you shortly to schedule the installation.
                         </p>
                         
-                        <button onclick="app.closeModal(); app.renderProfile();" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                        <button onclick="app.closeModal(); app.renderProfile();" class="btn btn-primary w-full mb-10">
                             <i class="fa-solid fa-receipt"></i> View My Orders
                         </button>
-                        <button onclick="app.closeModal(); app.showHome();" class="btn btn-secondary" style="width: 100%;">
+                        <button onclick="app.closeModal(); app.showHome();" class="btn btn-secondary w-full">
                             <i class="fa-solid fa-store"></i> Continue Shopping
                         </button>
                     </div>
@@ -1607,12 +2252,330 @@
                 app.openModal(html);
             },
 
-            // ============================================================
-            // SUPPORT REQUEST
-            // ============================================================
+            // Continuing with PROFILE, ADMIN PANEL, AUTH, and other functions...
+            // Due to character limit, I'll provide the complete file in parts
+
+            renderProfile: async () => {
+                const root = document.getElementById('app-root-view');
+                if(!APP_STATE.user) { app.showAuth('login'); return; }
+
+                let orders = [];
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/my-orders?email=${APP_STATE.user.email}`);
+                    if(res.ok) orders = await res.json();
+                } catch(e) {}
+
+                root.innerHTML = `
+                    <div class="container section fade-in">
+                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
+                            <i class="fa-solid fa-user-circle"></i> My Account
+                        </h1>
+                        <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem;">
+                            Manage your orders and account details
+                        </p>
+                        
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="fa-solid fa-id-card"></i> Profile Information
+                            </div>
+                            <div class="info-card-content">
+                                <div class="flex-between flex-wrap gap-20">
+                                    <div>
+                                        <div class="label" style="margin: 0 0 5px 0;">Full Name</div>
+                                        <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">
+                                            ${APP_STATE.user.name}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="margin: 0 0 5px 0;">Email Address</div>
+                                        <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">
+                                            ${APP_STATE.user.email}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 30px; margin-top: 30px;">
+                            <h3 style="font-family: var(--font-display); font-weight: 600; margin-bottom: 20px; color: var(--text-dark);">
+                                <i class="fa-solid fa-receipt"></i> Order History
+                            </h3>
+                            ${orders.length === 0 ? 
+                                `<div class="empty-state">
+                                    <div class="empty-state-icon"><i class="fa-solid fa-shopping-bag"></i></div>
+                                    <p class="empty-state-title">No orders yet</p>
+                                    <p class="empty-state-text">Start shopping to see your orders here</p>
+                                    <button onclick="app.showHome()" class="btn btn-primary mt-20">
+                                        <i class="fa-solid fa-store"></i> Start Shopping
+                                    </button>
+                                </div>` 
+                                : 
+                                orders.map(o => `
+                                    <div class="order-card ${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity-60' : ''}">
+                                        <div class="order-header">
+                                            <div>
+                                                <div class="order-id">Order #${o._id.substr(-8)}</div>
+                                                <div class="order-date">
+                                                    ${new Date(o.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="order-total">₹${o.total.toLocaleString()}</div>
+                                                <div class="badge ${
+                                                    o.status === 'Delivered' ? 'badge-success' : 
+                                                    o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'badge-danger' : 
+                                                    'badge-warning'
+                                                }" style="margin-top: 5px;">${o.status}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="order-items-box">
+                                            <div class="order-items-title">
+                                                <i class="fa-solid fa-box"></i> Items:
+                                            </div>
+                                            <div class="order-items-list">
+                                                ${o.items.map(i => `${i.qty}× ${i.name}`).join('<br>')}
+                                            </div>
+                                        </div>
+
+                                        ${o.status === 'Processing' ? `
+                                            <button onclick="app.cancelOrder('${o._id}')" class="btn btn-danger w-full">
+                                                <i class="fa-solid fa-times-circle"></i> Cancel Order & Request Refund
+                                            </button>
+                                            <p class="text-center mt-10" style="font-size: 0.75rem; color: var(--text-muted);">
+                                                Refund will be processed to your account within 7 business days
+                                            </p>
+                                        ` : ''}
+
+                                        ${o.status === 'Refund Processing' ? `
+                                            <div class="alert alert-warning">
+                                                <i class="fa-solid fa-clock"></i>
+                                                <strong>Refund in progress</strong> - Amount will be credited within 7 days
+                                            </div>
+                                        ` : ''}
+
+                                        ${o.status === 'Cancelled' && o.refundProcessed ? `
+                                            <div class="alert alert-danger">
+                                                <i class="fa-solid fa-ban"></i> Order Cancelled - Refund Completed
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+            },
+
+            cancelOrder: async (orderId) => {
+                if(!confirm('⚠️ Cancel Order?\n\nAre you sure you want to cancel this order?\n\n• Refund will be processed to your account\n• Amount will be credited within 7 business days\n• This action cannot be undone')) {
+                    return;
+                }
+
+                try {
+                    app.showToast("Processing cancellation...", 'warning');
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${orderId}/cancel`, { 
+                        method: 'PATCH' 
+                    });
+                    
+                    if(res.ok) {
+                        app.showToast("Order cancelled. Refund will be processed within 7 days.", 'success');
+                        app.renderProfile();
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error || "Cancellation failed", 'error');
+                    }
+                } catch(e) { 
+                    app.showToast("Server error. Please contact support.", 'error'); 
+                }
+            },
+
+            // AUTH METHODS
+            showAuth: (mode = 'login') => {
+                let content = '';
+                if(mode === 'login') {
+                    content = `
+                        <form onsubmit="app.handleLogin(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                                Customer Login
+                            </h2>
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" name="email" placeholder="Enter your email" required autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Password</label>
+                                <input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
+                                <i class="fa-solid fa-sign-in-alt"></i> Login to Account
+                            </button>
+                            <p class="text-center mt-20" style="font-size: 0.95rem; color: var(--text-muted);">
+                                Don't have an account? 
+                                <a href="#" onclick="app.showAuth('register'); return false;" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+                                    Create Account
+                                </a>
+                            </p>
+                        </form>
+                    `;
+                } else if (mode === 'register') {
+                    content = `
+                        <form onsubmit="app.handleRegister(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                                Create Account
+                            </h2>
+                            <div class="form-group">
+                                <label class="label">Full Name</label>
+                                <input type="text" name="name" placeholder="Enter your full name" required autocomplete="name">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" name="email" placeholder="Enter your email" required autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Password</label>
+                                <input type="password" name="password" placeholder="Create a password (min 6 characters)" required autocomplete="new-password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
+                                <i class="fa-solid fa-user-plus"></i> Create Account
+                            </button>
+                            <p class="text-center mt-20" style="font-size: 0.95rem; color: var(--text-muted);">
+                                Already have an account? 
+                                <a href="#" onclick="app.showAuth('login'); return false;" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+                                    Login Here
+                                </a>
+                            </p>
+                        </form>
+                    `;
+                } else if (mode === 'verify') {
+                    content = `
+                        <form onsubmit="app.handleVerifyOTP(event)">
+                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 15px; color: var(--text-dark); text-align: center;">
+                                Verify Your Email
+                            </h2>
+                            <p class="text-center" style="color: var(--text-muted); margin-bottom: 25px;">
+                                We've sent a 6-digit code to your email
+                            </p>
+                            <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 700;" required autocomplete="one-time-code">
+                            <button type="submit" class="btn btn-primary w-full mt-20" style="padding: 16px;">
+                                <i class="fa-solid fa-check-circle"></i> Verify Email
+                            </button>
+                        </form>
+                    `;
+                }
+
+                app.openModal(`<div class="fade-in">${content}</div>`);
+            },
+
+            handleLogin: async (e) => {
+                e.preventDefault();
+                app.showToast("Logging in...", 'warning');
+                const fd = Object.fromEntries(new FormData(e.target));
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/login`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
+                    });
+                    const data = await res.json();
+                    if(res.ok) {
+                        APP_STATE.user = data;
+                        sessionStorage.setItem('user', JSON.stringify(data));
+                        app.closeModal();
+                        
+                        // Show simple welcome toast instead of modal
+                        app.showToast(`Welcome back, ${data.name}!`, 'success');
+                        
+                        app.renderHeader();
+                        if(APP_STATE.user.role !== 'author') {
+                            app.showHome();
+                        }
+                    } else {
+                        app.showToast(data.error || "Login failed", 'error');
+                    }
+                } catch(e) { 
+                    app.showToast("Connection error", 'error'); 
+                }
+            },
+
+            handleRegister: async (e) => {
+                e.preventDefault();
+                app.showToast("Creating account...", 'warning');
+                const fd = Object.fromEntries(new FormData(e.target));
+                APP_STATE.registrationEmail = fd.email;
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/register`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(fd)
+                    });
+                    if(res.ok) {
+                        app.showToast("Verification code sent to your email!", 'success');
+                        app.showAuth('verify');
+                    } else {
+                        const data = await res.json();
+                        app.showToast(data.error, 'error');
+                    }
+                } catch(e) { 
+                    app.showToast("Registration failed", 'error'); 
+                }
+            },
+
+            handleVerifyOTP: async (e) => {
+                e.preventDefault();
+                const otp = e.target.otp.value;
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-otp`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: APP_STATE.registrationEmail, otp })
+                    });
+                    if(res.ok) {
+                        app.showToast("Email verified! Please login.", 'success');
+                        app.showAuth('login');
+                    } else {
+                        app.showToast("Invalid verification code", 'error');
+                    }
+                } catch(e) { 
+                    app.showToast("Verification failed", 'error'); 
+                }
+            },
+
+            executeLogout: () => {
+                if(!confirm('Are you sure you want to logout?')) return;
+                sessionStorage.removeItem('user');
+                APP_STATE.user = null;
+                APP_STATE.cart = [];
+                
+                const whatsappBtn = document.getElementById('whatsapp-float');
+                if (whatsappBtn) whatsappBtn.classList.remove('show');
+                
+                app.showToast("Logged out successfully", 'success');
+                app.showHome();
+            },
+
+            postReview: async (id) => {
+                const comment = document.getElementById('review-comment-field').value;
+                if(!comment || comment.trim() === '') {
+                    app.showToast("Please write a review", 'error');
+                    return;
+                }
+                try {
+                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
+                    });
+                    app.showToast("Review posted successfully!", 'success');
+                    app.syncInventory().then(() => app.viewProductDetails(id));
+                } catch(e) {
+                    app.showToast("Failed to post review", 'error');
+                }
+            },
+
             renderRaiseRequest: () => {
                 if(!APP_STATE.user) {
-                    app.showToast("Please login to raise a support request");
+                    app.showToast("Please login to raise a support request", 'error');
                     app.showAuth('login');
                     return;
                 }
@@ -1645,69 +2608,21 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="label">
-                                <i class="fa-solid fa-location-dot"></i> Share Your Location (Optional)
-                            </label>
-                            <button onclick="app.getRequestLocation()" id="req-location-btn" class="btn btn-secondary" style="width: 100%;">
-                                <i class="fa-solid fa-map-marker-alt"></i> Get My Current Location
-                            </button>
-                            <div id="req-location-display" style="margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none;">
-                                <i class="fa-solid fa-check-circle"></i> Location captured successfully
-                            </div>
-                        </div>
-
-                        <div class="form-group">
                             <label class="label">Describe Your Request</label>
                             <textarea id="req-msg-field" placeholder="Please provide details about your requirement or issue..." rows="4" required></textarea>
                         </div>
 
-                        <div style="background: var(--bg-light); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; border-left: 4px solid var(--info);">
-                            <p style="font-size: 0.9rem; color: var(--text-main); margin: 0;">
-                                <i class="fa-solid fa-info-circle" style="color: var(--info);"></i>
-                                Our support team will contact you via WhatsApp within 24 hours.
-                            </p>
+                        <div class="alert alert-info">
+                            <i class="fa-solid fa-info-circle"></i>
+                            Our support team will contact you via WhatsApp within 24 hours.
                         </div>
 
-                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem;">
+                        <button onclick="app.executeSubmitRequest()" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
                             <i class="fa-solid fa-paper-plane"></i> Submit Request
                         </button>
                     </div>
                 `;
                 app.openModal(html);
-            },
-
-            getRequestLocation: () => {
-                const btn = document.getElementById('req-location-btn');
-                const display = document.getElementById('req-location-display');
-                
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting location...';
-                btn.disabled = true;
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            APP_STATE.userLocation = {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy
-                            };
-                            btn.innerHTML = '<i class="fa-solid fa-check"></i> Location Captured';
-                            btn.classList.remove('btn-secondary');
-                            btn.classList.add('btn-success');
-                            display.style.display = 'block';
-                            app.showToast("Location captured successfully!");
-                        },
-                        (error) => {
-                            btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
-                            btn.disabled = false;
-                            app.showToast("Unable to get location");
-                        }
-                    );
-                } else {
-                    btn.innerHTML = '<i class="fa-solid fa-map-marker-alt"></i> Get My Current Location';
-                    btn.disabled = false;
-                    app.showToast("Geolocation not supported");
-                }
             },
 
             executeSubmitRequest: async () => {
@@ -1717,23 +2632,16 @@
                 const pin = document.getElementById('req-pin-field').value;
 
                 if(!msg || !addr || !pin) {
-                    app.showToast("Please fill all required fields");
+                    app.showToast("Please fill all required fields", 'error');
                     return;
-                }
-
-                let fullMessage = `${msg}\n\n📍 Location Details:\nAddress: ${addr}\nPincode: ${pin}`;
-                
-                if(APP_STATE.userLocation) {
-                    const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
-                    fullMessage += `\n\n🗺️ Google Maps: ${gmapsLink}`;
                 }
 
                 const data = {
                     customerName: APP_STATE.user.name,
                     email: APP_STATE.user.email,
                     type: type,
-                    message: fullMessage,
-                    location: APP_STATE.userLocation
+                    message: `${msg}\n\nAddress: ${addr}\nPincode: ${pin}`,
+                    location: null
                 };
 
                 try {
@@ -1746,333 +2654,22 @@
                     if(res.ok) {
                         let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
                         
-                        if(APP_STATE.userLocation) {
-                            const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
-                            waText += `\n\nLocation: ${gmapsLink}`;
-                        }
-                        
                         window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
                         
-                        APP_STATE.userLocation = null;
-                        app.showToast("Request submitted successfully!");
+                        app.showToast("Request submitted successfully!", 'success');
                         app.closeModal();
                     }
                 } catch(e) { 
-                    app.showToast("Failed to submit request. Please try again."); 
+                    app.showToast("Failed to submit request. Please try again.", 'error'); 
                 }
             },
 
-            // ============================================================
-            // PROFILE
-            // ============================================================
-            renderProfile: async () => {
-                const root = document.getElementById('app-root-view');
-                if(!APP_STATE.user) { app.showAuth('login'); return; }
-
-                let orders = [];
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/my-orders?email=${APP_STATE.user.email}`);
-                    if(res.ok) orders = await res.json();
-                } catch(e) {}
-
-                root.innerHTML = `
-                    <div style="max-width: 1000px; padding: 60px 5%; margin: 0 auto;" class="fade-in">
-                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
-                            <i class="fa-solid fa-user-circle"></i> My Account
-                        </h1>
-                        <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem;">Manage your orders and account details</p>
-                        
-                        <div style="background: white; border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 30px; margin-bottom: 30px;">
-                            <h3 style="font-family: var(--font-display); font-weight: 600; margin-bottom: 20px; color: var(--text-dark);">
-                                <i class="fa-solid fa-id-card"></i> Profile Information
-                            </h3>
-                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                                <div>
-                                    <span class="label" style="margin: 0 0 5px 0;">Full Name</span>
-                                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${APP_STATE.user.name}</div>
-                                </div>
-                                <div>
-                                    <span class="label" style="margin: 0 0 5px 0;">Email Address</span>
-                                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">${APP_STATE.user.email}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background: white; border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 30px;">
-                            <h3 style="font-family: var(--font-display); font-weight: 600; margin-bottom: 20px; color: var(--text-dark);">
-                                <i class="fa-solid fa-receipt"></i> Order History
-                            </h3>
-                            ${orders.length === 0 ? 
-                                '<div style="text-align: center; padding: 50px 20px; color: var(--text-muted);"><i class="fa-solid fa-shopping-bag" style="font-size: 4rem; opacity: 0.3; margin-bottom: 15px;"></i><p style="font-size: 1.1rem;">No orders yet</p><button onclick="app.showHome()" class="btn btn-primary" style="margin-top: 20px;"><i class="fa-solid fa-store"></i> Start Shopping</button></div>' 
-                                : 
-                                orders.map(o => `
-                                    <div style="border: 2px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 15px; ${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity: 0.6;' : ''}">
-                                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
-                                            <div>
-                                                <div style="font-family: var(--font-display); font-weight: 700; color: var(--primary); font-size: 1.1rem;">
-                                                    Order #${o._id.substr(-8)}
-                                                </div>
-                                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">
-                                                    ${new Date(o.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                                </div>
-                                            </div>
-                                            <div style="text-align: right;">
-                                                <div style="font-weight: 800; font-size: 1.3rem; color: var(--text-dark);">₹${o.total.toLocaleString()}</div>
-                                                <div class="badge ${
-                                                    o.status === 'Delivered' ? 'badge-success' : 
-                                                    o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'badge-danger' : 
-                                                    'badge-warning'
-                                                }" style="margin-top: 5px;">${o.status}</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div style="background: var(--bg-light); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 15px;">
-                                            <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 8px; font-size: 0.9rem;">
-                                                <i class="fa-solid fa-box"></i> Items:
-                                            </div>
-                                            <div style="font-size: 0.9rem; color: var(--text-main); line-height: 1.6;">
-                                                ${o.items.map(i => `${i.qty}× ${i.name}`).join('<br>')}
-                                            </div>
-                                        </div>
-
-                                        ${o.status === 'Processing' ? `
-                                            <button onclick="app.cancelOrder('${o._id}')" class="btn btn-danger" style="width: 100%;">
-                                                <i class="fa-solid fa-times-circle"></i> Cancel Order & Request Refund
-                                            </button>
-                                            <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 8px;">
-                                                Refund will be processed to your account within 7 business days
-                                            </p>
-                                        ` : ''}
-
-                                        ${o.status === 'Refund Processing' ? `
-                                            <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 12px; border-radius: var(--radius-sm); text-align: center;">
-                                                <i class="fa-solid fa-clock" style="color: #f59e0b;"></i>
-                                                <strong style="color: #92400e;">Refund in progress</strong> - Amount will be credited within 7 days
-                                            </div>
-                                        ` : ''}
-
-                                        ${o.status === 'Cancelled' && o.refundProcessed ? `
-                                            <div style="background: #fee2e2; border: 2px solid #ef4444; padding: 12px; border-radius: var(--radius-sm); text-align: center; color: #991b1b;">
-                                                <i class="fa-solid fa-ban"></i> Order Cancelled - Refund Completed
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                `).join('')
-                            }
-                        </div>
-                    </div>
-                `;
-            },
-
-            cancelOrder: async (orderId) => {
-                if(!confirm('⚠️ Cancel Order?\n\nAre you sure you want to cancel this order?\n\n• Refund will be processed to your account\n• Amount will be credited within 7 business days\n• This action cannot be undone')) {
-                    return;
-                }
-
-                try {
-                    app.showToast("Processing cancellation...");
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${orderId}/cancel`, { 
-                        method: 'PATCH' 
-                    });
-                    
-                    if(res.ok) {
-                        app.showToast("Order cancelled. Refund will be processed within 7 days.");
-                        app.renderProfile();
-                    } else {
-                        const data = await res.json();
-                        app.showToast(data.error || "Cancellation failed");
-                    }
-                } catch(e) { 
-                    app.showToast("Server error. Please contact support."); 
-                }
-            },
-
-            // ============================================================
-            // AUTH
-            // ============================================================
-            showAuth: (mode = 'login') => {
-                let content = '';
-                if(mode === 'login') {
-                    content = `
-                        <form onsubmit="app.handleLogin(event)">
-                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Customer Login</h2>
-                            <div class="form-group">
-                                <label class="label">Email Address</label>
-                                <input type="email" name="email" placeholder="Enter your email" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label">Password</label>
-                                <input type="password" name="password" placeholder="Enter your password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">
-                                <i class="fa-solid fa-sign-in-alt"></i> Login to Account
-                            </button>
-                            <p style="text-align:center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
-                                Don't have an account? <a href="#" onclick="app.showAuth('register')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create Account</a>
-                            </p>
-                        </form>
-                    `;
-                } else if (mode === 'register') {
-                    content = `
-                        <form onsubmit="app.handleRegister(event)">
-                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Create Account</h2>
-                            <div class="form-group">
-                                <label class="label">Full Name</label>
-                                <input type="text" name="name" placeholder="Enter your full name" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label">Email Address</label>
-                                <input type="email" name="email" placeholder="Enter your email" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="label">Password</label>
-                                <input type="password" name="password" placeholder="Create a password (min 6 characters)" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px;">
-                                <i class="fa-solid fa-user-plus"></i> Create Account
-                            </button>
-                            <p style="text-align:center; margin-top: 20px; font-size: 0.95rem; color: var(--text-muted);">
-                                Already have an account? <a href="#" onclick="app.showAuth('login')" style="color: var(--primary); font-weight: 600; text-decoration: none;">Login Here</a>
-                            </p>
-                        </form>
-                    `;
-                } else if (mode === 'verify') {
-                    content = `
-                        <form onsubmit="app.handleVerifyOTP(event)">
-                            <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 15px; color: var(--text-dark); text-align: center;">Verify Your Email</h2>
-                            <p style="color: var(--text-muted); margin-bottom: 25px; text-align: center;">We've sent a 6-digit code to your email</p>
-                            <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 700;">
-                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; margin-top: 20px;">
-                                <i class="fa-solid fa-check-circle"></i> Verify Email
-                            </button>
-                        </form>
-                    `;
-                }
-
-                app.openModal(`<div class="fade-in">${content}</div>`);
-            },
-
-            handleLogin: async (e) => {
-                e.preventDefault();
-                app.showToast("Logging in...");
-                const fd = Object.fromEntries(new FormData(e.target));
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/login`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(fd)
-                    });
-                    const data = await res.json();
-                    if(res.ok) {
-                        APP_STATE.user = data;
-                        sessionStorage.setItem('user', JSON.stringify(data));
-                        app.closeModal();
-                        app.showSuccessModal(data);
-                        app.renderHeader(); // Ensure nav updates immediately
-                        if(APP_STATE.user.role !== 'author') {
-                            app.showHome();
-                        }
-                    } else {
-                        app.showToast(data.error || "Login failed");
-                    }
-                } catch(e) { app.showToast("Connection error"); }
-            },
-
-            showSuccessModal: (user) => {
-                const modal = document.getElementById('success-modal');
-                document.getElementById('success-user-name').textContent = user.name;
-                document.getElementById('success-user-email').textContent = user.email;
-                document.getElementById('success-user-role').textContent = user.role === 'author' ? 'Administrator' : 'Customer';
-                
-                modal.classList.add('active');
-            },
-
-            closeSuccessModal: () => {
-                document.getElementById('success-modal').classList.remove('active');
-                const whatsappBtn = document.getElementById('whatsapp-float');
-                if (whatsappBtn && APP_STATE.user) whatsappBtn.classList.add('show');
-                app.renderHeader();
-            },
-
-            handleRegister: async (e) => {
-                e.preventDefault();
-                app.showToast("Creating account...");
-                const fd = Object.fromEntries(new FormData(e.target));
-                APP_STATE.registrationEmail = fd.email;
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/register`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(fd)
-                    });
-                    if(res.ok) {
-                        app.showToast("Verification code sent to your email!");
-                        app.showAuth('verify');
-                    } else {
-                        const data = await res.json();
-                        app.showToast(data.error);
-                    }
-                } catch(e) { app.showToast("Registration failed"); }
-            },
-
-            handleVerifyOTP: async (e) => {
-                e.preventDefault();
-                const otp = e.target.otp.value;
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/verify-otp`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ email: APP_STATE.registrationEmail, otp })
-                    });
-                    if(res.ok) {
-                        app.showToast("Email verified! Please login.");
-                        app.showAuth('login');
-                    } else {
-                        app.showToast("Invalid verification code");
-                    }
-                } catch(e) { app.showToast("Verification failed"); }
-            },
-
-            executeLogout: () => {
-                if(!confirm('Are you sure you want to logout?')) return;
-                sessionStorage.removeItem('user');
-                APP_STATE.user = null;
-                APP_STATE.cart = [];
-                
-                const whatsappBtn = document.getElementById('whatsapp-float');
-                if (whatsappBtn) whatsappBtn.classList.remove('show');
-                
-                app.showToast("Logged out successfully");
-                app.showHome(); // Return to home view
-            },
-
-            postReview: async (id) => {
-                const comment = document.getElementById('review-comment-field').value;
-                if(!comment || comment.trim() === '') {
-                    app.showToast("Please write a review");
-                    return;
-                }
-                try {
-                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
-                    });
-                    app.showToast("Review posted successfully!");
-                    app.syncInventory().then(() => app.viewProductDetails(id));
-                } catch(e) {
-                    app.showToast("Failed to post review");
-                }
-            },
-
-            // ============================================================
-            // ADMIN PANEL
-            // ============================================================
+            // ADMIN PANEL METHODS - Will continue in next part...
             renderAdminPortal: async () => {
                 if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.showHome();
 
                 try {
-                    app.showToast("Loading admin dashboard...");
+                    app.showToast("Loading admin dashboard...", 'warning');
                     const [ordersRes, inventoryRes, queriesRes] = await Promise.all([
                         fetch(`${COMMAND_CONFIG.API_BASE}/orders`),
                         fetch(`${COMMAND_CONFIG.API_BASE}/products`),
@@ -2097,7 +2694,10 @@
                                 <i class="fa-solid fa-chart-line"></i> Dashboard
                             </button>
                             <button onclick="app.switchAdminTab('orders')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}">
-                                <i class="fa-solid fa-shopping-bag"></i> Orders
+                                <i class="fa-solid fa-shopping-bag"></i> All Orders
+                            </button>
+                            <button onclick="app.switchAdminTab('cancelled')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}">
+                                <i class="fa-solid fa-ban"></i> Cancelled Orders
                             </button>
                             <button onclick="app.switchAdminTab('queries')" class="sidebar-btn ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}">
                                 <i class="fa-solid fa-headset"></i> Support Requests
@@ -2107,7 +2707,7 @@
                             </button>
                             
                             <div style="margin-top: 40px; padding: 0 10px;">
-                                <button onclick="app.showHome()" class="btn btn-secondary" style="width:100%;">
+                                <button onclick="app.showHome()" class="btn btn-secondary w-full">
                                     <i class="fa-solid fa-store"></i> Back to Store
                                 </button>
                             </div>
@@ -2124,40 +2724,70 @@
 
             switchAdminTab: (tab) => {
                 APP_STATE.currentAdminTab = tab;
-                app.renderAdminPortal();
+                const tabView = document.getElementById('admin-tab-view');
+                if (tabView) {
+                    tabView.innerHTML = app.getTabContent(tab);
+                }
+                
+                // Update active state
+                document.querySelectorAll('.sidebar-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.sidebar-btn[onclick*="'${tab}'"]`)?.classList.add('active');
             },
 
             getTabContent: (tab) => {
                 const totalRevenue = APP_STATE.orders.reduce((sum, o) => sum + (o.total || 0), 0);
                 const activeOrders = APP_STATE.orders.filter(o => o.status === 'Processing').length;
+                const cancelledOrders = APP_STATE.orders.filter(o => o.status === 'Cancelled' || o.status === 'Refund Processing').length;
 
                 if(tab === 'dashboard') {
                     return `
-                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 40px; color: var(--text-dark);">Dashboard Overview</h1>
+                        <div class="admin-header">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                Dashboard Overview
+                            </h1>
+                        </div>
+                        
                         <div class="stat-grid">
                             <div class="stat-box">
-                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Total Revenue</div>
-                                <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display); background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₹${totalRevenue.toLocaleString()}</div>
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-value" style="background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    ₹${totalRevenue.toLocaleString()}
+                                </div>
                             </div>
                             <div class="stat-box">
-                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Total Orders</div>
-                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark);">${APP_STATE.orders.length}</div>
+                                <div class="stat-label">Total Orders</div>
+                                <div class="stat-value" style="color: var(--text-dark);">
+                                    ${APP_STATE.orders.length}
+                                </div>
                             </div>
                             <div class="stat-box">
-                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Active Orders</div>
-                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--warning);">${activeOrders}</div>
+                                <div class="stat-label">Active Orders</div>
+                                <div class="stat-value" style="color: var(--warning);">
+                                    ${activeOrders}
+                                </div>
                             </div>
                             <div class="stat-box">
-                                <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem;">Products</div>
-                                <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark);">${APP_STATE.inventory.length}</div>
+                                <div class="stat-label">Products</div>
+                                <div class="stat-value" style="color: var(--text-dark);">
+                                    ${APP_STATE.inventory.length}
+                                </div>
                             </div>
                         </div>
                     `;
                 }
 
                 if(tab === 'orders') {
+                    const allOrders = APP_STATE.orders.filter(o => o.status !== 'Cancelled' && o.status !== 'Refund Processing');
+                    
                     return `
-                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 30px; color: var(--text-dark);">Order Management</h1>
+                        <div class="admin-header">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                Order Management
+                            </h1>
+                        </div>
+                        
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
@@ -2166,28 +2796,39 @@
                                         <th>Customer</th>
                                         <th>Items</th>
                                         <th>Amount</th>
+                                        <th>Location</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${APP_STATE.orders.map(o => `
+                                    ${allOrders.map(o => `
                                         <tr>
                                             <td>${new Date(o.date).toLocaleDateString()}</td>
                                             <td>
                                                 <strong>${o.customer}</strong><br>
-                                                <small style="color: var(--text-muted);">${o.phone}</small>
+                                                <small style="color: var(--text-muted);">${o.phone}</small><br>
+                                                <small style="color: var(--text-muted);">${o.address.substring(0, 30)}...</small>
                                             </td>
                                             <td>${o.items.length} items</td>
                                             <td style="font-weight: 700; color: var(--primary);">₹${o.total.toLocaleString()}</td>
-                                            <td><span class="badge ${
-                                                o.status === 'Delivered' ? 'badge-success' : 
-                                                o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'badge-danger' : 
-                                                'badge-warning'
-                                            }">${o.status}</span></td>
+                                            <td>
+                                                ${o.location ? `
+                                                    <a href="https://www.google.com/maps?q=${o.location.latitude},${o.location.longitude}" 
+                                                       target="_blank" 
+                                                       class="location-link">
+                                                        <i class="fa-solid fa-map-marker-alt"></i> View Map
+                                                    </a>
+                                                ` : '<span style="color: var(--text-muted);">Not provided</span>'}
+                                            </td>
+                                            <td>
+                                                <span class="badge ${
+                                                    o.status === 'Delivered' ? 'badge-success' : 'badge-warning'
+                                                }">${o.status}</span>
+                                            </td>
                                             <td>
                                                 ${o.status === 'Processing' 
-                                                    ? `<button onclick="app.executeOrderDelivery('${o._id}')" class="btn btn-success" style="padding:6px 12px; font-size:0.8rem;">Mark Delivered</button>` 
+                                                    ? `<button onclick="app.executeOrderDelivery('${o._id}')" class="btn btn-success btn-sm">Mark Delivered</button>` 
                                                     : '<i class="fa-solid fa-check-circle" style="color:var(--success); font-size: 1.2rem;"></i>'
                                                 }
                                             </td>
@@ -2199,9 +2840,71 @@
                     `;
                 }
 
+                if(tab === 'cancelled') {
+                    const cancelledOrders = APP_STATE.orders.filter(o => o.status === 'Cancelled' || o.status === 'Refund Processing');
+                    
+                    return `
+                        <div class="admin-header">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                Cancelled Orders
+                            </h1>
+                            <div class="badge badge-danger" style="font-size: 1rem; padding: 10px 20px;">
+                                ${cancelledOrders.length} Cancelled
+                            </div>
+                        </div>
+                        
+                        ${cancelledOrders.length === 0 ? `
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="fa-solid fa-check-circle"></i></div>
+                                <p class="empty-state-title">No Cancelled Orders</p>
+                                <p class="empty-state-text">All orders are being processed successfully!</p>
+                            </div>
+                        ` : `
+                            <div class="stat-box" style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Cancelled Date</th>
+                                            <th>Customer</th>
+                                            <th>Items</th>
+                                            <th>Amount</th>
+                                            <th>Refund Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${cancelledOrders.map(o => `
+                                            <tr>
+                                                <td>${new Date(o.date).toLocaleDateString()}</td>
+                                                <td>${o.cancelledAt ? new Date(o.cancelledAt).toLocaleDateString() : '-'}</td>
+                                                <td>
+                                                    <strong>${o.customer}</strong><br>
+                                                    <small style="color: var(--text-muted);">${o.phone}</small>
+                                                </td>
+                                                <td>${o.items.length} items</td>
+                                                <td style="font-weight: 700; color: var(--danger);">₹${o.total.toLocaleString()}</td>
+                                                <td>
+                                                    <span class="badge ${o.status === 'Refund Processing' ? 'badge-warning' : 'badge-danger'}">
+                                                        ${o.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    `;
+                }
+
                 if(tab === 'queries') {
                     return `
-                        <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 30px; color: var(--text-dark);">Support Requests</h1>
+                        <div class="admin-header">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                Support Requests
+                            </h1>
+                        </div>
+                        
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
@@ -2223,12 +2926,18 @@
                                                 <small style="color: var(--text-muted);">${q.email}</small>
                                             </td>
                                             <td><span class="badge badge-primary">${q.type}</span></td>
-                                            <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${q.message}</td>
-                                            <td><span class="badge ${q.status === 'Solved' ? 'badge-success' : 'badge-warning'}">${q.status}</span></td>
+                                            <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                ${q.message}
+                                            </td>
+                                            <td>
+                                                <span class="badge ${q.status === 'Solved' ? 'badge-success' : 'badge-warning'}">
+                                                    ${q.status}
+                                                </span>
+                                            </td>
                                             <td>
                                                 ${q.status !== 'Solved' 
-                                                    ? `<button onclick="app.executeSolveQuery('${q._id}')" class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;">Resolve</button>`
-                                                    : `<button onclick="app.executeDeleteQuery('${q._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">Delete</button>`
+                                                    ? `<button onclick="app.executeSolveQuery('${q._id}')" class="btn btn-success btn-sm">Resolve</button>`
+                                                    : `<button onclick="app.executeDeleteQuery('${q._id}')" class="btn btn-danger btn-sm">Delete</button>`
                                                 }
                                             </td>
                                         </tr>
@@ -2241,12 +2950,15 @@
 
                 if(tab === 'inventory') {
                     return `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
-                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">Product Inventory</h1>
+                        <div class="admin-header">
+                            <h1 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
+                                Product Inventory
+                            </h1>
                             <button onclick="app.showAddProduct()" class="btn btn-primary">
                                 <i class="fa-solid fa-plus"></i> Add Product
                             </button>
                         </div>
+                        
                         <div class="stat-box" style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
@@ -2262,20 +2974,22 @@
                                     ${APP_STATE.inventory.map(p => `
                                         <tr>
                                             <td>
-                                                <div style="display: flex; align-items: center; gap: 12px;">
+                                                <div class="flex gap-15" style="align-items: center;">
                                                     <img src="${p.image}" style="width:50px; height:50px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-sm); padding: 4px;">
                                                     <strong>${p.name}</strong>
                                                 </div>
                                             </td>
                                             <td><span class="badge badge-primary">${CATEGORIES[p.category]?.name || p.category}</span></td>
                                             <td style="font-weight: 700;">₹${p.price.toLocaleString()}</td>
-                                            <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">${p.stock}</td>
+                                            <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">
+                                                ${p.stock}
+                                            </td>
                                             <td>
-                                                <div style="display: flex; gap: 8px;">
-                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">
+                                                <div class="flex gap-10">
+                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary btn-sm">
                                                         <i class="fa-solid fa-pen"></i> Edit
                                                     </button>
-                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
+                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger btn-sm">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -2294,10 +3008,10 @@
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}/solve`, { method: 'PATCH' });
                     if(res.ok) {
-                        app.showToast("Request marked as resolved");
-                        app.renderAdminPortal();
+                        app.showToast("Request marked as resolved", 'success');
+                        await app.renderAdminPortal();
                     }
-                } catch(e) { app.showToast("Operation failed"); }
+                } catch(e) { app.showToast("Operation failed", 'error'); }
             },
 
             executeDeleteQuery: async (id) => {
@@ -2305,21 +3019,22 @@
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}`, { method: 'DELETE' });
                     if(res.ok) {
-                        app.showToast("Request deleted");
-                        app.renderAdminPortal();
+                        app.showToast("Request deleted", 'success');
+                        await app.renderAdminPortal();
                     }
-                } catch(e) { app.showToast("Delete failed"); }
+                } catch(e) { app.showToast("Delete failed", 'error'); }
             },
 
             showAddProduct: () => {
-                // Populate Dropdown with Strict Categories
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
                     `<option value="${key}">${CATEGORIES[key].name}</option>`
                 ).join('');
 
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Add New Product</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            Add New Product
+                        </h2>
                         <form id="add-product-form" onsubmit="app.executeAddProduct(event)">
                             <div class="form-group">
                                 <label class="label">Product Name</label>
@@ -2348,7 +3063,7 @@
                                 <label class="label">Product Image</label>
                                 <input type="file" name="image" required accept="image/*" style="padding: 10px;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 16px;">
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-plus"></i> Add Product
                             </button>
                         </form>
@@ -2359,27 +3074,28 @@
 
             executeAddProduct: async (e) => {
                 e.preventDefault();
-                app.showToast("Adding product...");
+                app.showToast("Adding product...", 'warning');
                 const fd = new FormData(e.target);
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { method: 'POST', body: fd });
                     if(res.ok) {
-                        app.showToast("Product added successfully!");
+                        app.showToast("Product added successfully!", 'success');
                         app.closeModal();
-                        app.renderAdminPortal();
+                        await app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Failed to add product"); }
+                } catch(err) { app.showToast("Failed to add product", 'error'); }
             },
 
             showEditProduct: (p) => {
-                // Populate Dropdown with Strict Categories
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
                     `<option value="${key}" ${p.category === key ? 'selected' : ''}>${CATEGORIES[key].name}</option>`
                 ).join('');
 
                 const html = `
                     <div class="fade-in">
-                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">Edit Product</h2>
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            Edit Product
+                        </h2>
                         <form onsubmit="app.executeEditProduct(event, '${p._id}')">
                             <div class="form-group">
                                 <label class="label">Product Name</label>
@@ -2407,7 +3123,7 @@
                                 <label class="label">New Image (Optional)</label>
                                 <input type="file" name="image" accept="image/*" style="padding: 10px;">
                             </div>
-                            <button type="submit" class="btn btn-primary" style="width:100%; padding: 16px;">
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-save"></i> Save Changes
                             </button>
                         </form>
@@ -2418,33 +3134,33 @@
 
             executeEditProduct: async (e, id) => {
                 e.preventDefault();
-                app.showToast("Updating product...");
+                app.showToast("Updating product...", 'warning');
                 const fd = new FormData(e.target);
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'PUT', body: fd });
                     if(res.ok) {
-                        app.showToast("Product updated successfully!");
+                        app.showToast("Product updated successfully!", 'success');
                         app.closeModal();
-                        app.renderAdminPortal();
+                        await app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Update failed"); }
+                } catch(err) { app.showToast("Update failed", 'error'); }
             },
 
             executeDeleteProduct: async (id, name) => {
                 if(!confirm(`Delete "${name}"?\n\nThis action cannot be undone.`)) return;
 
                 try {
-                    app.showToast("Deleting product...");
+                    app.showToast("Deleting product...", 'warning');
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'DELETE' });
                     
                     if(res.ok) {
-                        app.showToast("Product deleted successfully");
-                        app.renderAdminPortal();
+                        app.showToast("Product deleted successfully", 'success');
+                        await app.renderAdminPortal();
                     } else {
-                        app.showToast("Failed to delete product");
+                        app.showToast("Failed to delete product", 'error');
                     }
                 } catch(e) { 
-                    app.showToast("Delete operation failed"); 
+                    app.showToast("Delete operation failed", 'error'); 
                 }
             },
 
@@ -2452,10 +3168,10 @@
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
                     if(res.ok) { 
-                        app.showToast("Order marked as delivered"); 
-                        app.renderAdminPortal(); 
+                        app.showToast("Order marked as delivered", 'success'); 
+                        await app.renderAdminPortal(); 
                     }
-                } catch(e) { app.showToast("Operation failed"); }
+                } catch(e) { app.showToast("Operation failed", 'error'); }
             },
 
             // ============================================================
@@ -2468,12 +3184,20 @@
 
             closeModal: () => {
                 document.getElementById('modal-overlay').classList.remove('active');
+                document.getElementById('modal-body-content').classList.remove('map-modal');
+                
+                // Cleanup map if exists
+                if (APP_STATE.map) {
+                    APP_STATE.map.remove();
+                    APP_STATE.map = null;
+                    APP_STATE.marker = null;
+                }
             },
 
-            showToast: (msg) => {
+            showToast: (msg, type = 'success') => {
                 const t = document.getElementById('toast');
                 t.innerText = msg;
-                t.classList.add('show');
+                t.className = 'toast show ' + type;
                 setTimeout(() => t.classList.remove('show'), 3500);
             }
         };
@@ -2498,7 +3222,6 @@
     ╚══════════════════════════════════════════════════════════════╝
     `;
 
-            // CCTV Mode
             const activateCCTVMode = () => {
                 document.body.style.filter = 'grayscale(100%) contrast(1.2)';
                 document.body.style.transition = 'filter 0.5s ease';
@@ -2520,7 +3243,6 @@
                 }, 10000);
             };
 
-            // Matrix Rain
             const matrixRain = () => {
                 const canvas = document.createElement('canvas');
                 canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;pointer-events:none;';
@@ -2557,7 +3279,6 @@
                 }, 15000);
             };
 
-            // Global Commands
             window.BNG = {
                 cctvMode: activateCCTVMode,
                 matrix: matrixRain,
@@ -2587,7 +3308,6 @@
                 }
             };
 
-            // Triple-click logo Easter egg
             setTimeout(() => {
                 const logo = document.getElementById('app-logo');
                 if (logo) {
@@ -2596,7 +3316,7 @@
                         clicks++;
                         if (clicks === 3) {
                             activateCCTVMode();
-                            if (app?.showToast) app.showToast("🎉 Easter egg unlocked!");
+                            if (app?.showToast) app.showToast("🎉 Easter egg unlocked!", 'success');
                             clicks = 0;
                         }
                         setTimeout(() => clicks = 0, 500);
@@ -2604,7 +3324,6 @@
                 }
             }, 1000);
 
-            // Welcome message
             console.log(bannerArt);
             console.log('%cType %cBNG.help()%c for secret commands!', 'color: #94a3b8;', 'color: #f59e0b; font-weight: bold;', 'color: #94a3b8;');
 
