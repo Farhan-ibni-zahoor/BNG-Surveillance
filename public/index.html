@@ -12,10 +12,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Leaflet Geocoder for Map Search -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -182,113 +178,6 @@
         .pulse { animation: pulse 2s ease-in-out infinite; }
 
         /* ============================================================
-           IMAGE CAROUSEL FOR PRODUCTS
-           ============================================================ */
-        .image-carousel {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background: var(--bg-light);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
-
-        .carousel-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .carousel-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: none;
-            padding: 20px;
-        }
-
-        .carousel-image.active {
-            display: block;
-        }
-
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 10;
-            box-shadow: var(--shadow);
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
-        .carousel-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .carousel-btn-prev {
-            left: 15px;
-        }
-
-        .carousel-btn-next {
-            right: 15px;
-        }
-
-        .carousel-indicators {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-
-        .carousel-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .carousel-indicator.active {
-            background: white;
-            transform: scale(1.3);
-            border-color: var(--primary);
-        }
-
-        .carousel-counter {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            z-index: 10;
-        }
-
-        /* ============================================================
            BUTTON COMPONENTS
            ============================================================ */
         .btn { 
@@ -411,81 +300,6 @@
             opacity: 0.7;
         }
 
-        /* Multiple file input styling */
-        .file-input-wrapper {
-            position: relative;
-        }
-
-        .file-input-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 40px;
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-md);
-            background: var(--bg-light);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-input-label:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .file-input-label i {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .image-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .image-preview-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 2px solid var(--border);
-        }
-
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .image-preview-remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: var(--danger);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-        }
-
-        .image-preview-remove:hover {
-            transform: scale(1.2);
-        }
-
         /* ============================================================
            BADGE COMPONENTS
            ============================================================ */
@@ -523,6 +337,7 @@
             color: #1e40af; 
         }
 
+        /* Clickable badge effect */
         .badge.clickable-badge:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow);
@@ -575,7 +390,7 @@
         }
 
         /* ============================================================
-           USER MENU DROPDOWN
+           USER MENU DROPDOWN (3 Dots - For Customers)
            ============================================================ */
         .user-menu-container {
             position: relative;
@@ -663,7 +478,7 @@
         }
 
         /* ============================================================
-           ADMIN HAMBURGER MENU
+           ADMIN HAMBURGER MENU (Inside Admin Panel)
            ============================================================ */
         .admin-menu-container {
             position: relative;
@@ -993,13 +808,13 @@
 
         /* Map Modal */
         .map-modal {
-            max-width: 900px;
+            max-width: 800px;
             width: 95%;
         }
 
         #location-map {
             width: 100%;
-            height: 500px;
+            height: 450px;
             border-radius: var(--radius-md);
             margin: 20px 0;
             border: 2px solid var(--border);
@@ -1032,25 +847,6 @@
         .location-status.success {
             border-color: var(--success);
             background: #d1fae5;
-        }
-
-        /* Leaflet Geocoder Search Customization */
-        .leaflet-control-geocoder {
-            width: 100%;
-            max-width: none !important;
-        }
-
-        .leaflet-control-geocoder-form input {
-            width: 100% !important;
-            padding: 12px !important;
-            font-size: 1rem !important;
-            border-radius: var(--radius-md) !important;
-            border: 2px solid var(--border) !important;
-        }
-
-        .leaflet-control-geocoder-alternatives {
-            max-height: 200px;
-            overflow-y: auto;
         }
 
         /* ============================================================
@@ -1536,10 +1332,6 @@
                 width: 100%;
                 padding: 20px;
             }
-
-            .image-preview-grid {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            }
         }
 
         /* ============================================================
@@ -1729,10 +1521,8 @@
             selectedCategory: null,
             map: null,
             marker: null,
-            geocoder: null,
             locationPickerContext: null,
-            locationFetched: false,
-            currentImageIndex: 0
+            locationFetched: false
         };
 
         // ================================================================
@@ -1873,14 +1663,11 @@
                 } else {
                     productsHtml = products.map(p => {
                         const isSoldOut = p.stock <= 0;
-                        // Get first image from images array or fallback to single image
-                        const mainImage = (p.images && p.images.length > 0) ? p.images[0] : p.image;
-                        
                         return `
                             <div class="card slide-up">
                                 ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
                                 <div class="card-img-box" onclick="app.viewProductDetails('${p._id}')">
-                                    <img src="${mainImage}" alt="${p.name}">
+                                    <img src="${p.image}" alt="${p.name}">
                                 </div>
                                 <div class="card-info">
                                     <div class="tag">${cat.name}</div>
@@ -1953,7 +1740,7 @@
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                     
                 } else if (APP_STATE.user.role === 'author') {
-                    // Admin user
+                    // Admin user - Clickable Admin Mode badge with dropdown
                     nav.innerHTML = `
                         <div class="admin-menu-container" style="position: relative;">
                             <div class="badge badge-success clickable-badge" 
@@ -1991,10 +1778,11 @@
                             </div>
                         </div>
                     `;
+                    // NO WhatsApp for admin
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                     
                 } else {
-                    // Regular customer
+                    // Regular customer - show cart + user menu
                     nav.innerHTML = `
                         <button onclick="app.toggleCart()" class="btn btn-primary">
                             <i class="fa-solid fa-shopping-cart"></i>
@@ -2020,6 +1808,7 @@
                         </div>
                     `;
                     
+                    // Show WhatsApp for customers
                     if (whatsappBtn) whatsappBtn.classList.add('show');
                 }
             },
@@ -2038,6 +1827,7 @@
                 }
             },
 
+            // Admin Navigation Menu (in top nav)
             toggleAdminNavMenu: () => {
                 const dropdown = document.getElementById('admin-nav-dropdown');
                 if (dropdown) {
@@ -2090,49 +1880,8 @@
                 </footer>
             `,
 
-            // ===========================================================
-            // IMAGE CAROUSEL FUNCTIONS
-            // ============================================================
-            initCarousel: (images) => {
-                APP_STATE.currentImageIndex = 0;
-                app.updateCarousel(images);
-            },
-
-            updateCarousel: (images) => {
-                const carouselImages = document.querySelectorAll('.carousel-image');
-                const indicators = document.querySelectorAll('.carousel-indicator');
-                const counter = document.querySelector('.carousel-counter');
-
-                carouselImages.forEach((img, index) => {
-                    img.classList.toggle('active', index === APP_STATE.currentImageIndex);
-                });
-
-                indicators.forEach((indicator, index) => {
-                    indicator.classList.toggle('active', index === APP_STATE.currentImageIndex);
-                });
-
-                if(counter) {
-                    counter.textContent = `${APP_STATE.currentImageIndex + 1} / ${images.length}`;
-                }
-            },
-
-            nextImage: (images) => {
-                APP_STATE.currentImageIndex = (APP_STATE.currentImageIndex + 1) % images.length;
-                app.updateCarousel(images);
-            },
-
-            prevImage: (images) => {
-                APP_STATE.currentImageIndex = (APP_STATE.currentImageIndex - 1 + images.length) % images.length;
-                app.updateCarousel(images);
-            },
-
-            goToImage: (index, images) => {
-                APP_STATE.currentImageIndex = index;
-                app.updateCarousel(images);
-            },
-
 // ============================================================
-            // PRODUCT DETAILS VIEWER WITH CAROUSEL
+            // PRODUCT DETAILS VIEWER
             // ============================================================
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
@@ -2140,43 +1889,10 @@
 
                 const category = CATEGORIES[p.category] || { badge: '', name: p.category };
                 const hasReviews = p.reviews && p.reviews.length > 0;
-                
-                // Support both old single image and new multiple images
-                const images = (p.images && p.images.length > 0) ? p.images : [p.image];
-                
-                // Build carousel HTML
-                let carouselHtml = '';
-                if(images.length > 1) {
-                    carouselHtml = `
-                        <div class="image-carousel">
-                            <div class="carousel-container">
-                                ${images.map((img, idx) => `
-                                    <img src="${img}" alt="${p.name}" class="carousel-image ${idx === 0 ? 'active' : ''}">
-                                `).join('')}
-                            </div>
-                            <button class="carousel-btn carousel-btn-prev" onclick="app.prevImage(${JSON.stringify(images)})">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn carousel-btn-next" onclick="app.nextImage(${JSON.stringify(images)})">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <div class="carousel-counter">${1} / ${images.length}</div>
-                            <div class="carousel-indicators">
-                                ${images.map((_, idx) => `
-                                    <div class="carousel-indicator ${idx === 0 ? 'active' : ''}" onclick="app.goToImage(${idx}, ${JSON.stringify(images)})"></div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    carouselHtml = `
-                        <img src="${images[0]}" style="width:100%; height:350px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">
-                    `;
-                }
 
                 const html = `
                     <div class="fade-in">
-                        ${carouselHtml}
+                        <img src="${p.image}" style="width:100%; height:300px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">
                         
                         <div class="flex-between flex-wrap gap-15">
                             <div>
@@ -2258,9 +1974,6 @@
                 `;
 
                 app.openModal(html);
-                if(images.length > 1) {
-                    app.initCarousel(images);
-                }
             },
 
             // ============================================================
@@ -2333,12 +2046,10 @@
                 let html = APP_STATE.cart.map((item, idx) => {
                     const rowTotal = item.price * item.qty;
                     total += rowTotal;
-                    const displayImage = (item.images && item.images.length > 0) ? item.images[0] : item.image;
-                    
                     return `
                         <div style="background: var(--bg-light); border: 2px solid var(--border); padding: 18px; border-radius: var(--radius-md); margin-bottom: 15px;" class="slide-up">
                             <div class="flex gap-15" style="align-items:center;">
-                                <img src="${displayImage}" style="width: 60px; height: 60px; object-fit: contain; background: white; border-radius: var(--radius-sm); padding: 5px;">
+                                <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; background: white; border-radius: var(--radius-sm); padding: 5px;">
                                 <div style="flex: 1;">
                                     <h4 style="font-weight: 600; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px;">${item.name}</h4>
                                     <div style="font-size: 0.85rem; color: var(--text-muted);">
@@ -2390,7 +2101,7 @@
 
                         <div class="form-group">
                             <label class="label">Phone Number</label>
-                            <input type="tel" id="checkout-phone" placeholder="Enter your 10-digit phone number" required>
+                            <input type="tel" id="checkout-phone" placeholder="Enter your phone number" required>
                         </div>
 
                         <div class="form-group">
@@ -2437,7 +2148,7 @@
             },
 
             // ============================================================
-            // MAP PICKER WITH SEARCH
+            // LIVE LOCATION MAP PICKER
             // ============================================================
             showMapPicker: (context) => {
                 APP_STATE.locationPickerContext = context;
@@ -2456,9 +2167,9 @@
                         <div class="map-instructions">
                             <strong><i class="fa-solid fa-info-circle"></i> Instructions:</strong>
                             <ul style="margin: 10px 0 0 25px; line-height: 1.8;">
-                                <li>Use the search box on the map to find your location</li>
-                                <li>Or click anywhere on the map to pin your location</li>
-                                <li>Drag the marker to adjust precisely</li>
+                                <li>We're fetching your live location</li>
+                                <li>Click on the map to pin your exact delivery location</li>
+                                <li>Drag the marker to adjust if needed</li>
                                 <li>Zoom in for more accuracy</li>
                             </ul>
                         </div>
@@ -2483,57 +2194,15 @@
             },
 
             initializeMap: () => {
-                const defaultLat = 34.0837;
-                const defaultLng = 74.7973; // Srinagar coordinates
+                const defaultLat = 20.5937;
+                const defaultLng = 78.9629;
                 
-                APP_STATE.map = L.map('location-map').setView([defaultLat, defaultLng], 12);
+                APP_STATE.map = L.map('location-map').setView([defaultLat, defaultLng], 5);
                 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19
+                    attribution: '© OpenStreetMap contributors'
                 }).addTo(APP_STATE.map);
                 
-                // Add geocoder search control
-                APP_STATE.geocoder = L.Control.Geocoder.nominatim();
-                const geocoderControl = L.Control.geocoder({
-                    geocoder: APP_STATE.geocoder,
-                    defaultMarkGeocode: false,
-                    placeholder: 'Search for a location...',
-                    errorMessage: 'Location not found'
-                }).on('markgeocode', function(e) {
-                    const latlng = e.geocode.center;
-                    
-                    if (APP_STATE.marker) {
-                        APP_STATE.map.removeLayer(APP_STATE.marker);
-                    }
-                    
-                    APP_STATE.marker = L.marker(latlng, {
-                        draggable: true
-                    }).addTo(APP_STATE.map);
-                    
-                    APP_STATE.map.setView(latlng, 16);
-                    
-                    APP_STATE.userLocation = {
-                        latitude: latlng.lat,
-                        longitude: latlng.lng
-                    };
-                    
-                    APP_STATE.marker.on('dragend', function(event) {
-                        const position = event.target.getLatLng();
-                        APP_STATE.userLocation = {
-                            latitude: position.lat,
-                            longitude: position.lng
-                        };
-                    });
-                    
-                    const statusEl = document.getElementById('location-status');
-                    if (statusEl) {
-                        statusEl.className = 'location-status success';
-                        statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Location selected! You can adjust the marker if needed.</span>';
-                    }
-                }).addTo(APP_STATE.map);
-                
-                // Click on map to set location
                 APP_STATE.map.on('click', function(e) {
                     if (APP_STATE.marker) {
                         APP_STATE.map.removeLayer(APP_STATE.marker);
@@ -2555,12 +2224,6 @@
                             longitude: position.lng
                         };
                     });
-                    
-                    const statusEl = document.getElementById('location-status');
-                    if (statusEl) {
-                        statusEl.className = 'location-status success';
-                        statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Location pinned! Adjust marker if needed.</span>';
-                    }
                 });
                 
                 // Get live location
@@ -2584,7 +2247,7 @@
                             const statusEl = document.getElementById('location-status');
                             if (statusEl) {
                                 statusEl.className = 'location-status success';
-                                statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Live location detected! Adjust marker or search for a different location.</span>';
+                                statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Live location found! Adjust marker if needed.</span>';
                             }
                             
                             APP_STATE.marker.on('dragend', function(event) {
@@ -2599,7 +2262,7 @@
                             const statusEl = document.getElementById('location-status');
                             if (statusEl) {
                                 statusEl.className = 'location-status';
-                                statusEl.innerHTML = '<i class="fa-solid fa-info-circle"></i><span>Use search box or click on map to select your location.</span>';
+                                statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Could not get live location. Click on map to select manually.</span>';
                             }
                         }
                     );
@@ -2612,11 +2275,13 @@
                     return;
                 }
                 
+                // Set location as fetched
                 APP_STATE.locationFetched = true;
                 
                 app.closeModal();
                 document.getElementById('modal-body-content').classList.remove('map-modal');
                 
+                // Return to checkout with location fetched message
                 if (APP_STATE.locationPickerContext === 'checkout') {
                     app.checkout();
                 } else if (APP_STATE.locationPickerContext === 'support') {
@@ -2637,9 +2302,6 @@
                 }
             },
 
-            // ============================================================
-            // PAYMENT PROCESSING WITH WHATSAPP REDIRECT
-            // ============================================================
             initiatePayment: async (amount) => {
                 const phone = document.getElementById('checkout-phone').value;
                 const address = document.getElementById('checkout-address').value;
@@ -2725,19 +2387,16 @@
                     if(res.ok) {
                         const data = await res.json();
                         
-                        // REDIRECT TO WHATSAPP WITH ORDER DETAILS
                         if (data.whatsappUrl) {
-                            setTimeout(() => {
-                                window.open(data.whatsappUrl, '_blank');
-                            }, 1000);
+                            window.open(data.whatsappUrl, '_blank');
                         }
                         
                         APP_STATE.cart = [];
                         APP_STATE.userLocation = null;
                         APP_STATE.locationFetched = false;
                         
-                        app.showToast("Payment successful! Redirecting to WhatsApp...", 'success');
-                        app.renderOrderSuccess(response.razorpay_order_id, total, data.whatsappUrl);
+                        app.showToast("Payment successful! Order confirmed.", 'success');
+                        app.renderOrderSuccess(response.razorpay_order_id, total);
                         app.syncInventory();
                         app.renderHeader();
                     } else {
@@ -2748,7 +2407,7 @@
                 }
             },
 
-            renderOrderSuccess: (id, amount, whatsappUrl) => {
+            renderOrderSuccess: (id, amount) => {
                 const html = `
                     <div class="text-center" style="padding: 30px 20px;">
                         <div style="width: 100px; height: 100px; margin: 0 auto 25px; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; animation: bounce 0.6s ease;">
@@ -2757,14 +2416,8 @@
                         <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark); margin-bottom: 15px;">Order Confirmed!</h2>
                         <p style="color: var(--text-muted); margin-bottom: 10px;">Order ID: <strong>#${id.substr(-8)}</strong></p>
                         <p style="color: var(--text-main); margin-bottom: 30px; line-height: 1.6;">
-                            Thank you for your purchase! We've sent your order details to our team via WhatsApp. Our team will contact you shortly to schedule the installation.
+                            Thank you for your purchase! Our team will contact you shortly to schedule the installation.
                         </p>
-                        
-                        ${whatsappUrl ? `
-                            <a href="${whatsappUrl}" target="_blank" class="btn btn-success w-full mb-10" style="text-decoration: none;">
-                                <i class="fa-brands fa-whatsapp"></i> Open WhatsApp Chat
-                            </a>
-                        ` : ''}
                         
                         <button onclick="app.closeModal(); app.renderProfile();" class="btn btn-primary w-full mb-10">
                             <i class="fa-solid fa-receipt"></i> View My Orders
@@ -2778,7 +2431,7 @@
             },
 
             // ============================================================
-            // SUPPORT REQUEST WITH PHONE
+            // SUPPORT REQUEST
             // ============================================================
             renderRaiseRequest: () => {
                 if(!APP_STATE.user) {
@@ -2802,11 +2455,6 @@
                                 <option value="Upgrade">System Upgrade</option>
                                 <option value="General">General Inquiry</option>
                             </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="label">Phone Number</label>
-                            <input type="tel" id="req-phone-field" placeholder="Enter your 10-digit phone number" required>
                         </div>
 
                         <div class="form-group">
@@ -2855,25 +2503,18 @@
 
             executeSubmitRequest: async () => {
                 const type = document.getElementById('req-type-select').value;
-                const phone = document.getElementById('req-phone-field').value;
                 const msg = document.getElementById('req-msg-field').value;
                 const addr = document.getElementById('req-addr-field').value;
                 const pin = document.getElementById('req-pin-field').value;
 
-                if(!phone || !msg || !addr || !pin) {
+                if(!msg || !addr || !pin) {
                     app.showToast("Please fill all required fields", 'error');
-                    return;
-                }
-
-                if(!/^[0-9]{10}$/.test(phone.replace(/\D/g, ''))) {
-                    app.showToast("Please enter a valid 10-digit phone number", 'error');
                     return;
                 }
 
                 const data = {
                     customerName: APP_STATE.user.name,
                     email: APP_STATE.user.email,
-                    phone: phone,
                     type: type,
                     message: `${msg}\n\nAddress: ${addr}\nPincode: ${pin}`,
                     location: APP_STATE.userLocation
@@ -2887,7 +2528,7 @@
                     });
 
                     if(res.ok) {
-                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\nPhone: ${phone}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
+                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
                         
                         if (APP_STATE.userLocation) {
                             const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
@@ -2906,7 +2547,7 @@
                 }
             },
 
-// ============================================================
+            // ============================================================
             // USER PROFILE & ORDERS
             // ============================================================
             renderProfile: async () => {
@@ -3244,8 +2885,8 @@
                 app.showHome();
             },
 
-// ============================================================
-            // ADMIN PANEL
+            // ============================================================
+            // ADMIN PANEL (Hamburger Menu INSIDE Admin Dashboard)
             // ============================================================
             renderAdminPortal: async () => {
                 if(!APP_STATE.user || APP_STATE.user.role !== 'author') {
@@ -3279,6 +2920,7 @@
                 `;
             },
 
+            // Render Admin Hamburger Menu (INSIDE Admin Panel)
             renderAdminMenu: () => {
                 return `
                     <div class="admin-menu-container">
@@ -3335,12 +2977,14 @@
                 if (tabView) {
                     tabView.innerHTML = app.getTabContent(tab);
                 }
+                // Update active state
                 app.renderAdminPortal();
             },
 
             getTabContent: (tab) => {
                 const totalRevenue = APP_STATE.orders.reduce((sum, o) => sum + (o.total || 0), 0);
                 const activeOrders = APP_STATE.orders.filter(o => o.status === 'Processing').length;
+                const cancelledOrders = APP_STATE.orders.filter(o => o.status === 'Cancelled' || o.status === 'Refund Processing').length;
 
                 if(tab === 'dashboard') {
                     return `
@@ -3513,7 +3157,6 @@
                                     <tr>
                                         <th>Date</th>
                                         <th>Customer</th>
-                                        <th>Phone</th>
                                         <th>Type</th>
                                         <th>Message</th>
                                         <th>Location</th>
@@ -3522,7 +3165,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${APP_STATE.queries.length === 0 ? '<tr><td colspan="8" class="text-center" style="padding: 40px;">No support requests</td></tr>' :
+                                    ${APP_STATE.queries.length === 0 ? '<tr><td colspan="7" class="text-center" style="padding: 40px;">No support requests</td></tr>' :
                                     APP_STATE.queries.map(q => `
                                         <tr>
                                             <td>${new Date(q.date).toLocaleDateString()}</td>
@@ -3530,7 +3173,6 @@
                                                 <strong>${q.customerName}</strong><br>
                                                 <small style="color: var(--text-muted);">${q.email}</small>
                                             </td>
-                                            <td><strong>${q.phone || 'N/A'}</strong></td>
                                             <td><span class="badge badge-primary">${q.type}</span></td>
                                             <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 ${q.message}
@@ -3582,20 +3224,15 @@
                                         <th>Category</th>
                                         <th>Price</th>
                                         <th>Stock</th>
-                                        <th>Images</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${APP_STATE.inventory.map(p => {
-                                        const displayImage = (p.images && p.images.length > 0) ? p.images[0] : p.image;
-                                        const imageCount = (p.images && p.images.length > 0) ? p.images.length : 1;
-                                        
-                                        return `
+                                    ${APP_STATE.inventory.map(p => `
                                         <tr>
                                             <td>
                                                 <div class="flex gap-15" style="align-items: center;">
-                                                    <img src="${displayImage}" style="width:50px; height:50px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-sm); padding: 4px;">
+                                                    <img src="${p.image}" style="width:50px; height:50px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-sm); padding: 4px;">
                                                     <strong>${p.name}</strong>
                                                 </div>
                                             </td>
@@ -3604,19 +3241,18 @@
                                             <td style="color: ${p.stock < 1 ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">
                                                 ${p.stock}
                                             </td>
-                                            <td><span class="badge badge-info">${imageCount} image${imageCount > 1 ? 's' : ''}</span></td>
                                             <td>
                                                 <div class="flex gap-10">
-                                                    <button onclick='app.showEditProduct(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="btn btn-secondary btn-sm">
+                                                    <button onclick='app.showEditProduct(${JSON.stringify(p)})' class="btn btn-secondary btn-sm">
                                                         <i class="fa-solid fa-pen"></i> Edit
                                                     </button>
-                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name.replace(/'/g, "\\'")}' class="btn btn-danger btn-sm">
+                                                    <button onclick="app.executeDeleteProduct('${p._id}', '${p.name}')" class="btn btn-danger btn-sm">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
-                                    `}).join('')}
+                                    `).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -3660,7 +3296,7 @@
             },
 
             // ============================================================
-            // PRODUCT MANAGEMENT WITH MULTIPLE IMAGES
+            // PRODUCT MANAGEMENT
             // ============================================================
             showAddProduct: () => {
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
@@ -3697,18 +3333,8 @@
                                 <textarea name="desc" placeholder="Enter product description" required rows="3"></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">Product Images (Up to 5)</label>
-                                <div class="file-input-wrapper">
-                                    <input type="file" id="product-images" name="images" multiple accept="image/*" onchange="app.previewImages(event)" style="display: none;">
-                                    <label for="product-images" class="file-input-label">
-                                        <i class="fa-solid fa-cloud-upload-alt"></i>
-                                        <div>
-                                            <strong>Click to upload images</strong>
-                                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Maximum 5 images (JPEG, PNG, WebP)</p>
-                                        </div>
-                                    </label>
-                                </div>
-                                <div id="image-preview-container" class="image-preview-grid" style="display: none;"></div>
+                                <label class="label">Product Image</label>
+                                <input type="file" name="image" required accept="image/*" style="padding: 10px;">
                             </div>
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-plus"></i> Add Product
@@ -3717,53 +3343,6 @@
                     </div>
                 `;
                 app.openModal(html);
-            },
-
-            previewImages: (event) => {
-                const files = event.target.files;
-                const container = document.getElementById('image-preview-container');
-                
-                if (files.length > 5) {
-                    app.showToast("Maximum 5 images allowed", 'error');
-                    event.target.value = '';
-                    return;
-                }
-
-                if (files.length > 0) {
-                    container.style.display = 'grid';
-                    container.innerHTML = '';
-
-                    Array.from(files).forEach((file, index) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const previewItem = document.createElement('div');
-                            previewItem.className = 'image-preview-item';
-                            previewItem.innerHTML = `
-                                <img src="${e.target.result}" alt="Preview ${index + 1}">
-                                <button type="button" class="image-preview-remove" onclick="app.removePreviewImage(${index})">
-                                    <i class="fa-solid fa-times"></i>
-                                </button>
-                            `;
-                            container.appendChild(previewItem);
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                } else {
-                    container.style.display = 'none';
-                }
-            },
-
-            removePreviewImage: (index) => {
-                const input = document.getElementById('product-images');
-                const dt = new DataTransfer();
-                const { files } = input;
-
-                for (let i = 0; i < files.length; i++) {
-                    if (i !== index) dt.items.add(files[i]);
-                }
-
-                input.files = dt.files;
-                app.previewImages({ target: input });
             },
 
             executeAddProduct: async (e) => {
@@ -3779,9 +3358,6 @@
                         app.showToast("Product added successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
-                    } else {
-                        const data = await res.json();
-                        app.showToast(data.error || "Failed to add product", 'error');
                     }
                 } catch(err) { 
                     app.showToast("Failed to add product", 'error'); 
@@ -3822,18 +3398,8 @@
                                 <textarea name="desc" required rows="3">${p.desc}</textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">New Images (Optional - Up to 5)</label>
-                                <div class="file-input-wrapper">
-                                    <input type="file" id="product-images-edit" name="images" multiple accept="image/*" onchange="app.previewImages(event)">
-                                    <label for="product-images-edit" class="file-input-label">
-                                        <i class="fa-solid fa-cloud-upload-alt"></i>
-                                        <div>
-                                            <strong>Click to upload new images</strong>
-                                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Leave empty to keep existing images</p>
-                                        </div>
-                                    </label>
-                                </div>
-                                <div id="image-preview-container" class="image-preview-grid" style="display: none;"></div>
+                                <label class="label">New Image (Optional)</label>
+                                <input type="file" name="image" accept="image/*" style="padding: 10px;">
                             </div>
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-save"></i> Save Changes
@@ -3857,9 +3423,6 @@
                         app.showToast("Product updated successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
-                    } else {
-                        const data = await res.json();
-                        app.showToast(data.error || "Update failed", 'error');
                     }
                 } catch(err) { 
                     app.showToast("Update failed", 'error'); 
@@ -3902,7 +3465,6 @@
                     APP_STATE.map.remove();
                     APP_STATE.map = null;
                     APP_STATE.marker = null;
-                    APP_STATE.geocoder = null;
                 }
             },
 
@@ -3921,6 +3483,7 @@
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
 
+        // Close dropdowns on click outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.user-menu-container')) {
                 app.closeUserMenu();
