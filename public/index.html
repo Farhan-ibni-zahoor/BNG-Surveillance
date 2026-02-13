@@ -17,10 +17,10 @@
 
     <style>
         /* ============================================================
-           1. DESIGN SYSTEM & VARIABLES
+           DESIGN SYSTEM & GLOBAL VARIABLES
            ============================================================ */
         :root {
-            /* Colors */
+            /* Color Palette */
             --bg-main: #f8fafc;
             --bg-white: #ffffff;
             --bg-light: #f1f5f9;
@@ -30,30 +30,39 @@
             --secondary: #64748b;
             --accent: #06b6d4;
             
+            /* Semantic Colors */
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #3b82f6;
             
+            /* Text Colors */
             --text-dark: #1e293b;
             --text-main: #334155;
             --text-muted: #64748b;
             --text-light: #94a3b8;
             
+            /* UI Elements */
             --border: #e2e8f0;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            /* Border Radius */
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
             
+            /* Typography */
             --font-main: 'Inter', sans-serif;
             --font-display: 'Poppins', sans-serif;
         }
 
+        /* ============================================================
+           RESET & BASE STYLES
+           ============================================================ */
         * { 
             margin: 0; 
             padding: 0; 
@@ -66,21 +75,37 @@
             font-family: var(--font-main);
             min-height: 100vh;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg-light); }
+        /* ============================================================
+           SCROLLBAR CUSTOMIZATION
+           ============================================================ */
+        ::-webkit-scrollbar { 
+            width: 10px; 
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track { 
+            background: var(--bg-light); 
+        }
+        
         ::-webkit-scrollbar-thumb { 
             background: var(--primary); 
             border-radius: 10px; 
         }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+        
+        ::-webkit-scrollbar-thumb:hover { 
+            background: var(--primary-dark); 
+        }
 
-        ::selection { background: var(--primary-light); color: var(--text-dark); }
+        ::selection { 
+            background: var(--primary-light); 
+            color: var(--text-dark); 
+        }
 
         /* ============================================================
-           2. ANIMATIONS
+           ANIMATIONS & KEYFRAMES
            ============================================================ */
         @keyframes fadeIn { 
             from { opacity: 0; } 
@@ -88,18 +113,36 @@
         }
 
         @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(30px); } 
-            to { opacity: 1; transform: translateY(0); } 
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            } 
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
 
         @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
         }
 
         @keyframes float {
@@ -121,14 +164,21 @@
             50% { opacity: 0.5; }
         }
 
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        /* Animation Classes */
         .fade-in { animation: fadeIn 0.5s ease; }
         .slide-up { animation: slideUp 0.6s ease; }
         .slide-down { animation: slideDown 0.3s ease; }
         .slide-in-right { animation: slideInRight 0.3s ease; }
         .float { animation: float 3s ease-in-out infinite; }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
 
         /* ============================================================
-           3. BUTTONS & FORM COMPONENTS
+           BUTTON COMPONENTS
            ============================================================ */
         .btn { 
             padding: 12px 24px; 
@@ -144,6 +194,12 @@
             justify-content: center; 
             font-size: 0.95rem;
             text-decoration: none;
+            user-select: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-primary { 
@@ -151,7 +207,8 @@
             color: white; 
             box-shadow: var(--shadow); 
         }
-        .btn-primary:hover { 
+        
+        .btn-primary:hover:not(:disabled) { 
             transform: translateY(-2px); 
             box-shadow: var(--shadow-lg);
         }
@@ -161,7 +218,8 @@
             border: 2px solid var(--border); 
             color: var(--text-dark); 
         }
-        .btn-secondary:hover { 
+        
+        .btn-secondary:hover:not(:disabled) { 
             border-color: var(--primary); 
             color: var(--primary); 
         }
@@ -170,7 +228,8 @@
             background: var(--danger); 
             color: white; 
         }
-        .btn-danger:hover { 
+        
+        .btn-danger:hover:not(:disabled) { 
             background: #dc2626; 
         }
 
@@ -178,18 +237,36 @@
             background: var(--success); 
             color: white; 
         }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+        }
 
         .btn-warning {
             background: var(--warning);
             color: white;
+        }
+        
+        .btn-warning:hover:not(:disabled) {
+            background: #d97706;
         }
 
         .btn-sm {
             padding: 8px 16px;
             font-size: 0.85rem;
         }
+        
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
 
-        .form-group { margin-bottom: 20px; }
+        /* ============================================================
+           FORM COMPONENTS
+           ============================================================ */
+        .form-group { 
+            margin-bottom: 20px; 
+        }
         
         .label { 
             font-weight: 600; 
@@ -216,7 +293,16 @@
             border-color: var(--primary); 
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); 
         }
+        
+        input:disabled, textarea:disabled, select:disabled {
+            background: var(--bg-light);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
 
+        /* ============================================================
+           BADGE COMPONENTS
+           ============================================================ */
         .badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -225,14 +311,34 @@
             text-transform: uppercase;
             display: inline-block;
         }
-        .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-danger { background: #fee2e2; color: #991b1b; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
+        
+        .badge-primary { 
+            background: var(--primary-light); 
+            color: var(--primary-dark); 
+        }
+        
+        .badge-success { 
+            background: #d1fae5; 
+            color: #065f46; 
+        }
+        
+        .badge-warning { 
+            background: #fef3c7; 
+            color: #92400e; 
+        }
+        
+        .badge-danger { 
+            background: #fee2e2; 
+            color: #991b1b; 
+        }
+        
+        .badge-info { 
+            background: #dbeafe; 
+            color: #1e40af; 
+        }
 
         /* ============================================================
-           4. NAVIGATION
+           NAVIGATION BAR
            ============================================================ */
         nav { 
             position: sticky; 
@@ -277,7 +383,9 @@
             gap: 12px; 
         }
 
-        /* User Menu Dropdown (3 Dots) */
+        /* ============================================================
+           USER MENU DROPDOWN (3 Dots - For Customers)
+           ============================================================ */
         .user-menu-container {
             position: relative;
         }
@@ -316,6 +424,7 @@
             pointer-events: none;
             transform: translateY(-10px);
             transition: all 0.3s;
+            z-index: 2000;
         }
 
         .user-dropdown.active {
@@ -362,29 +471,39 @@
             color: var(--text-muted);
         }
 
-        /* Admin Hamburger Menu (3 Lines) */
+        /* ============================================================
+           ADMIN HAMBURGER MENU (Inside Admin Panel)
+           ============================================================ */
         .admin-menu-container {
             position: relative;
+            margin-bottom: 20px;
         }
 
         .admin-hamburger-btn {
-            width: 45px;
-            height: 45px;
+            width: 100%;
+            height: 50px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             border-radius: var(--radius-md);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 5px;
+            justify-content: space-between;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 10px;
+            padding: 15px 20px;
+            color: white;
+            font-weight: 700;
+            font-family: var(--font-display);
         }
 
         .admin-hamburger-btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
+        }
+
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .hamburger-line {
@@ -396,32 +515,20 @@
         }
 
         .admin-dropdown {
-            position: absolute;
-            top: 55px;
-            left: 0;
             background: white;
             border: 2px solid var(--border);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            min-width: 250px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            max-height: 0;
             opacity: 0;
-            pointer-events: none;
-            transform: translateY(-10px);
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
         .admin-dropdown.active {
+            max-height: 600px;
             opacity: 1;
-            pointer-events: all;
-            transform: translateY(0);
-        }
-
-        .admin-dropdown-header {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            font-weight: 700;
         }
 
         .admin-dropdown-item {
@@ -453,7 +560,7 @@
         }
 
         /* ============================================================
-           5. HERO SECTION
+           HERO SECTION
            ============================================================ */
         .hero { 
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
@@ -497,7 +604,7 @@
         }
 
         /* ============================================================
-           6. CATEGORY & PRODUCT SECTIONS
+           CATEGORY & PRODUCT GRIDS
            ============================================================ */
         .category-selection-grid {
             display: grid;
@@ -605,11 +712,14 @@
             object-fit: contain; 
             transition: 0.3s ease;
         }
+        
         .card:hover img { 
             transform: scale(1.1); 
         }
         
-        .card-info { padding: 20px; }
+        .card-info { 
+            padding: 20px; 
+        }
         
         .card-title {
             font-family: var(--font-display);
@@ -652,7 +762,7 @@
         }
 
         /* ============================================================
-           7. MODALS & OVERLAYS
+           MODALS & OVERLAYS
            ============================================================ */
         .overlay { 
             position: fixed; 
@@ -667,7 +777,11 @@
             pointer-events: none; 
             transition: all 0.3s ease; 
         }
-        .overlay.active { opacity: 1; pointer-events: all; }
+        
+        .overlay.active { 
+            opacity: 1; 
+            pointer-events: all; 
+        }
         
         .modal { 
             background: white; 
@@ -681,7 +795,10 @@
             max-height: 90vh; 
             overflow-y: auto; 
         }
-        .overlay.active .modal { transform: scale(1); }
+        
+        .overlay.active .modal { 
+            transform: scale(1); 
+        }
 
         /* Map Modal */
         .map-modal {
@@ -726,7 +843,9 @@
             background: #d1fae5;
         }
 
-        /* Cart Panel */
+        /* ============================================================
+           CART PANEL
+           ============================================================ */
         .cart-panel { 
             position: fixed; 
             top: 0; 
@@ -742,9 +861,14 @@
             flex-direction: column; 
             box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
         }
-        .cart-panel.open { right: 0; }
+        
+        .cart-panel.open { 
+            right: 0; 
+        }
 
-        /* Toast Notification */
+        /* ============================================================
+           TOAST NOTIFICATIONS
+           ============================================================ */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -779,7 +903,9 @@
             background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
         }
 
-        /* Floating WhatsApp Button (NOT shown for admin) */
+        /* ============================================================
+           FLOATING WHATSAPP BUTTON
+           ============================================================ */
         .whatsapp-float {
             position: fixed;
             bottom: 100px;
@@ -810,7 +936,9 @@
             display: flex;
         }
 
-        /* Loader */
+        /* ============================================================
+           LOADER
+           ============================================================ */
         #loader {
             position: fixed;
             inset: 0;
@@ -833,7 +961,7 @@
         }
 
         /* ============================================================
-           8. FOOTER
+           FOOTER
            ============================================================ */
         footer {
             background: var(--text-dark);
@@ -875,13 +1003,15 @@
         }
 
         /* ============================================================
-           9. ADMIN PANEL
+           ADMIN PANEL STYLES
            ============================================================ */
         .admin-content { 
             padding: 40px 5%; 
             width: 100%; 
             background: var(--bg-main); 
             min-height: calc(100vh - 70px);
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .admin-header {
@@ -971,69 +1101,7 @@
         }
 
         /* ============================================================
-           10. RESPONSIVE DESIGN
-           ============================================================ */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .cart-panel { width: 100%; right: -100%; }
-            .grid, .category-selection-grid, .product-grid-container .grid { 
-                grid-template-columns: 1fr; 
-            }
-            .whatsapp-float {
-                bottom: 80px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.6rem;
-            }
-            .stat-grid {
-                grid-template-columns: 1fr;
-            }
-            .user-dropdown, .admin-dropdown {
-                right: -10px;
-            }
-            .admin-content {
-                padding: 20px;
-            }
-        }
-
-        /* ============================================================
-           11. UTILITY CLASSES
-           ============================================================ */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
-        
-        .mt-10 { margin-top: 10px; }
-        .mt-20 { margin-top: 20px; }
-        .mt-30 { margin-top: 30px; }
-        .mb-10 { margin-bottom: 10px; }
-        .mb-20 { margin-bottom: 20px; }
-        .mb-30 { margin-bottom: 30px; }
-        
-        .p-10 { padding: 10px; }
-        .p-20 { padding: 20px; }
-        .p-30 { padding: 30px; }
-        
-        .flex { display: flex; }
-        .flex-center { display: flex; justify-content: center; align-items: center; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .flex-wrap { flex-wrap: wrap; }
-        .gap-10 { gap: 10px; }
-        .gap-15 { gap: 15px; }
-        .gap-20 { gap: 20px; }
-        
-        .w-full { width: 100%; }
-        .h-full { height: 100%; }
-        
-        .cursor-pointer { cursor: pointer; }
-        .no-select { user-select: none; }
-        
-        .hidden { display: none !important; }
-        .visible { display: block !important; }
-
-        /* ============================================================
-           12. ALERT BOXES
+           ALERT COMPONENTS
            ============================================================ */
         .alert {
             padding: 15px 20px;
@@ -1069,7 +1137,7 @@
         }
 
         /* ============================================================
-           13. EMPTY STATES
+           EMPTY STATES
            ============================================================ */
         .empty-state {
             text-align: center;
@@ -1095,7 +1163,7 @@
         }
 
         /* ============================================================
-           14. ORDER CARDS
+           ORDER CARDS
            ============================================================ */
         .order-card {
             border: 2px solid var(--border);
@@ -1162,7 +1230,7 @@
         }
 
         /* ============================================================
-           15. INFO CARDS
+           INFO CARDS
            ============================================================ */
         .info-card {
             background: var(--bg-light);
@@ -1186,7 +1254,7 @@
         }
 
         /* ============================================================
-           16. BACK TO TOP BUTTON
+           BACK TO TOP BUTTON
            ============================================================ */
         .back-to-top {
             position: fixed;
@@ -1214,11 +1282,94 @@
         .back-to-top.show {
             display: flex;
         }
+
+        /* ============================================================
+           RESPONSIVE DESIGN
+           ============================================================ */
+        @media (max-width: 768px) {
+            .hero h1 { 
+                font-size: 2.5rem; 
+            }
+            
+            .cart-panel { 
+                width: 100%; 
+                right: -100%; 
+            }
+            
+            .grid, 
+            .category-selection-grid, 
+            .product-grid-container .grid { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .whatsapp-float {
+                bottom: 80px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
+            }
+            
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-dropdown {
+                right: -10px;
+            }
+            
+            .admin-content {
+                padding: 20px;
+            }
+            
+            .modal {
+                width: 100%;
+                padding: 20px;
+            }
+        }
+
+        /* ============================================================
+           UTILITY CLASSES
+           ============================================================ */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        
+        .mt-10 { margin-top: 10px; }
+        .mt-20 { margin-top: 20px; }
+        .mt-30 { margin-top: 30px; }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-20 { margin-bottom: 20px; }
+        .mb-30 { margin-bottom: 30px; }
+        
+        .p-10 { padding: 10px; }
+        .p-20 { padding: 20px; }
+        .p-30 { padding: 30px; }
+        
+        .flex { display: flex; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        
+        .gap-10 { gap: 10px; }
+        .gap-15 { gap: 15px; }
+        .gap-20 { gap: 20px; }
+        
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        
+        .cursor-pointer { cursor: pointer; }
+        .no-select { user-select: none; }
+        
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
+    <!-- ============================================================
+         LOADER
+         ============================================================ -->
     <div id="loader">
         <div class="spinner"></div>
         <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">
@@ -1226,20 +1377,31 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- ============================================================
+         TOAST NOTIFICATION
+         ============================================================ -->
     <div id="toast" class="toast">Action Completed</div>
 
-    <!-- Floating WhatsApp Button (Hidden for admin) -->
-    <a id="whatsapp-float" class="whatsapp-float" href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" target="_blank" title="Chat with us on WhatsApp">
+    <!-- ============================================================
+         FLOATING WHATSAPP BUTTON (Customer Only)
+         ============================================================ -->
+    <a id="whatsapp-float" class="whatsapp-float" 
+       href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" 
+       target="_blank" 
+       title="Chat with us on WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
-    <!-- Back to Top Button -->
+    <!-- ============================================================
+         BACK TO TOP BUTTON
+         ============================================================ -->
     <div id="back-to-top" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <i class="fa-solid fa-arrow-up"></i>
     </div>
 
-    <!-- Cart Panel -->
+    <!-- ============================================================
+         CART PANEL
+         ============================================================ -->
     <div id="cart-panel" class="cart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
@@ -1263,13 +1425,15 @@
                 <span>Total</span>
                 <span id="cart-total-display" style="color: var(--primary);">₹0</span>
             </div>
-            <button onclick="app.checkout()" class="btn btn-primary" style="width: 100%; padding: 16px;">
+            <button onclick="app.checkout()" class="btn btn-primary w-full" style="padding: 16px;">
                 <i class="fa-solid fa-credit-card"></i> Proceed to Checkout
             </button>
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- ============================================================
+         NAVIGATION BAR
+         ============================================================ -->
     <nav>
         <div class="logo" onclick="app.init()" id="app-logo">
             <img src="bngimage.jpg" alt="BNG Logo" />
@@ -1278,17 +1442,21 @@
         <div class="nav-right" id="nav-actions-area"></div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ============================================================
+         MAIN CONTENT AREA
+         ============================================================ -->
     <main id="app-root-view"></main>
 
-    <!-- Modal Overlay -->
+    <!-- ============================================================
+         MODAL OVERLAY
+         ============================================================ -->
     <div id="modal-overlay" class="overlay">
         <div id="modal-body-content" class="modal"></div>
     </div>
 
     <script>
         // ================================================================
-        // CONFIGURATION
+        // APPLICATION CONFIGURATION
         // ================================================================
         const COMMAND_CONFIG = {
             API_BASE: '/api', 
@@ -1296,7 +1464,9 @@
             WHATSAPP_ID: '916006750581'
         };
 
-        // Product Categorie
+        // ================================================================
+        // PRODUCT CATEGORIES DEFINITION
+        // ================================================================
         const CATEGORIES = {
             ANALOG: { 
                 name: 'CCTV Camera Analog', 
@@ -1331,7 +1501,7 @@
         };
 
         // ================================================================
-        // APPLICATION STATE
+        // APPLICATION STATE MANAGEMENT
         // ================================================================
         const APP_STATE = {
             user: JSON.parse(sessionStorage.getItem('user')) || null,
@@ -1345,7 +1515,8 @@
             selectedCategory: null,
             map: null,
             marker: null,
-            locationPickerContext: null // 'checkout' or 'support'
+            locationPickerContext: null,
+            locationFetched: false
         };
 
         // ================================================================
@@ -1354,12 +1525,12 @@
         const app = {
             
             // ============================================================
-            // INITIALIZATION
+            // INITIALIZATION METHOD
             // ============================================================
             init: async () => {
-                console.log('🚀 Initializing BNG Surveillance...');
+                console.log('🚀 Initializing BNG Surveillance Application...');
                 
-                // Hide loader
+                // Hide loader after 1.5 seconds
                 setTimeout(() => {
                     const loader = document.getElementById('loader');
                     if(loader) {
@@ -1368,14 +1539,14 @@
                     }
                 }, 1500);
 
-                // Load inventory
+                // Sync inventory from server
                 await app.syncInventory();
                 
-                // Render UI
+                // Render initial UI
                 app.showHome();
                 app.renderHeader();
                 
-                // Show back to top on scroll
+                // Setup back to top button
                 window.addEventListener('scroll', () => {
                     const backToTop = document.getElementById('back-to-top');
                     if (window.pageYOffset > 300) {
@@ -1385,26 +1556,29 @@
                     }
                 });
                 
-                console.log('✅ Application ready!');
+                console.log('✅ Application initialized successfully!');
             },
 
+            // ============================================================
+            // INVENTORY SYNC
+            // ============================================================
             syncInventory: async () => {
                 try {
-                    console.log('📦 Syncing inventory...');
+                    console.log('📦 Syncing product inventory...');
                     const response = await fetch(`${COMMAND_CONFIG.API_BASE}/products`);
                     if(response.ok) {
                         APP_STATE.inventory = await response.json();
                         console.log(`✅ Loaded ${APP_STATE.inventory.length} products`);
                     }
                 } catch(err) {
-                    console.warn("❌ Database Sync Failed", err);
+                    console.warn("❌ Database Sync Failed:", err);
                     app.showToast("Failed to connect to server", 'error');
                     APP_STATE.inventory = [];
                 }
             },
 
             // ============================================================
-            // VIEW CONTROLLERS
+            // HOME PAGE RENDERER
             // ============================================================
             showHome: () => {
                 APP_STATE.selectedCategory = null;
@@ -1439,10 +1613,10 @@
                                     Complete security solutions with professional installation and 24/7 customer support
                                 </p>
                                 <div style="display:flex; gap:15px; justify-content:center; flex-wrap: wrap;">
-                                    <button onclick="document.getElementById('categories-grid').scrollIntoView({behavior: 'smooth'})" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+                                    <button onclick="document.getElementById('categories-grid').scrollIntoView({behavior: 'smooth'})" class="btn btn-primary btn-lg">
                                         <i class="fa-solid fa-video"></i> Browse Cameras
                                     </button>
-                                    <button onclick="app.renderRaiseRequest()" class="btn btn-secondary" style="font-size: 1.1rem; padding: 16px 32px;">
+                                    <button onclick="app.renderRaiseRequest()" class="btn btn-secondary btn-lg">
                                         <i class="fa-solid fa-headset"></i> Get Support
                                     </button>
                                 </div>
@@ -1458,6 +1632,9 @@
                 `;
             },
 
+            // ============================================================
+            // CATEGORY PAGE RENDERER
+            // ============================================================
             showCategoryPage: (categoryKey) => {
                 APP_STATE.selectedCategory = categoryKey;
                 app.renderHeader();
@@ -1473,7 +1650,7 @@
                             <div class="empty-state">
                                 <div class="empty-state-icon"><i class="fa-solid fa-box-open"></i></div>
                                 <p class="empty-state-title">No products found</p>
-                                <p class="empty-state-text">Please check back later</p>
+                                <p class="empty-state-text">Please check back later for new products</p>
                             </div>
                         </div>
                     `;
@@ -1481,7 +1658,7 @@
                     productsHtml = products.map(p => {
                         const isSoldOut = p.stock <= 0;
                         return `
-                            <div class="card slide-up ${isSoldOut ? 'out-of-stock' : ''}">
+                            <div class="card slide-up">
                                 ${isSoldOut ? '<div class="stock-label">OUT OF STOCK</div>' : ''}
                                 <div class="card-img-box" onclick="app.viewProductDetails('${p._id}')">
                                     <img src="${p.image}" alt="${p.name}">
@@ -1494,8 +1671,8 @@
                                         Stock: ${p.stock} units
                                     </p>
                                     ${!isSoldOut 
-                                        ? `<button class="btn btn-primary" style="width:100%; margin-top: 10px;" onclick="app.viewProductDetails('${p._id}')">View Details</button>`
-                                        : `<button class="btn btn-secondary" style="width:100%; margin-top: 10px;" disabled>Out of Stock</button>`
+                                        ? `<button class="btn btn-primary w-full mt-10" onclick="app.viewProductDetails('${p._id}')">View Details</button>`
+                                        : `<button class="btn btn-secondary w-full mt-10" disabled>Out of Stock</button>`
                                     }
                                 </div>
                             </div>
@@ -1507,7 +1684,7 @@
                     <div class="fade-in">
                         <div style="background: white; padding: 40px 5%; border-bottom: 1px solid var(--border); margin-bottom: 30px;">
                             <div style="max-width: 1400px; margin: 0 auto;">
-                                <button onclick="app.showHome()" class="btn btn-secondary" style="margin-bottom: 20px;">
+                                <button onclick="app.showHome()" class="btn btn-secondary mb-20">
                                     <i class="fa-solid fa-arrow-left"></i> Back to Categories
                                 </button>
                                 <h1 style="font-family: var(--font-display); font-size: 2.5rem; color: var(--text-dark); margin-bottom: 10px;">
@@ -1540,89 +1717,63 @@
                 }
             },
 
+            // ============================================================
+            // HEADER RENDERER (Navigation)
+            // ============================================================
             renderHeader: () => {
                 const nav = document.getElementById('nav-actions-area');
                 const whatsappBtn = document.getElementById('whatsapp-float');
                 
                 if (!APP_STATE.user) {
+                    // Guest user - show login button
                     nav.innerHTML = `
                         <button onclick="app.showAuth('login')" class="btn btn-primary">
                             <i class="fa-solid fa-user"></i> Customer Login
                         </button>
                     `;
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
-                } else {
-                    const isAdmin = APP_STATE.user.role === 'author';
                     
-                    // Admin gets hamburger menu, NO WhatsApp
-                    if (isAdmin) {
-                        nav.innerHTML = `
-                            <div class="admin-menu-container">
-                                <div class="admin-hamburger-btn" onclick="app.toggleAdminMenu()">
-                                    <div class="hamburger-line"></div>
-                                    <div class="hamburger-line"></div>
-                                    <div class="hamburger-line"></div>
-                                </div>
-                                <div id="admin-dropdown" class="admin-dropdown">
-                                    <div class="admin-dropdown-header">
-                                        <i class="fa-solid fa-dashboard"></i> Admin Panel
-                                    </div>
-                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}" onclick="app.switchAdminTab('dashboard'); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-chart-line"></i> Dashboard
-                                    </div>
-                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}" onclick="app.switchAdminTab('orders'); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-shopping-bag"></i> All Orders
-                                    </div>
-                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}" onclick="app.switchAdminTab('cancelled'); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-ban"></i> Cancelled Orders
-                                    </div>
-                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}" onclick="app.switchAdminTab('queries'); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-headset"></i> Support Requests
-                                    </div>
-                                    <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}" onclick="app.switchAdminTab('inventory'); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-box"></i> Inventory
-                                    </div>
-                                    <div class="admin-dropdown-item" onclick="app.showHome(); app.toggleAdminMenu();">
-                                        <i class="fa-solid fa-store"></i> Back to Store
-                                    </div>
-                                    <div class="admin-dropdown-item" onclick="app.executeLogout();">
-                                        <i class="fa-solid fa-sign-out-alt"></i> Logout
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        // NO WhatsApp for admin
-                        if (whatsappBtn) whatsappBtn.classList.remove('show');
-                    } else {
-                        // Regular customer gets 3-dot menu WITH WhatsApp
-                        nav.innerHTML = `
-                            <button onclick="app.toggleCart()" class="btn btn-primary">
-                                <i class="fa-solid fa-shopping-cart"></i>
-                                <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
-                            </button>
-                            
-                            <div class="user-menu-container">
-                                <div class="user-menu-btn" onclick="app.toggleUserMenu()">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </div>
-                                <div id="user-dropdown" class="user-dropdown">
-                                    <div class="user-dropdown-header">
-                                        <div class="user-dropdown-name">${APP_STATE.user.name}</div>
-                                        <div class="user-dropdown-email">${APP_STATE.user.email}</div>
-                                    </div>
-                                    <div class="user-dropdown-item" onclick="app.renderProfile(); app.toggleUserMenu();">
-                                        <i class="fa-solid fa-receipt"></i> My Orders
-                                    </div>
-                                    <div class="user-dropdown-item" onclick="app.executeLogout();">
-                                        <i class="fa-solid fa-sign-out-alt"></i> Logout
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                } else if (APP_STATE.user.role === 'author') {
+                    // Admin user - NO navigation menu (hamburger is in admin panel)
+                    nav.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 8px 16px;">
+                                <i class="fa-solid fa-user-shield"></i> Admin Mode
+                            </span>
+                        </div>
+                    `;
+                    // NO WhatsApp for admin
+                    if (whatsappBtn) whatsappBtn.classList.remove('show');
+                    
+                } else {
+                    // Regular customer - show cart + user menu
+                    nav.innerHTML = `
+                        <button onclick="app.toggleCart()" class="btn btn-primary">
+                            <i class="fa-solid fa-shopping-cart"></i>
+                            <span style="background:white; color: var(--primary); padding:2px 8px; border-radius:50%; font-size:0.8rem; font-weight: 700;">${APP_STATE.cart.length}</span>
+                        </button>
                         
-                        // Show WhatsApp for customers only
-                        if (whatsappBtn) whatsappBtn.classList.add('show');
-                    }
+                        <div class="user-menu-container">
+                            <div class="user-menu-btn" onclick="app.toggleUserMenu()">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </div>
+                            <div id="user-dropdown" class="user-dropdown">
+                                <div class="user-dropdown-header">
+                                    <div class="user-dropdown-name">${APP_STATE.user.name}</div>
+                                    <div class="user-dropdown-email">${APP_STATE.user.email}</div>
+                                </div>
+                                <div class="user-dropdown-item" onclick="app.renderProfile(); app.closeUserMenu();">
+                                    <i class="fa-solid fa-receipt"></i> My Orders
+                                </div>
+                                <div class="user-dropdown-item" onclick="app.executeLogout();">
+                                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Show WhatsApp for customers
+                    if (whatsappBtn) whatsappBtn.classList.add('show');
                 }
             },
 
@@ -1631,33 +1782,18 @@
                 if (dropdown) {
                     dropdown.classList.toggle('active');
                 }
-                
-                // Close on click outside
-                document.addEventListener('click', function closeMenu(e) {
-                    const userMenu = document.querySelector('.user-menu-container');
-                    if (userMenu && !userMenu.contains(e.target)) {
-                        dropdown?.classList.remove('active');
-                        document.removeEventListener('click', closeMenu);
-                    }
-                });
             },
 
-            toggleAdminMenu: () => {
-                const dropdown = document.getElementById('admin-dropdown');
+            closeUserMenu: () => {
+                const dropdown = document.getElementById('user-dropdown');
                 if (dropdown) {
-                    dropdown.classList.toggle('active');
+                    dropdown.classList.remove('active');
                 }
-                
-                // Close on click outside
-                document.addEventListener('click', function closeMenu(e) {
-                    const adminMenu = document.querySelector('.admin-menu-container');
-                    if (adminMenu && !adminMenu.contains(e.target)) {
-                        dropdown?.classList.remove('active');
-                        document.removeEventListener('click', closeMenu);
-                    }
-                });
             },
 
+            // ============================================================
+            // FOOTER RENDERER
+            // ============================================================
             renderFooter: () => `
                 <footer>
                     <div class="footer-content">
@@ -1668,7 +1804,7 @@
                             Your trusted partner for complete CCTV and surveillance solutions. Professional installation and 24/7 customer support.
                         </p>
                         <div class="social-links">
-                            <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank">
+                            <a href="https://www.instagram.com/bng_surveillance" target="_blank">
                                 <i class="fa-brands fa-instagram"></i>
                             </a>
                             <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank">
@@ -1688,6 +1824,9 @@
                 </footer>
             `,
 
+// ============================================================
+            // PRODUCT DETAILS VIEWER
+            // ============================================================
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
                 if(!p) return;
@@ -1710,7 +1849,7 @@
                         </div>
 
                         ${category.badge ? `
-                            <div class="badge badge-success" style="margin: 15px 0; font-size: 0.85rem; padding: 8px 16px;">
+                            <div class="badge badge-success mt-10" style="font-size: 0.85rem; padding: 8px 16px;">
                                 <i class="fa-solid ${p.category === 'ACCESSORIES' ? 'fa-truck' : 'fa-tools'}"></i> ${category.badge}
                             </div>
                         ` : ''}
@@ -1735,14 +1874,14 @@
                         </div>
 
                         ${APP_STATE.user ? `
-                            <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
+                            <button onclick="app.executeAddToCart('${p._id}')" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
                                 <i class="fa-solid fa-cart-plus"></i> Add to Cart
                             </button>
                         ` : `
-                            <button onclick="app.closeModal(); app.showAuth('login');" class="btn btn-primary" style="width:100%; padding: 18px; font-size: 1.1rem;">
+                            <button onclick="app.closeModal(); app.showAuth('login');" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
                                 <i class="fa-solid fa-sign-in-alt"></i> Login to Purchase
                             </button>
-                            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">
+                            <p class="text-center mt-10" style="font-size: 0.9rem; color: var(--text-muted);">
                                 Please login to add items to your cart
                             </p>
                         `}
@@ -1773,7 +1912,7 @@
                                         <i class="fa-solid fa-paper-plane"></i>
                                     </button>
                                 </div>
-                            ` : '<p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 15px; background: var(--bg-light); border-radius: var(--radius-md);">Please login to write a review</p>'}
+                            ` : '<p class="alert alert-info" style="font-size: 0.9rem; text-align: center;">Please login to write a review</p>'}
                         </div>
                     </div>
                 `;
@@ -1781,6 +1920,9 @@
                 app.openModal(html);
             },
 
+            // ============================================================
+            // ADD TO CART
+            // ============================================================
             executeAddToCart: (id) => {
                 if(!APP_STATE.user) {
                     app.showToast("Please login to add items to cart", 'error');
@@ -1815,6 +1957,9 @@
                 app.renderHeader();
             },
 
+            // ============================================================
+            // CART MANAGEMENT
+            // ============================================================
             toggleCart: () => {
                 const panel = document.getElementById('cart-panel');
                 if(panel.classList.contains('open')) {
@@ -1876,7 +2021,7 @@
             },
 
             // ============================================================
-            // CHECKOUT WITH LIVE LOCATION MAP
+            // CHECKOUT PROCESS
             // ============================================================
             checkout: () => {
                 if(APP_STATE.cart.length === 0) {
@@ -1915,15 +2060,18 @@
 
                         <div class="form-group">
                             <label class="label">
-                                <i class="fa-solid fa-map-marker-alt"></i> Pin Your Location on Map
+                                <i class="fa-solid fa-map-marker-alt"></i> Select Delivery Location on Map
                             </label>
-                            <button onclick="app.showMapPicker('checkout')" id="location-btn" class="btn btn-secondary w-full">
-                                <i class="fa-solid fa-map"></i> Pick Location from Map
+                            <button onclick="app.showMapPicker('checkout')" id="location-btn" class="btn ${APP_STATE.locationFetched ? 'btn-success' : 'btn-secondary'} w-full">
+                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
+                                ${APP_STATE.locationFetched ? 'Location Fetched Successfully' : 'Pick Location from Map'}
                             </button>
-                            <div id="location-display" class="alert alert-success mt-10" style="display: none;">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span id="location-text">Location selected successfully</span>
-                            </div>
+                            ${APP_STATE.locationFetched ? `
+                                <div class="alert alert-success mt-10">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                    <span>Your delivery location has been saved</span>
+                                </div>
+                            ` : ''}
                         </div>
 
                         <div style="background: linear-gradient(135deg, var(--primary-light) 0%, rgba(14, 165, 233, 0.1) 100%); padding: 25px; border-radius: var(--radius-lg); margin: 25px 0; text-align: center; border: 2px solid var(--primary);">
@@ -1935,7 +2083,7 @@
                             <i class="fa-solid fa-lock"></i> Proceed to Payment
                         </button>
 
-                        <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 15px;">
+                        <p class="text-center mt-20" style="font-size: 0.85rem; color: var(--text-muted);">
                             <i class="fa-solid fa-shield-halved"></i> Your payment is 100% secure
                         </p>
                     </div>
@@ -1943,7 +2091,9 @@
                 app.openModal(html);
             },
 
-            // MAP LOCATION PICKER - Gets live location then lets user adjust
+            // ============================================================
+            // LIVE LOCATION MAP PICKER
+            // ============================================================
             showMapPicker: (context) => {
                 APP_STATE.locationPickerContext = context;
                 
@@ -1962,7 +2112,7 @@
                             <strong><i class="fa-solid fa-info-circle"></i> Instructions:</strong>
                             <ul style="margin: 10px 0 0 25px; line-height: 1.8;">
                                 <li>We're fetching your live location</li>
-                                <li>Click on the map to pin your exact house location</li>
+                                <li>Click on the map to pin your exact delivery location</li>
                                 <li>Drag the marker to adjust if needed</li>
                                 <li>Zoom in for more accuracy</li>
                             </ul>
@@ -1984,14 +2134,10 @@
                 app.openModal(html);
                 document.getElementById('modal-body-content').classList.add('map-modal');
                 
-                // Initialize map and get live location
-                setTimeout(() => {
-                    app.initializeMap();
-                }, 300);
+                setTimeout(() => app.initializeMap(), 300);
             },
 
             initializeMap: () => {
-                // Default to India center
                 const defaultLat = 20.5937;
                 const defaultLng = 78.9629;
                 
@@ -2001,7 +2147,6 @@
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(APP_STATE.map);
                 
-                // Click to add/move marker
                 APP_STATE.map.on('click', function(e) {
                     if (APP_STATE.marker) {
                         APP_STATE.map.removeLayer(APP_STATE.marker);
@@ -2016,7 +2161,6 @@
                         longitude: e.latlng.lng
                     };
                     
-                    // Update marker position on drag
                     APP_STATE.marker.on('dragend', function(event) {
                         const position = event.target.getLatLng();
                         APP_STATE.userLocation = {
@@ -2026,17 +2170,15 @@
                     });
                 });
                 
-                // Try to get user's LIVE location
+                // Get live location
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const lat = position.coords.latitude;
                             const lng = position.coords.longitude;
                             
-                            // Center map on live location
                             APP_STATE.map.setView([lat, lng], 15);
                             
-                            // Add marker at live location
                             APP_STATE.marker = L.marker([lat, lng], {
                                 draggable: true
                             }).addTo(APP_STATE.map);
@@ -2046,14 +2188,12 @@
                                 longitude: lng
                             };
                             
-                            // Update status
                             const statusEl = document.getElementById('location-status');
                             if (statusEl) {
                                 statusEl.className = 'location-status success';
                                 statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Live location found! Adjust marker if needed.</span>';
                             }
                             
-                            // Update marker position on drag
                             APP_STATE.marker.on('dragend', function(event) {
                                 const position = event.target.getLatLng();
                                 APP_STATE.userLocation = {
@@ -2063,7 +2203,6 @@
                             });
                         },
                         (error) => {
-                            console.log("Geolocation error:", error);
                             const statusEl = document.getElementById('location-status');
                             if (statusEl) {
                                 statusEl.className = 'location-status';
@@ -2071,12 +2210,6 @@
                             }
                         }
                     );
-                } else {
-                    const statusEl = document.getElementById('location-status');
-                    if (statusEl) {
-                        statusEl.className = 'location-status';
-                        statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Geolocation not supported. Click on map to select location.</span>';
-                    }
                 }
             },
 
@@ -2086,49 +2219,26 @@
                     return;
                 }
                 
+                // Set location as fetched
+                APP_STATE.locationFetched = true;
+                
                 app.closeModal();
                 document.getElementById('modal-body-content').classList.remove('map-modal');
                 
-                // Return to appropriate form
+                // Return to checkout with location fetched message
                 if (APP_STATE.locationPickerContext === 'checkout') {
                     app.checkout();
-                    
-                    // Show success message
-                    const display = document.getElementById('location-display');
-                    const locationBtn = document.getElementById('location-btn');
-                    
-                    if (display && locationBtn) {
-                        display.style.display = 'flex';
-                        locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
-                        locationBtn.classList.remove('btn-secondary');
-                        locationBtn.classList.add('btn-success');
-                        locationBtn.disabled = true;
-                    }
                 } else if (APP_STATE.locationPickerContext === 'support') {
                     app.renderRaiseRequest();
-                    
-                    // Show success message
-                    setTimeout(() => {
-                        const display = document.getElementById('req-location-display');
-                        const locationBtn = document.getElementById('req-location-btn');
-                        
-                        if (display && locationBtn) {
-                            display.style.display = 'flex';
-                            locationBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Location Selected';
-                            locationBtn.classList.remove('btn-secondary');
-                            locationBtn.classList.add('btn-success');
-                            locationBtn.disabled = true;
-                        }
-                    }, 100);
                 }
             },
 
             cancelLocationPicker: () => {
                 APP_STATE.userLocation = null;
+                APP_STATE.locationFetched = false;
                 app.closeModal();
                 document.getElementById('modal-body-content').classList.remove('map-modal');
                 
-                // Return to appropriate form
                 if (APP_STATE.locationPickerContext === 'checkout') {
                     app.checkout();
                 } else if (APP_STATE.locationPickerContext === 'support') {
@@ -2221,13 +2331,14 @@
                     if(res.ok) {
                         const data = await res.json();
                         
-                        // Send WhatsApp message to admin
                         if (data.whatsappUrl) {
                             window.open(data.whatsappUrl, '_blank');
                         }
                         
                         APP_STATE.cart = [];
                         APP_STATE.userLocation = null;
+                        APP_STATE.locationFetched = false;
+                        
                         app.showToast("Payment successful! Order confirmed.", 'success');
                         app.renderOrderSuccess(response.razorpay_order_id, total);
                         app.syncInventory();
@@ -2263,7 +2374,9 @@
                 app.openModal(html);
             },
 
-            // SUPPORT REQUEST WITH LOCATION MAP
+            // ============================================================
+            // SUPPORT REQUEST
+            // ============================================================
             renderRaiseRequest: () => {
                 if(!APP_STATE.user) {
                     app.showToast("Please login to raise a support request", 'error');
@@ -2300,15 +2413,18 @@
 
                         <div class="form-group">
                             <label class="label">
-                                <i class="fa-solid fa-map-marker-alt"></i> Pin Your Location on Map
+                                <i class="fa-solid fa-map-marker-alt"></i> Select Location on Map
                             </label>
-                            <button onclick="app.showMapPicker('support')" id="req-location-btn" class="btn btn-secondary w-full">
-                                <i class="fa-solid fa-map"></i> Pick Location from Map
+                            <button onclick="app.showMapPicker('support')" id="req-location-btn" class="btn ${APP_STATE.locationFetched ? 'btn-success' : 'btn-secondary'} w-full">
+                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
+                                ${APP_STATE.locationFetched ? 'Location Fetched Successfully' : 'Pick Location from Map'}
                             </button>
-                            <div id="req-location-display" class="alert alert-success mt-10" style="display: none;">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span>Location selected successfully</span>
-                            </div>
+                            ${APP_STATE.locationFetched ? `
+                                <div class="alert alert-success mt-10">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                    <span>Your service location has been saved</span>
+                                </div>
+                            ` : ''}
                         </div>
 
                         <div class="form-group">
@@ -2366,6 +2482,7 @@
                         window.open(`https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${waText}`);
                         
                         APP_STATE.userLocation = null;
+                        APP_STATE.locationFetched = false;
                         app.showToast("Request submitted successfully!", 'success');
                         app.closeModal();
                     }
@@ -2374,11 +2491,15 @@
                 }
             },
 
-            // Continue with profile, admin, auth methods in next comment due to length...
-            
+            // ============================================================
+            // USER PROFILE & ORDERS
+            // ============================================================
             renderProfile: async () => {
                 const root = document.getElementById('app-root-view');
-                if(!APP_STATE.user) { app.showAuth('login'); return; }
+                if(!APP_STATE.user) { 
+                    app.showAuth('login'); 
+                    return; 
+                }
 
                 let orders = [];
                 try {
@@ -2387,7 +2508,7 @@
                 } catch(e) {}
 
                 root.innerHTML = `
-                    <div class="container section fade-in" style="max-width: 1000px; padding: 60px 5%;">
+                    <div class="fade-in" style="max-width: 1000px; padding: 60px 5%; margin: 0 auto;">
                         <h1 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 10px; color: var(--text-dark);">
                             <i class="fa-solid fa-user-circle"></i> My Account
                         </h1>
@@ -2432,7 +2553,7 @@
                                 </div>` 
                                 : 
                                 orders.map(o => `
-                                    <div class="order-card" style="${o.status === 'Cancelled' || o.status === 'Refund Processing' ? 'opacity: 0.6;' : ''}">
+                                    <div class="order-card">
                                         <div class="order-header">
                                             <div>
                                                 <div class="order-id">Order #${o._id.substr(-8)}</div>
@@ -2511,9 +2632,31 @@
                 }
             },
 
-            // AUTH METHODS
+            postReview: async (id) => {
+                const comment = document.getElementById('review-comment-field').value;
+                if(!comment || comment.trim() === '') {
+                    app.showToast("Please write a review", 'error');
+                    return;
+                }
+                try {
+                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
+                    });
+                    app.showToast("Review posted successfully!", 'success');
+                    app.syncInventory().then(() => app.viewProductDetails(id));
+                } catch(e) {
+                    app.showToast("Failed to post review", 'error');
+                }
+            },
+
+            // ============================================================
+            // AUTHENTICATION
+            // ============================================================
             showAuth: (mode = 'login') => {
                 let content = '';
+                
                 if(mode === 'login') {
                     content = `
                         <form onsubmit="app.handleLogin(event)">
@@ -2539,6 +2682,7 @@
                             </p>
                         </form>
                     `;
+                    
                 } else if (mode === 'register') {
                     content = `
                         <form onsubmit="app.handleRegister(event)">
@@ -2568,6 +2712,7 @@
                             </p>
                         </form>
                     `;
+                    
                 } else if (mode === 'verify') {
                     content = `
                         <form onsubmit="app.handleVerifyOTP(event)">
@@ -2577,7 +2722,15 @@
                             <p class="text-center" style="color: var(--text-muted); margin-bottom: 25px;">
                                 We've sent a 6-digit code to your email
                             </p>
-                            <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 700;" required autocomplete="one-time-code">
+                            
+                            <div class="alert alert-info mb-20">
+                                <i class="fa-solid fa-info-circle"></i>
+                                <strong>Tip:</strong> Please check your spam folder if you don't see the email in your inbox
+                            </div>
+                            
+                            <input type="text" name="otp" placeholder="Enter 6-digit code" maxlength="6" 
+                                   style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 700;" 
+                                   required autocomplete="one-time-code">
                             <button type="submit" class="btn btn-primary w-full mt-20" style="padding: 16px;">
                                 <i class="fa-solid fa-check-circle"></i> Verify Email
                             </button>
@@ -2604,14 +2757,12 @@
                         sessionStorage.setItem('user', JSON.stringify(data));
                         app.closeModal();
                         
-                        // Show simple welcome toast instead of modal
                         app.showToast(`Welcome back, ${data.name}!`, 'success');
                         
                         app.renderHeader();
                         if(APP_STATE.user.role !== 'author') {
                             app.showHome();
                         } else {
-                            // Admin goes to admin panel
                             app.renderAdminPortal();
                         }
                     } else {
@@ -2678,28 +2829,13 @@
                 app.showHome();
             },
 
-            postReview: async (id) => {
-                const comment = document.getElementById('review-comment-field').value;
-                if(!comment || comment.trim() === '') {
-                    app.showToast("Please write a review", 'error');
-                    return;
-                }
-                try {
-                    await fetch(`${COMMAND_CONFIG.API_BASE}/review/${id}`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ user: APP_STATE.user.name, comment })
-                    });
-                    app.showToast("Review posted successfully!", 'success');
-                    app.syncInventory().then(() => app.viewProductDetails(id));
-                } catch(e) {
-                    app.showToast("Failed to post review", 'error');
-                }
-            },
-
-            // ADMIN PANEL METHODS with Hamburger Navigation
+            // ============================================================
+            // ADMIN PANEL (Hamburger Menu INSIDE Admin Dashboard)
+            // ============================================================
             renderAdminPortal: async () => {
-                if(!APP_STATE.user || APP_STATE.user.role !== 'author') return app.showHome();
+                if(!APP_STATE.user || APP_STATE.user.role !== 'author') {
+                    return app.showHome();
+                }
 
                 try {
                     app.showToast("Loading admin dashboard...", 'warning');
@@ -2713,16 +2849,70 @@
                     APP_STATE.inventory = await inventoryRes.json();
                     if(queriesRes.ok) APP_STATE.queries = await queriesRes.json();
 
-                } catch(e) { console.error("Admin Load Failed"); }
+                } catch(e) { 
+                    console.error("Admin Load Failed:", e); 
+                }
 
                 const root = document.getElementById('app-root-view');
                 root.innerHTML = `
                     <div class="admin-content fade-in">
+                        ${app.renderAdminMenu()}
                         <div id="admin-tab-view">
                             ${app.getTabContent(APP_STATE.currentAdminTab)}
                         </div>
                     </div>
                 `;
+            },
+
+            // Render Admin Hamburger Menu (INSIDE Admin Panel)
+            renderAdminMenu: () => {
+                return `
+                    <div class="admin-menu-container">
+                        <div class="admin-hamburger-btn" onclick="app.toggleAdminMenu()">
+                            <span><i class="fa-solid fa-bars"></i> Admin Menu</span>
+                            <div class="hamburger-icon">
+                                <div class="hamburger-line"></div>
+                                <div class="hamburger-line"></div>
+                                <div class="hamburger-line"></div>
+                            </div>
+                        </div>
+                        <div id="admin-dropdown" class="admin-dropdown">
+                            <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}" 
+                                 onclick="app.switchAdminTab('dashboard')">
+                                <i class="fa-solid fa-chart-line"></i> Dashboard
+                            </div>
+                            <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}" 
+                                 onclick="app.switchAdminTab('orders')">
+                                <i class="fa-solid fa-shopping-bag"></i> All Orders
+                            </div>
+                            <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}" 
+                                 onclick="app.switchAdminTab('cancelled')">
+                                <i class="fa-solid fa-ban"></i> Cancelled Orders
+                            </div>
+                            <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}" 
+                                 onclick="app.switchAdminTab('queries')">
+                                <i class="fa-solid fa-headset"></i> Support Requests
+                            </div>
+                            <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}" 
+                                 onclick="app.switchAdminTab('inventory')">
+                                <i class="fa-solid fa-box"></i> Inventory
+                            </div>
+                            <div class="admin-dropdown-item" onclick="app.showHome()">
+                                <i class="fa-solid fa-store"></i> Back to Store
+                            </div>
+                            <div class="admin-dropdown-item" onclick="app.executeLogout()">
+                                <i class="fa-solid fa-sign-out-alt"></i> Logout
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            toggleAdminMenu: () => {
+                const dropdown = document.getElementById('admin-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('active');
+                }
             },
 
             switchAdminTab: (tab) => {
@@ -2731,7 +2921,8 @@
                 if (tabView) {
                     tabView.innerHTML = app.getTabContent(tab);
                 }
-                app.renderHeader(); // Update active state in dropdown
+                // Update active state
+                app.renderAdminPortal();
             },
 
             getTabContent: (tab) => {
@@ -2800,7 +2991,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${allOrders.map(o => `
+                                    ${allOrders.length === 0 ? '<tr><td colspan="7" class="text-center" style="padding: 40px;">No orders found</td></tr>' :
+                                    allOrders.map(o => `
                                         <tr>
                                             <td>${new Date(o.date).toLocaleDateString()}</td>
                                             <td>
@@ -2811,7 +3003,7 @@
                                             <td>${o.items.length} items</td>
                                             <td style="font-weight: 700; color: var(--primary);">₹${o.total.toLocaleString()}</td>
                                             <td>
-                                                ${o.location ? `
+                                                ${o.location && o.location.latitude ? `
                                                     <a href="https://www.google.com/maps?q=${o.location.latitude},${o.location.longitude}" 
                                                        target="_blank" 
                                                        class="location-link">
@@ -2820,9 +3012,9 @@
                                                 ` : '<span style="color: var(--text-muted);">Not provided</span>'}
                                             </td>
                                             <td>
-                                                <span class="badge ${
-                                                    o.status === 'Delivered' ? 'badge-success' : 'badge-warning'
-                                                }">${o.status}</span>
+                                                <span class="badge ${o.status === 'Delivered' ? 'badge-success' : 'badge-warning'}">
+                                                    ${o.status}
+                                                </span>
                                             </td>
                                             <td>
                                                 ${o.status === 'Processing' 
@@ -2917,7 +3109,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${APP_STATE.queries.map(q => `
+                                    ${APP_STATE.queries.length === 0 ? '<tr><td colspan="7" class="text-center" style="padding: 40px;">No support requests</td></tr>' :
+                                    APP_STATE.queries.map(q => `
                                         <tr>
                                             <td>${new Date(q.date).toLocaleDateString()}</td>
                                             <td>
@@ -3012,6 +3205,9 @@
                 return '';
             },
 
+            // ============================================================
+            // ADMIN ACTIONS
+            // ============================================================
             executeSolveQuery: async (id) => {
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/requests/${id}/solve`, { method: 'PATCH' });
@@ -3033,6 +3229,19 @@
                 } catch(e) { app.showToast("Delete failed", 'error'); }
             },
 
+            executeOrderDelivery: async (id) => {
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
+                    if(res.ok) { 
+                        app.showToast("Order marked as delivered", 'success'); 
+                        await app.renderAdminPortal(); 
+                    }
+                } catch(e) { app.showToast("Operation failed", 'error'); }
+            },
+
+            // ============================================================
+            // PRODUCT MANAGEMENT
+            // ============================================================
             showAddProduct: () => {
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
                     `<option value="${key}">${CATEGORIES[key].name}</option>`
@@ -3085,13 +3294,18 @@
                 app.showToast("Adding product...", 'warning');
                 const fd = new FormData(e.target);
                 try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { method: 'POST', body: fd });
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { 
+                        method: 'POST', 
+                        body: fd 
+                    });
                     if(res.ok) {
                         app.showToast("Product added successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Failed to add product", 'error'); }
+                } catch(err) { 
+                    app.showToast("Failed to add product", 'error'); 
+                }
             },
 
             showEditProduct: (p) => {
@@ -3145,13 +3359,18 @@
                 app.showToast("Updating product...", 'warning');
                 const fd = new FormData(e.target);
                 try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'PUT', body: fd });
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { 
+                        method: 'PUT', 
+                        body: fd 
+                    });
                     if(res.ok) {
                         app.showToast("Product updated successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
                     }
-                } catch(err) { app.showToast("Update failed", 'error'); }
+                } catch(err) { 
+                    app.showToast("Update failed", 'error'); 
+                }
             },
 
             executeDeleteProduct: async (id, name) => {
@@ -3159,7 +3378,9 @@
 
                 try {
                     app.showToast("Deleting product...", 'warning');
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { method: 'DELETE' });
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products/${id}`, { 
+                        method: 'DELETE' 
+                    });
                     
                     if(res.ok) {
                         app.showToast("Product deleted successfully", 'success');
@@ -3172,18 +3393,8 @@
                 }
             },
 
-            executeOrderDelivery: async (id) => {
-                try {
-                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
-                    if(res.ok) { 
-                        app.showToast("Order marked as delivered", 'success'); 
-                        await app.renderAdminPortal(); 
-                    }
-                } catch(e) { app.showToast("Operation failed", 'error'); }
-            },
-
             // ============================================================
-            // UTILITIES
+            // UTILITY METHODS
             // ============================================================
             openModal: (html) => {
                 document.getElementById('modal-body-content').innerHTML = html;
@@ -3194,7 +3405,6 @@
                 document.getElementById('modal-overlay').classList.remove('active');
                 document.getElementById('modal-body-content').classList.remove('map-modal');
                 
-                // Cleanup map if exists
                 if (APP_STATE.map) {
                     APP_STATE.map.remove();
                     APP_STATE.map = null;
@@ -3217,130 +3427,20 @@
             if(e.target.id === 'modal-overlay') app.closeModal();
         });
 
-        // ================================================================
-        // EASTER EGG INITIALIZATION
-        // ================================================================
-        (function() {
-            'use strict';
-            
-            const bannerArt = `
-    ╔══════════════════════════════════════════════════════════════╗
-    ║       🛡️  BNG SURVEILLANCE - DEV MODE ACTIVATED  🛡️            ║
-    ║       "We see everything... including your code!" 👀          ║
-    ╚══════════════════════════════════════════════════════════════╝
-    `;
-
-            const activateCCTVMode = () => {
-                document.body.style.filter = 'grayscale(100%) contrast(1.2)';
-                document.body.style.transition = 'filter 0.5s ease';
-                
-                const overlay = document.createElement('div');
-                overlay.innerHTML = `
-                    <div style="position: fixed; top: 20px; left: 20px; background: rgba(0,0,0,0.8); color: lime; padding: 15px; font-family: 'Courier New', monospace; border: 2px solid lime; z-index: 9999; border-radius: 5px;">
-                        <div style="font-size: 20px; font-weight: bold;">📹 CCTV MODE</div>
-                        <div style="font-size: 12px; color: #0f0;">● REC</div>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
-                
-                console.log('%c🎬 CCTV MODE ACTIVATED! 🎬', 'color: lime; font-size: 20px; font-weight: bold; background: black; padding: 10px;');
-                
-                setTimeout(() => {
-                    document.body.style.filter = '';
-                    overlay.remove();
-                }, 10000);
-            };
-
-            const matrixRain = () => {
-                const canvas = document.createElement('canvas');
-                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;pointer-events:none;';
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                document.body.appendChild(canvas);
-                
-                const ctx = canvas.getContext('2d');
-                const chars = 'BNGSURVEILLANCE01234@#$%';
-                const fontSize = 14;
-                const columns = canvas.width / fontSize;
-                const drops = Array(Math.floor(columns)).fill(1);
-                
-                const draw = () => {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#0F0';
-                    ctx.font = fontSize + 'px monospace';
-                    
-                    for (let i = 0; i < drops.length; i++) {
-                        const text = chars[Math.floor(Math.random() * chars.length)];
-                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                        drops[i]++;
-                    }
-                };
-                
-                const interval = setInterval(draw, 33);
-                console.log('%c🌧️ ENTERING THE MATRIX...', 'color: #0f0; font-size: 18px; font-family: monospace;');
-                
-                setTimeout(() => {
-                    clearInterval(interval);
-                    canvas.remove();
-                }, 15000);
-            };
-
-            window.BNG = {
-                cctvMode: activateCCTVMode,
-                matrix: matrixRain,
-                
-                whoIsWatching: () => {
-                    console.log('%c👀 WHO IS WATCHING?', 'color: orange; font-size: 20px; font-weight: bold;');
-                    console.log('%cIt\'s us. The dev team. Hi! 👋', 'color: cyan; font-size: 14px;');
-                },
-                
-                secretStats: () => {
-                    console.table({
-                        'Coffee Consumed': Math.floor(Math.random() * 100) + ' cups ☕',
-                        'Bugs Fixed': Math.floor(Math.random() * 500) + ' bugs 🐛',
-                        'Late Nights': Math.floor(Math.random() * 50) + ' nights 🌙',
-                        'Lines of Code': (Math.random() * 10000).toFixed(0) + ' lines 💻'
-                    });
-                },
-                
-                help: () => {
-                    console.log(bannerArt);
-                    console.log('%c🎮 SECRET DEV COMMANDS', 'color: #0ea5e9; font-size: 18px; font-weight: bold;');
-                    console.log('%c  BNG.cctvMode()      - CCTV mode 📹', 'color: #f59e0b; font-weight: bold;');
-                    console.log('%c  BNG.matrix()        - Matrix effect 🌧️', 'color: #f59e0b; font-weight: bold;');
-                    console.log('%c  BNG.whoIsWatching() - Find out 👀', 'color: #f59e0b; font-weight: bold;');
-                    console.log('%c  BNG.secretStats()   - Dev stats 📊', 'color: #f59e0b; font-weight: bold;');
-                    console.log('%c💡 Tip: Triple-click the logo!', 'color: #8b5cf6;');
-                }
-            };
-
-            setTimeout(() => {
-                const logo = document.getElementById('app-logo');
-                if (logo) {
-                    let clicks = 0;
-                    logo.addEventListener('click', () => {
-                        clicks++;
-                        if (clicks === 3) {
-                            activateCCTVMode();
-                            if (app?.showToast) app.showToast("🎉 Easter egg unlocked!", 'success');
-                            clicks = 0;
-                        }
-                        setTimeout(() => clicks = 0, 500);
-                    });
-                }
-            }, 1000);
-
-            console.log(bannerArt);
-            console.log('%cType %cBNG.help()%c for secret commands!', 'color: #94a3b8;', 'color: #f59e0b; font-weight: bold;', 'color: #94a3b8;');
-
-        })();
+        // Close dropdowns on click outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu-container')) {
+                app.closeUserMenu();
+            }
+        });
 
         // ================================================================
-        // BOOT APPLICATION
+        // APPLICATION INITIALIZATION
         // ================================================================
         window.onload = app.init;
+        
+        console.log('%c🛡️ BNG SURVEILLANCE LOADED', 'color: #0ea5e9; font-size: 20px; font-weight: bold;');
+        console.log('%cDeveloped by Farhan Zahoor', 'color: #64748b; font-size: 12px;');
     </script>
 </body>
 </html>
