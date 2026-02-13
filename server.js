@@ -1,6 +1,6 @@
 // ================================================================
 // BNG SURVEILLANCE - COMPLETE BACKEND SERVER
-// With WhatsApp Notifications & All Features
+// With Multiple Images, WhatsApp Notifications & All Features
 // ================================================================
 
 require('dotenv').config();
@@ -107,7 +107,8 @@ const ProductSchema = new mongoose.Schema({
     category: { type: String, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },
-    image: { type: String, required: true },
+    image: { type: String }, // Legacy field for backward compatibility
+    images: [{ type: String }], // NEW: Array of image URLs
     desc: { type: String, required: true },
     reviews: [{ user: String, comment: String, date: { type: Date, default: Date.now } }],
     createdAt: { type: Date, default: Date.now },
@@ -140,6 +141,7 @@ const OrderSchema = new mongoose.Schema({
 const RequestSchema = new mongoose.Schema({
     customerName: { type: String, required: true },
     email: { type: String, required: true },
+    phone: { type: String, required: true }, // NEW: Phone field
     type: { type: String, required: true },
     message: { type: String, required: true },
     location: {
@@ -157,7 +159,7 @@ const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 const Request = mongoose.model('Request', RequestSchema);
 
-// FILE UPLOAD SETUP
+// FILE UPLOAD SETUP - SUPPORTS MULTIPLE FILES
 const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp/;
@@ -168,7 +170,7 @@ const fileFilter = (req, file, cb) => {
 };
 const upload = multer({ 
     storage: storage, fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB per file
 });
 
 // EMAIL TEMPLATES
@@ -302,7 +304,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// PRODUCTS
+// PRODUCTS - WITH MULTIPLE IMAGES SUPPORT
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find().sort({ createdAt: -1 });
@@ -313,58 +315,137 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-app.post('/api/products', upload.single('image'), async (req, res) => {
+app.post('/api/products', upload.array('images', 5), async (req, res) => {
     try {
-        if (!req.file) return res.status(400).json({ error: "No image file uploaded" });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: "At least one image file is required" });
+        }
+        
+        if (req.files.length > 5) {
+            return res.status(400).json({ error: "Maximum 5 images allowed" });
+        }
+
         const { name, category, price, desc, stock } = req.body;
-        if (!name || !category || !price || !desc) return res.status(400).json({ error: "All fields are required" });
-        const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: 'bng_surveillance', resource_type: 'image',
-              transformation: [{ width: 800, height: 800, crop: 'limit' }, { quality: 'auto:good' }] },
-            async (error, result) => {
-                if (error) {
-                    console.error('Cloudinary Upload Error:', error);
-                    return res.status(500).json({ error: "Image upload failed" });
-                }
-                const newProduct = new Product({ name, category, price: Number(price), 
-                    stock: Number(stock) || 0, image: result.secure_url, desc, reviews: [] });
-                await newProduct.save();
-                console.log(`✅ Product added: ${name}`);
-                res.json(newProduct);
+        if (!name || !category || !price || !desc) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+
+        // Upload all images to Cloudinary
+        const imageUrls = [];
+        
+        for (const file of req.files) {
+            const uploadPromise = new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { 
+                        folder: 'bng_surveillance', 
+                        resource_type: 'image',
+                        transformation: [
+                            { width: 800, height: 800, crop: 'limit' }, 
+                            { quality: 'auto:good' }
+                        ] 
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result.secure_url);
+                    }
+                );
+                streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            });
+            
+            try {
+                const url = await uploadPromise;
+                imageUrls.push(url);
+            } catch (err) {
+                console.error('Image upload error:', err);
             }
-        );
-        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+        }
+
+        if (imageUrls.length === 0) {
+            return res.status(500).json({ error: "Failed to upload images" });
+        }
+
+        const newProduct = new Product({ 
+            name, 
+            category, 
+            price: Number(price), 
+            stock: Number(stock) || 0, 
+            image: imageUrls[0], // First image as main (for backward compatibility)
+            images: imageUrls, // All images
+            desc, 
+            reviews: [] 
+        });
+        
+        await newProduct.save();
+        console.log(`✅ Product added: ${name} with ${imageUrls.length} images`);
+        res.json(newProduct);
+
     } catch (err) { 
         console.error('Add Product Error:', err);
         res.status(500).json({ error: "Server Error" }); 
     }
 });
 
-app.put('/api/products/:id', upload.single('image'), async (req, res) => {
+app.put('/api/products/:id', upload.array('images', 5), async (req, res) => {
     try {
         const { name, category, price, desc, stock } = req.body;
-        const updateData = { name, category, price: Number(price), stock: Number(stock), desc, updatedAt: new Date() };
-        if (req.file) {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: 'bng_surveillance', resource_type: 'image',
-                  transformation: [{ width: 800, height: 800, crop: 'limit' }, { quality: 'auto:good' }] },
-                async (error, result) => {
-                    if (error) {
-                        console.error('Cloudinary Upload Error:', error);
-                        return res.status(500).json({ error: "Image upload failed" });
-                    }
-                    updateData.image = result.secure_url;
-                    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
-                    console.log(`✅ Product updated: ${updatedProduct.name}`);
-                    res.json(updatedProduct);
+        const updateData = { 
+            name, 
+            category, 
+            price: Number(price), 
+            stock: Number(stock), 
+            desc, 
+            updatedAt: new Date() 
+        };
+
+        // If new images are uploaded, replace all images
+        if (req.files && req.files.length > 0) {
+            if (req.files.length > 5) {
+                return res.status(400).json({ error: "Maximum 5 images allowed" });
+            }
+
+            const imageUrls = [];
+            
+            for (const file of req.files) {
+                const uploadPromise = new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        { 
+                            folder: 'bng_surveillance', 
+                            resource_type: 'image',
+                            transformation: [
+                                { width: 800, height: 800, crop: 'limit' }, 
+                                { quality: 'auto:good' }
+                            ] 
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result.secure_url);
+                        }
+                    );
+                    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+                });
+                
+                try {
+                    const url = await uploadPromise;
+                    imageUrls.push(url);
+                } catch (err) {
+                    console.error('Image upload error:', err);
                 }
-            );
-            streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-        } else {
-            const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
-            console.log(`✅ Product updated: ${updatedProduct.name}`);
-            res.json(updatedProduct);
+            }
+
+            if (imageUrls.length > 0) {
+                updateData.image = imageUrls[0];
+                updateData.images = imageUrls;
+            }
         }
+
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        if (!updatedProduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+        
+        console.log(`✅ Product updated: ${updatedProduct.name}`);
+        res.json(updatedProduct);
+
     } catch (e) {
         console.error('Update Product Error:', e);
         res.status(500).json({ error: "Update failed" });
@@ -375,17 +456,24 @@ app.delete('/api/products/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ error: "Product not found" });
-        if (product.image) {
-            try {
-                const urlParts = product.image.split('/');
-                const publicIdWithExt = urlParts[urlParts.length - 1];
-                const publicId = `bng_surveillance/${publicIdWithExt.split('.')[0]}`;
-                await cloudinary.uploader.destroy(publicId);
-                console.log(`✅ Image deleted: ${publicId}`);
-            } catch (cloudinaryError) {
-                console.error('Cloudinary deletion error:', cloudinaryError.message);
+        
+        // Delete all images from Cloudinary
+        const imagesToDelete = product.images && product.images.length > 0 ? product.images : [product.image];
+        
+        for (const imageUrl of imagesToDelete) {
+            if (imageUrl) {
+                try {
+                    const urlParts = imageUrl.split('/');
+                    const publicIdWithExt = urlParts[urlParts.length - 1];
+                    const publicId = `bng_surveillance/${publicIdWithExt.split('.')[0]}`;
+                    await cloudinary.uploader.destroy(publicId);
+                    console.log(`✅ Image deleted: ${publicId}`);
+                } catch (cloudinaryError) {
+                    console.error('Cloudinary deletion error:', cloudinaryError.message);
+                }
             }
         }
+        
         await Product.findByIdAndDelete(req.params.id);
         console.log(`✅ Product deleted: ${product.name}`);
         res.json({ message: "Product deleted successfully" });
@@ -429,7 +517,7 @@ app.post('/api/create-order', async (req, res) => {
     }
 });
 
-// VERIFY PAYMENT WITH WHATSAPP NOTIFICATION
+// VERIFY PAYMENT WITH WHATSAPP REDIRECT URL
 app.post('/api/verify-payment', async (req, res) => {
     const { orderCreationId, razorpayPaymentId, razorpaySignature, customerDetails } = req.body;
     try {
@@ -439,9 +527,11 @@ app.post('/api/verify-payment', async (req, res) => {
             console.error('❌ Invalid payment signature');
             return res.status(400).json({ message: "Invalid Transaction" });
         }
+        
         if (!customerDetails.phone || !validatePhone(customerDetails.phone)) {
             return res.status(400).json({ error: "Invalid phone number" });
         }
+        
         // Deduct stock
         if (customerDetails.items && customerDetails.items.length > 0) {
             for (const item of customerDetails.items) {
@@ -459,6 +549,7 @@ app.post('/api/verify-payment', async (req, res) => {
                 }
             }
         }
+        
         // Save order
         const newOrder = new Order({
             razorpay_order_id: orderCreationId,
@@ -484,18 +575,17 @@ app.post('/api/verify-payment', async (req, res) => {
 
         // Email admin
         const itemList = customerDetails.items.map(i => `${i.qty}x ${i.name} @ ₹${i.price}`).join('\n');
-        let locationInfo = '';
         let gmapsLink = '';
         if (customerDetails.location && customerDetails.location.latitude) {
             gmapsLink = `https://www.google.com/maps?q=${customerDetails.location.latitude},${customerDetails.location.longitude}`;
-            locationInfo = `\n\n📍 Location:\n${gmapsLink}`;
         }
+        
         await sendEmail(process.env.EMAIL_USER, 
             `💰 NEW ORDER: ₹${customerDetails.total} - ${customerDetails.name}`, 
-            `NEW ORDER!\n\nOrder ID: ${orderCreationId}\n\nCustomer:\nName: ${customerDetails.name}\nEmail: ${customerDetails.email}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}${locationInfo}\n\nItems:\n${itemList}\n\nTotal: ₹${customerDetails.total}\n\nPayment ID: ${razorpayPaymentId}`
+            `NEW ORDER!\n\nOrder ID: ${orderCreationId}\n\nCustomer:\nName: ${customerDetails.name}\nEmail: ${customerDetails.email}\nPhone: ${customerDetails.phone}\nAddress: ${customerDetails.address}, ${customerDetails.pincode}${gmapsLink ? '\n\nLocation:\n' + gmapsLink : ''}\n\nItems:\n${itemList}\n\nTotal: ₹${customerDetails.total}\n\nPayment ID: ${razorpayPaymentId}`
         );
 
-        // PREPARE WHATSAPP NOTIFICATION
+        // GENERATE WHATSAPP REDIRECT URL
         const whatsappMessage = `🛡️ *BNG SURVEILLANCE - NEW ORDER*
 
 ━━━━━━━━━━━━━━━━━━━━━
@@ -510,7 +600,9 @@ Email: ${customerDetails.email}
 Phone: ${customerDetails.phone}
 
 📦 *PRODUCTS ORDERED*
-${customerDetails.items.map(item => `• ${item.qty}x ${item.name}\n  Price: ₹${item.price.toLocaleString()}\n  Subtotal: ₹${(item.qty * item.price).toLocaleString()}`).join('\n')}
+${customerDetails.items.map(item => `• ${item.qty}x ${item.name}
+  Price: ₹${item.price.toLocaleString()}
+  Subtotal: ₹${(item.qty * item.price).toLocaleString()}`).join('\n\n')}
 
 💰 *TOTAL AMOUNT: ₹${customerDetails.total.toLocaleString()}*
 
@@ -518,8 +610,7 @@ ${customerDetails.items.map(item => `• ${item.qty}x ${item.name}\n  Price: ₹
 ${customerDetails.address}
 Pincode: ${customerDetails.pincode}
 
-${gmapsLink ? `🗺️ *LOCATION*\n${gmapsLink}\n` : ''}
-━━━━━━━━━━━━━━━━━━━━━
+${gmapsLink ? `🗺️ *LOCATION*\n${gmapsLink}\n\n` : ''}━━━━━━━━━━━━━━━━━━━━━
 
 ✅ *Payment Status:* PAID
 💳 *Payment ID:* ${razorpayPaymentId}
@@ -527,12 +618,12 @@ ${gmapsLink ? `🗺️ *LOCATION*\n${gmapsLink}\n` : ''}
 🔔 Please process this order immediately!`;
 
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const whatsappURL = `https://api.whatsapp.com/send?phone=916006750581&text=${encodedMessage}`;
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=916006750581&text=${encodedMessage}`;
 
         res.json({ 
             message: "Payment Successful", 
             orderId: newOrder._id,
-            whatsappNotification: whatsappURL
+            whatsappUrl: whatsappUrl // Return WhatsApp URL to frontend
         });
 
     } catch (error) { 
@@ -584,6 +675,7 @@ app.patch('/api/orders/:id/cancel', async (req, res) => {
         if (order.status !== 'Processing') {
             return res.status(400).json({ error: "Only processing orders can be cancelled" });
         }
+        
         // Restore stock
         if (order.items && order.items.length > 0) {
             for (const item of order.items) {
@@ -593,6 +685,7 @@ app.patch('/api/orders/:id/cancel', async (req, res) => {
                 }
             }
         }
+        
         const updated = await Order.findByIdAndUpdate(req.params.id, {
             status: 'Refund Processing', cancelledAt: new Date(), refundProcessed: false
         }, { new: true });
@@ -613,15 +706,31 @@ app.patch('/api/orders/:id/cancel', async (req, res) => {
     }
 });
 
-// REQUESTS
+// REQUESTS - WITH PHONE NUMBER
 app.post('/api/requests', async (req, res) => {
     try {
-        const { customerName, email, type, message, location } = req.body;
-        if (!customerName || !email || !type || !message) {
+        const { customerName, email, phone, type, message, location } = req.body;
+        
+        if (!customerName || !email || !phone || !type || !message) {
             return res.status(400).json({ error: "All fields are required" });
         }
-        if (!validateEmail(email)) return res.status(400).json({ error: "Invalid email format" });
-        const newRequest = new Request({ customerName, email, type, message, location: location || null });
+        
+        if (!validateEmail(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+        
+        if (!validatePhone(phone)) {
+            return res.status(400).json({ error: "Invalid phone number. Must be 10 digits." });
+        }
+        
+        const newRequest = new Request({ 
+            customerName, 
+            email, 
+            phone,
+            type, 
+            message, 
+            location: location || null 
+        });
         await newRequest.save();
 
         let locationInfo = '';
@@ -629,8 +738,9 @@ app.post('/api/requests', async (req, res) => {
             const gmapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
             locationInfo = `\n\n📍 Location:\n${gmapsLink}`;
         }
+        
         await sendEmail(process.env.EMAIL_USER, `🔔 NEW ${type.toUpperCase()} REQUEST - ${customerName}`, 
-            `NEW SERVICE REQUEST\n\nType: ${type}\nFrom: ${customerName}\nEmail: ${email}\n\nMessage:\n${message}${locationInfo}`);
+            `NEW SERVICE REQUEST\n\nType: ${type}\nFrom: ${customerName}\nEmail: ${email}\nPhone: ${phone}\n\nMessage:\n${message}${locationInfo}`);
 
         console.log(`✅ Request created: ${newRequest._id}`);
         res.json(newRequest);
@@ -718,6 +828,7 @@ if (require.main === module) {
 ║  📊 Environment: ${process.env.NODE_ENV || 'development'}   ║
 ║  🔐 Database: ${mongoose.connection.readyState === 1 ? 'Connected ✅' : 'Pending ⏳'}              ║
 ║  📱 WhatsApp Notifications: ENABLED                          ║
+║  🖼️  Multiple Images Support: ENABLED                       ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
         `);
