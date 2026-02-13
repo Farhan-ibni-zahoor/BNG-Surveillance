@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
+    <!-- ⭐ NEW: Leaflet Geocoding for Map Search -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -1334,6 +1339,209 @@
             }
         }
 
+
+        /* ============================================================
+           IMAGE CAROUSEL & GALLERY (MULTIPLE IMAGES)
+           ============================================================ */
+        .image-carousel {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover { 
+            background: rgba(0,0,0,0.9); 
+            transform: translateY(-50%) scale(1.1); 
+        }
+
+        .carousel-btn-prev { left: 20px; }
+        .carousel-btn-next { right: 20px; }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .carousel-dot.active { 
+            background: white; 
+            width: 35px; 
+            border-radius: 6px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .carousel-dot:hover:not(.active) {
+            background: rgba(255,255,255,0.8);
+            transform: scale(1.2);
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 12px 0;
+            margin-bottom: 25px;
+            scroll-behavior: smooth;
+        }
+
+        .thumbnail-gallery::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .thumbnail {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: var(--bg-light);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 3px solid var(--border);
+            padding: 8px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .thumbnail.active { 
+            border-color: var(--primary); 
+            transform: scale(1.05); 
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            background: white;
+        }
+
+        .thumbnail:hover:not(.active) { 
+            border-color: var(--primary-light); 
+            transform: scale(1.02);
+        }
+
+        /* Image Upload Preview (Admin) */
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            min-height: 80px;
+        }
+
+        .image-preview-container:empty::after {
+            content: "No images selected";
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .image-preview {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+
+        .image-preview:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .image-preview-remove:hover {
+            background: #dc2626;
+            transform: scale(1.15);
+        }
+
+        .image-preview-main {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: var(--shadow);
+            letter-spacing: 0.5px;
+        }
+
         /* ============================================================
            UTILITY CLASSES
            ============================================================ */
@@ -1369,6 +1577,66 @@
         
         .hidden { display: none !important; }
         .visible { display: block !important; }
+    
+        /* ============================================================
+           LEAFLET GEOCODER (MAP SEARCH) STYLING
+           ============================================================ */
+        .leaflet-control-geocoder {
+            border: 2px solid var(--primary) !important;
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+            background: white !important;
+        }
+
+        .leaflet-control-geocoder-form {
+            background: white !important;
+        }
+
+        .leaflet-control-geocoder-form input {
+            font-family: var(--font-main) !important;
+            font-size: 1rem !important;
+            padding: 12px !important;
+            border: none !important;
+            width: 300px !important;
+        }
+
+        .leaflet-control-geocoder-icon {
+            display: none !important;
+        }
+
+        .leaflet-control-geocoder-alternatives {
+            background: white !important;
+            border: 2px solid var(--border) !important;
+            border-radius: var(--radius-sm) !important;
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            margin-top: 5px !important;
+        }
+
+        .leaflet-control-geocoder-alternatives-minimized {
+            display: none !important;
+        }
+
+        .leaflet-control-geocoder-alternative {
+            padding: 10px 15px !important;
+            cursor: pointer !important;
+            border-bottom: 1px solid var(--border) !important;
+            transition: background 0.2s !important;
+        }
+
+        .leaflet-control-geocoder-alternative:hover {
+            background: var(--bg-light) !important;
+            color: var(--primary) !important;
+        }
+
+        .leaflet-control-geocoder-alternative:last-child {
+            border-bottom: none !important;
+        }
+
+        .leaflet-control-geocoder-selected {
+            background: var(--primary-light) !important;
+        }
+
     </style>
 </head>
 <body>
@@ -1522,7 +1790,10 @@
             map: null,
             marker: null,
             locationPickerContext: null,
-            locationFetched: false
+            locationFetched: false,
+            currentProductImages: [],
+            currentImageIndex: 0,
+            productImageFiles: [],
         };
 
         // ================================================================
@@ -1860,7 +2131,7 @@
                             Your trusted partner for complete CCTV and surveillance solutions. Professional installation and 24/7 customer support.
                         </p>
                         <div class="social-links">
-                            <a href="https://www.instagram.com/bng_surveillance" target="_blank">
+                            <a href="https://www.instagram.com/bng_surveillance/?hl=en" target="_blank">
                                 <i class="fa-brands fa-instagram"></i>
                             </a>
                             <a href="https://www.facebook.com/profile.php?id=61585589131328" target="_blank">
