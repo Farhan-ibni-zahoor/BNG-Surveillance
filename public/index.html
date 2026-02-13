@@ -337,6 +337,12 @@
             color: #1e40af; 
         }
 
+        /* Clickable badge effect */
+        .badge.clickable-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
         /* ============================================================
            NAVIGATION BAR
            ============================================================ */
@@ -1734,12 +1740,42 @@
                     if (whatsappBtn) whatsappBtn.classList.remove('show');
                     
                 } else if (APP_STATE.user.role === 'author') {
-                    // Admin user - NO navigation menu (hamburger is in admin panel)
+                    // Admin user - Clickable Admin Mode badge with dropdown
                     nav.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 8px 16px;">
+                        <div class="admin-menu-container" style="position: relative;">
+                            <div class="badge badge-success clickable-badge" 
+                                 onclick="app.toggleAdminNavMenu()" 
+                                 style="font-size: 0.9rem; padding: 8px 16px; cursor: pointer; user-select: none; transition: all 0.3s;">
                                 <i class="fa-solid fa-user-shield"></i> Admin Mode
-                            </span>
+                            </div>
+                            <div id="admin-nav-dropdown" class="admin-dropdown" style="position: absolute; top: 45px; right: 0; z-index: 2000;">
+                                <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'dashboard' ? 'active' : ''}" 
+                                     onclick="app.goToAdminTab('dashboard'); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                                </div>
+                                <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'orders' ? 'active' : ''}" 
+                                     onclick="app.goToAdminTab('orders'); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-shopping-bag"></i> All Orders
+                                </div>
+                                <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'cancelled' ? 'active' : ''}" 
+                                     onclick="app.goToAdminTab('cancelled'); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-ban"></i> Cancelled Orders
+                                </div>
+                                <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'queries' ? 'active' : ''}" 
+                                     onclick="app.goToAdminTab('queries'); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-headset"></i> Support Requests
+                                </div>
+                                <div class="admin-dropdown-item ${APP_STATE.currentAdminTab === 'inventory' ? 'active' : ''}" 
+                                     onclick="app.goToAdminTab('inventory'); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-box"></i> Inventory
+                                </div>
+                                <div class="admin-dropdown-item" onclick="app.showHome(); app.closeAdminNavMenu();">
+                                    <i class="fa-solid fa-store"></i> Back to Store
+                                </div>
+                                <div class="admin-dropdown-item" onclick="app.executeLogout();">
+                                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                                </div>
+                            </div>
                         </div>
                     `;
                     // NO WhatsApp for admin
@@ -1789,6 +1825,26 @@
                 if (dropdown) {
                     dropdown.classList.remove('active');
                 }
+            },
+
+            // Admin Navigation Menu (in top nav)
+            toggleAdminNavMenu: () => {
+                const dropdown = document.getElementById('admin-nav-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('active');
+                }
+            },
+
+            closeAdminNavMenu: () => {
+                const dropdown = document.getElementById('admin-nav-dropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('active');
+                }
+            },
+
+            goToAdminTab: (tab) => {
+                APP_STATE.currentAdminTab = tab;
+                app.renderAdminPortal();
             },
 
             // ============================================================
@@ -3431,6 +3487,9 @@
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.user-menu-container')) {
                 app.closeUserMenu();
+            }
+            if (!e.target.closest('.admin-menu-container')) {
+                app.closeAdminNavMenu();
             }
         });
 
