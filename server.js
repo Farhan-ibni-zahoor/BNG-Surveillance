@@ -1,7 +1,7 @@
 // ================================================================
 // BNG SURVEILLANCE - ULTIMATE PERFECT SERVER
 // Production-Ready Backend with All Features
-// Version: 2.3 Ultimate Edition (Fixed for Index.html)
+// Version: 2.0 Ultimate Edition
 // Lines: ~1,200 (Comprehensive Implementation)
 // ================================================================
 
@@ -31,8 +31,8 @@ const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 console.log('╔════════════════════════════════════════════════════════════╗');
-console.log('║   🛡️  BNG SURVEILLANCE - ULTIMATE SERVER v2.3              ║');
-console.log('║   Initializing all systems...                              ║');
+console.log('║  🛡️  BNG SURVEILLANCE - ULTIMATE SERVER v2.0              ║');
+console.log('║  Initializing all systems...                              ║');
 console.log('╚════════════════════════════════════════════════════════════╝');
 
 // ================================================================
@@ -337,7 +337,7 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['customer', 'admin', 'author'],
+        enum: ['customer', 'admin'],
         default: 'customer'
     },
     phoneNumber: {
@@ -567,7 +567,7 @@ const OrderSchema = new mongoose.Schema({
 
 /**
  * Support Request Schema
- * Phone number optional as it is not sent by frontend form
+ * Includes phone number and location
  */
 const RequestSchema = new mongoose.Schema({
     requestId: {
@@ -588,7 +588,7 @@ const RequestSchema = new mongoose.Schema({
     },
     phone: { 
         type: String, 
-        default: null // PHONE NUMBER OPTIONAL to match frontend
+        required: true  // PHONE NUMBER REQUIRED IN SUPPORT
     },
     type: { 
         type: String, 
@@ -1401,9 +1401,8 @@ app.get('/api/products', async (req, res) => {
 /**
  * Add new product with multiple images
  * POST /api/products
- * FIXED: Changed 'images' to 'image' to match index.html form
  */
-app.post('/api/products', upload.array('image', 5), async (req, res) => {
+app.post('/api/products', upload.array('images', 5), async (req, res) => {
     try {
         // Check if files uploaded
         if (!req.files || req.files.length === 0) {
@@ -1471,9 +1470,8 @@ app.post('/api/products', upload.array('image', 5), async (req, res) => {
 /**
  * Update product with optional new images
  * PUT /api/products/:id
- * FIXED: Changed 'images' to 'image' to match index.html form
  */
-app.put('/api/products/:id', upload.array('image', 5), async (req, res) => {
+app.put('/api/products/:id', upload.array('images', 5), async (req, res) => {
     try {
         const { name, category, price, desc, stock } = req.body;
         
@@ -1595,7 +1593,7 @@ app.post('/api/review/:id', async (req, res) => {
         console.log(`✅ Review added to ${product.name} by ${user}`);
         
         res.json({ 
-            message: "Review added successfully", 
+            message: "Review added successfully",
             review: review
         });
         
@@ -1646,7 +1644,6 @@ app.post('/api/create-order', async (req, res) => {
 /**
  * Verify payment and save order with WhatsApp notification
  * POST /api/verify-payment
- * FIXED: Changed response key to `whatsappUrl` to match frontend
  */
 app.post('/api/verify-payment', async (req, res) => {
     try {
@@ -1882,12 +1879,11 @@ Razorpay Order: ${orderCreationId}
 
         console.log(`✅ Payment verified successfully for Order: ${uniqueOrderId}`);
 
-        // IMPORTANT FIX: Changed key from 'whatsappNotification' to 'whatsappUrl'
         res.json({ 
             message: "Payment successful! Order confirmed.", 
             orderId: newOrder._id,
             orderNumber: uniqueOrderId,
-            whatsappUrl: whatsappURL  
+            whatsappNotification: whatsappURL  // WhatsApp notification URL
         });
 
     } catch (error) {
@@ -2094,20 +2090,19 @@ app.patch('/api/orders/:id/cancel', async (req, res) => {
 /**
  * Create support request
  * POST /api/requests
- * FIXED: Removed phone requirement since frontend form does not send it.
  */
 app.post('/api/requests', async (req, res) => {
     try {
-        // NOTE: phone is removed from destructuring as HTML form doesn't send it
-        const { customerName, email, type, message, location } = req.body;
+        const { customerName, email, phone, type, message, location } = req.body;
         
         // Validation
-        if (!customerName || !email || !type || !message) {
+        if (!customerName || !email || !phone || !type || !message) {
             return res.status(400).json({ 
                 error: "All fields are required",
                 fields: {
                     customerName: !customerName,
                     email: !email,
+                    phone: !phone,
                     type: !type,
                     message: !message
                 }
@@ -2118,6 +2113,11 @@ app.post('/api/requests', async (req, res) => {
             return res.status(400).json({ error: "Invalid email format" });
         }
         
+        // Phone validation - REQUIRED
+        if (!validatePhone(phone)) {
+            return res.status(400).json({ error: "Valid 10-digit phone number is required" });
+        }
+        
         // Generate unique request ID
         const requestId = 'REQ' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
         
@@ -2125,8 +2125,7 @@ app.post('/api/requests', async (req, res) => {
             requestId,
             customerName: customerName.trim(), 
             email: email.toLowerCase().trim(), 
-            // Phone is optional/missing from form, so we skip it or set null
-            phone: null, 
+            phone: phone.replace(/\D/g, ''),
             type: type.trim(), 
             message: message.trim(), 
             location: location || null,
@@ -2166,6 +2165,7 @@ Date: ${new Date().toLocaleString('en-IN')}
 
 Name: ${customerName}
 Email: ${email}
+Phone: ${phone}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -2275,7 +2275,7 @@ app.patch('/api/requests/:id/solve', async (req, res) => {
         );
         
         res.json({ 
-            message: "Request marked as solved", 
+            message: "Request marked as solved",
             request 
         });
         
@@ -2398,7 +2398,7 @@ app.use((err, req, res, next) => {
     
     // Default error
     res.status(500).json({ 
-        error: "Internal server error", 
+        error: "Internal server error",
         message: NODE_ENV === 'development' ? err.message : undefined
     });
 });
@@ -2452,7 +2452,7 @@ if (require.main === module) {
         console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║      🛡️  BNG SURVEILLANCE - ULTIMATE SERVER v2.3              ║
+║      🛡️  BNG SURVEILLANCE - ULTIMATE SERVER v2.0             ║
 ║                                                               ║
 ║  🚀 Port: ${PORT.toString().padEnd(53)}║
 ║  📊 Environment: ${NODE_ENV.padEnd(44)}║
@@ -2468,7 +2468,7 @@ if (require.main === module) {
 ║  ✅ Razorpay Payment Integration                              ║
 ║  ✅ Stock Management with Auto-Update                         ║
 ║  ✅ Order Management & Tracking                               ║
-║  ✅ Support Request System (Frontend Compatible)              ║
+║  ✅ Support Request System with Phone                         ║
 ║  ✅ Admin Dashboard & Statistics                              ║
 ║  ✅ Email Notifications (HTML Templates)                      ║
 ║  ✅ Cloudinary Image Storage                                  ║
