@@ -8,11 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Leaflet CSS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- ⭐ NEW: Leaflet Geocoding for Map Search -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -703,7 +701,7 @@
         .card:hover { 
             transform: translateY(-8px); 
             box-shadow: var(--shadow-xl); 
-            border-color: var(--primary);
+            border-color: var(--primary); 
         }
 
         .card-img-box { 
@@ -744,8 +742,8 @@
             font-size: 1.6rem; 
             font-family: var(--font-display); 
             font-weight: 700; 
-            color: var(--primary);
-            margin: 10px 0;
+            color: var(--primary); 
+            margin: 10px 0; 
         }
 
         .stock-label { 
@@ -1322,7 +1320,7 @@
             }
             
             .stat-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; 
             }
             
             .user-dropdown {
@@ -1455,7 +1453,7 @@
 
         .thumbnail:hover:not(.active) { 
             border-color: var(--primary-light); 
-            transform: scale(1.02);
+            transform: scale(1.02); 
         }
 
         /* Image Upload Preview (Admin) */
@@ -1641,9 +1639,6 @@
 </head>
 <body>
 
-    <!-- ============================================================
-         LOADER
-         ============================================================ -->
     <div id="loader">
         <div class="spinner"></div>
         <div style="margin-top: 25px; font-family: var(--font-display); color: var(--primary); font-weight: 600; font-size: 1.1rem;">
@@ -1651,14 +1646,8 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         TOAST NOTIFICATION
-         ============================================================ -->
     <div id="toast" class="toast">Action Completed</div>
 
-    <!-- ============================================================
-         FLOATING WHATSAPP BUTTON (Customer Only)
-         ============================================================ -->
     <a id="whatsapp-float" class="whatsapp-float" 
        href="https://wa.me/916006750581?text=Hi%2C%20I%20need%20help%20with%20BNG%20Surveillance%20products" 
        target="_blank" 
@@ -1666,16 +1655,10 @@
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
-    <!-- ============================================================
-         BACK TO TOP BUTTON
-         ============================================================ -->
     <div id="back-to-top" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <i class="fa-solid fa-arrow-up"></i>
     </div>
 
-    <!-- ============================================================
-         CART PANEL
-         ============================================================ -->
     <div id="cart-panel" class="cart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark);">
@@ -1705,9 +1688,6 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         NAVIGATION BAR
-         ============================================================ -->
     <nav>
         <div class="logo" onclick="app.init()" id="app-logo">
             <img src="bngimage.jpg" alt="BNG Logo" />
@@ -1716,14 +1696,8 @@
         <div class="nav-right" id="nav-actions-area"></div>
     </nav>
 
-    <!-- ============================================================
-         MAIN CONTENT AREA
-         ============================================================ -->
     <main id="app-root-view"></main>
 
-    <!-- ============================================================
-         MODAL OVERLAY
-         ============================================================ -->
     <div id="modal-overlay" class="overlay">
         <div id="modal-body-content" class="modal"></div>
     </div>
@@ -2151,7 +2125,7 @@
                 </footer>
             `,
 
-// ============================================================
+            // ============================================================
             // PRODUCT DETAILS VIEWER
             // ============================================================
             viewProductDetails: (id) => {
@@ -2194,7 +2168,7 @@
                             </div>
                             ${APP_STATE.user ? `
                                 <div style="width: 120px;">
-                                    <span class="label" style="margin: 0 0 5px 0; display: block; font-size: 0.85rem;">Quantity</span>
+                                    <span class="label" style="margin: 0 0 5px 0;">Quantity</span>
                                     <input type="number" id="purchase-qty-input" value="1" min="1" max="${p.stock}" style="padding: 10px; text-align:center;">
                                 </div>
                             ` : ''}
@@ -2488,6 +2462,12 @@
                         longitude: e.latlng.lng
                     };
                     
+                    const statusEl = document.getElementById('location-status');
+                    if (statusEl) {
+                        statusEl.className = 'location-status success';
+                        statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Location selected! Adjust marker if needed.</span>';
+                    }
+
                     APP_STATE.marker.on('dragend', function(event) {
                         const position = event.target.getLatLng();
                         APP_STATE.userLocation = {
@@ -2676,6 +2656,15 @@
                 } catch(e) {
                     app.showToast("Server error. Please contact support.", 'error');
                 }
+            },
+
+            notifyAdminWhatsApp: () => {
+                if (!APP_STATE.lastPaymentData || !APP_STATE.lastPaymentData.whatsappNotification) {
+                    app.showToast("WhatsApp notification not available", 'error');
+                    return;
+                }
+                window.open(APP_STATE.lastPaymentData.whatsappNotification, '_blank');
+                app.showToast("Opening WhatsApp...", 'success');
             },
 
             renderOrderSuccess: (id, amount) => {
@@ -2929,8 +2918,7 @@
                                             </div>
                                         ` : ''}
                                     </div>
-                                `).join('')
-                            }
+                                `).join('')}
                         </div>
                     </div>
                 `;
@@ -3744,7 +3732,76 @@
                 t.innerText = msg;
                 t.className = 'toast show ' + type;
                 setTimeout(() => t.classList.remove('show'), 3500);
-            }
+            },
+
+            // ============================================================
+            // IMAGE CAROUSEL METHODS (Unified)
+            // ============================================================
+            prevProductImage: () => {
+                APP_STATE.currentImageIndex = (APP_STATE.currentImageIndex - 1 + APP_STATE.currentProductImages.length) % APP_STATE.currentProductImages.length;
+                app.updateCarouselDisplay();
+            },
+            
+            nextProductImage: () => {
+                APP_STATE.currentImageIndex = (APP_STATE.currentImageIndex + 1) % APP_STATE.currentProductImages.length;
+                app.updateCarouselDisplay();
+            },
+            
+            goToProductImage: (index) => {
+                APP_STATE.currentImageIndex = index;
+                app.updateCarouselDisplay();
+            },
+            
+            updateCarouselDisplay: () => {
+                const mainImage = document.getElementById('carousel-main-image');
+                if (mainImage && APP_STATE.currentProductImages[APP_STATE.currentImageIndex]) {
+                    mainImage.src = APP_STATE.currentProductImages[APP_STATE.currentImageIndex];
+                }
+                document.querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === APP_STATE.currentImageIndex);
+                });
+                document.querySelectorAll('.thumbnail').forEach((thumb, idx) => {
+                    thumb.classList.toggle('active', idx === APP_STATE.currentImageIndex);
+                });
+            },
+
+            previewProductImages: (event) => {
+                const files = Array.from(event.target.files);
+                if (files.length > 5) {
+                    app.showToast("Maximum 5 images allowed", 'error');
+                    event.target.value = '';
+                    return;
+                }
+                const container = document.getElementById('images-preview-container');
+                if (!container) return;
+                container.innerHTML = '';
+                APP_STATE.productImageFiles = files;
+                files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = document.createElement('div');
+                        preview.className = 'image-preview';
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Preview ${index + 1}">
+                            <button type="button" class="image-preview-remove" onclick="app.removePreviewImage(${index})">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                            ${index === 0 ? '<div class="image-preview-main">Main</div>' : ''}`;
+                        container.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+            
+            removePreviewImage: (index) => {
+                APP_STATE.productImageFiles.splice(index, 1);
+                const dataTransfer = new DataTransfer();
+                APP_STATE.productImageFiles.forEach(file => dataTransfer.items.add(file));
+                const input = document.getElementById('product-images-input');
+                if (input) {
+                    input.files = dataTransfer.files;
+                    app.previewProductImages({ target: { files: dataTransfer.files } });
+                }
+            },
         };
 
         // ================================================================
