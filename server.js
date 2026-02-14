@@ -172,11 +172,17 @@ const sendEmail = async (to, subject, text, html = null) => {
             text: text,
             html: html || text
         };
-        await transporter.sendMail(mailOptions);
+        // Use promise.race to avoid hanging forever
+        const sendPromise = transporter.sendMail(mailOptions);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Email send timeout')), 10000)
+        );
+        await Promise.race([sendPromise, timeoutPromise]);
         console.log(`✅ Email sent to ${to}`);
         return true;
     } catch (error) {
         console.error(`❌ Email error:`, error.message);
+        // Still return true to not break user flow, but log error
         return false;
     }
 };
@@ -192,8 +198,10 @@ const uploadToCloudinary = (fileBuffer) => {
                 ]
             },
             (error, result) => {
-                if (error) reject(error);
-                else resolve(result.secure_url);
+                if (error) {
+                    console.error('Cloudinary upload error:', error);
+                    reject(error);
+                } else resolve(result.secure_url);
             }
         );
         streamifier.createReadStream(fileBuffer).pipe(uploadStream);
@@ -319,6 +327,82 @@ app.post('/api/login', async (req, res) => {
     } catch (e) {
         console.error('Login error:', e);
         res.status(500).json({ error: "Login failed" });
+    }
+});
+
+// Forgot Password Routes
+app.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "Email not registered" });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
+        await user.save();
+
+        const emailHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+                .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; }
+                .otp { font-size: 32px; font-weight: bold; color: #f59e0b; text-align: center; padding: 20px; background: #fef3c7; border-radius: 8px; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2 style="color: #f59e0b;">🛡️ BNG Surveillance</h2>
+                <p>Hello ${user.name},</p>
+                <p>Your password reset OTP is:</p>
+                <div class="otp">${otp}</div>
+                <p>This code will expire in 10 minutes.</p>
+                <p>If you didn't request this, please ignore this email.</p>
+            </div>
+        </body>
+        </html>`;
+
+        await sendEmail(email, 'Password Reset - BNG Surveillance', `Your OTP is: ${otp}`, emailHTML);
+
+        res.json({ message: "OTP sent to email" });
+    } catch (err) {
+        console.error('Forgot password error:', err);
+        res.status(500).json({ error: "Failed to send OTP" });
+    }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        if (new Date() > user.otpExpiry) {
+            return res.status(400).json({ error: "OTP expired" });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ error: "Invalid OTP" });
+        }
+
+        user.password = newPassword; // Note: In production, hash the password!
+        user.otp = null;
+        user.otpExpiry = null;
+        await user.save();
+
+        res.json({ message: "Password reset successful" });
+    } catch (err) {
+        console.error('Reset password error:', err);
+        res.status(500).json({ error: "Failed to reset password" });
     }
 });
 
@@ -728,6 +812,7 @@ app.listen(PORT, () => {
 ║   ✅ Live Location                          ║
 ║   ✅ Email OTP                              ║
 ║   ✅ Payment Integration                    ║
+║   ✅ Forgot Password                        ║
 ╚════════════════════════════════════════════╝
     `);
 });

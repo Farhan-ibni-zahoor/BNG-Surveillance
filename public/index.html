@@ -2962,7 +2962,12 @@
                                                 <i class="fa-solid fa-box"></i> Items:
                                             </div>
                                             <div class="order-items-list">
-                                                ${o.items.map(i => `${i.qty}× ${i.name}`).join('<br>')}
+                                                ${o.items.map(i => `
+                                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                                        <img src="${i.image}" style="width: 40px; height: 40px; object-fit: contain; background: var(--bg-light); border-radius: 4px; padding: 2px;">
+                                                        <span>${i.qty}× ${i.name}</span>
+                                                    </div>
+                                                `).join('')}
                                             </div>
                                         </div>
 
@@ -3038,7 +3043,7 @@
             },
 
             // ============================================================
-            // AUTHENTICATION
+            // AUTHENTICATION (including Forgot Password)
             // ============================================================
             showAuth: (mode = 'login') => {
                 let content = '';
@@ -3060,6 +3065,11 @@
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-sign-in-alt"></i> Login to Account
                             </button>
+                            <p class="text-center mt-10">
+                                <a href="#" onclick="app.showForgotPassword(); return false;" style="color: var(--primary); font-size: 0.9rem;">
+                                    Forgot Password?
+                                </a>
+                            </p>
                             <p class="text-center mt-20" style="font-size: 0.95rem; color: var(--text-muted);">
                                 Don't have an account? 
                                 <a href="#" onclick="app.showAuth('register'); return false;" style="color: var(--primary); font-weight: 600; text-decoration: none;">
@@ -3125,6 +3135,109 @@
                 }
 
                 app.openModal(`<div class="fade-in">${content}</div>`);
+            },
+
+            // Forgot Password Flow
+            showForgotPassword: () => {
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            Reset Password
+                        </h2>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            Enter your email address. We'll send you an OTP to reset your password.
+                        </p>
+                        <form onsubmit="app.handleForgotPassword(event)">
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" name="email" placeholder="Enter your email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
+                                <i class="fa-solid fa-paper-plane"></i> Send OTP
+                            </button>
+                        </form>
+                        <p class="text-center mt-20">
+                            <a href="#" onclick="app.showAuth('login'); return false;" style="color: var(--primary);">
+                                Back to Login
+                            </a>
+                        </p>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            handleForgotPassword: async (e) => {
+                e.preventDefault();
+                const email = e.target.email.value;
+                app.showToast("Sending OTP...", 'warning');
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/forgot-password`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await res.json();
+                    if(res.ok) {
+                        app.showToast("OTP sent to your email!", 'success');
+                        app.showResetPassword(email);
+                    } else {
+                        app.showToast(data.error || "Failed to send OTP", 'error');
+                    }
+                } catch(e) {
+                    app.showToast("Network error", 'error');
+                }
+            },
+
+            showResetPassword: (email) => {
+                const html = `
+                    <div class="fade-in">
+                        <h2 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 25px; color: var(--text-dark);">
+                            Reset Password
+                        </h2>
+                        <form onsubmit="app.handleResetPassword(event, '${email}')">
+                            <div class="form-group">
+                                <label class="label">OTP</label>
+                                <input type="text" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">New Password</label>
+                                <input type="password" name="newPassword" placeholder="Enter new password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
+                                <i class="fa-solid fa-key"></i> Reset Password
+                            </button>
+                        </form>
+                        <p class="text-center mt-20">
+                            <a href="#" onclick="app.showAuth('login'); return false;" style="color: var(--primary);">
+                                Back to Login
+                            </a>
+                        </p>
+                    </div>
+                `;
+                app.openModal(html);
+            },
+
+            handleResetPassword: async (e, email) => {
+                e.preventDefault();
+                const otp = e.target.otp.value;
+                const newPassword = e.target.newPassword.value;
+                app.showToast("Resetting password...", 'warning');
+                try {
+                    const res = await fetch(`${COMMAND_CONFIG.API_BASE}/reset-password`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email, otp, newPassword })
+                    });
+                    const data = await res.json();
+                    if(res.ok) {
+                        app.showToast("Password reset successfully! Please login.", 'success');
+                        app.showAuth('login');
+                    } else {
+                        app.showToast(data.error || "Reset failed", 'error');
+                    }
+                } catch(e) {
+                    app.showToast("Network error", 'error');
+                }
             },
 
             handleLogin: async (e) => {
@@ -3628,7 +3741,7 @@
             },
 
             // ============================================================
-            // PRODUCT MANAGEMENT (with multiple image upload)
+            // PRODUCT MANAGEMENT (with multiple image upload & validation)
             // ============================================================
             showAddProduct: () => {
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
@@ -3665,7 +3778,7 @@
                                 <textarea name="desc" placeholder="Enter product description" required rows="3"></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">Product Images (up to 5)</label>
+                                <label class="label">Product Images (up to 5, max 5MB each)</label>
                                 <input type="file" name="images" multiple accept="image/*" style="padding: 10px;" onchange="app.previewMultipleImages(event)">
                                 <div id="image-preview-container" class="image-preview-container"></div>
                             </div>
@@ -3683,8 +3796,15 @@
                 const container = document.getElementById('image-preview-container');
                 if (!container) return;
                 container.innerHTML = '';
+                const maxSize = 5 * 1024 * 1024; // 5MB
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
+                    if (file.size > maxSize) {
+                        app.showToast(`File ${file.name} exceeds 5MB limit`, 'error');
+                        event.target.value = ''; // clear input
+                        container.innerHTML = '';
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const img = document.createElement('img');
@@ -3704,7 +3824,6 @@
                 e.preventDefault();
                 app.showToast("Adding product...", 'warning');
                 const fd = new FormData(e.target);
-                // Ensure 'images' field is used; input name must be "images"
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { 
                         method: 'POST', 
@@ -3757,7 +3876,7 @@
                                 <textarea name="desc" required rows="3">${p.desc}</textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">New Images (optional, up to 5, will replace existing)</label>
+                                <label class="label">New Images (optional, up to 5, will replace existing, max 5MB each)</label>
                                 <input type="file" name="images" multiple accept="image/*" style="padding: 10px;" onchange="app.previewMultipleImages(event)">
                                 <div id="image-preview-container" class="image-preview-container"></div>
                             </div>
