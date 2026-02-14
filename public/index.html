@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- ⭐ NEW: Leaflet Geocoding for Map Search -->
+    <!-- Leaflet Geocoding for Map Search -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -2151,7 +2151,7 @@
                 </footer>
             `,
 
-// ============================================================
+            // ============================================================
             // PRODUCT DETAILS VIEWER
             // ============================================================
             viewProductDetails: (id) => {
@@ -2390,7 +2390,7 @@
                                 <i class="fa-solid fa-map-marker-alt"></i> Select Delivery Location on Map
                             </label>
                             <button onclick="app.showMapPicker('checkout')" id="location-btn" class="btn ${APP_STATE.locationFetched ? 'btn-success' : 'btn-secondary'} w-full">
-                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
+                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
                                 ${APP_STATE.locationFetched ? 'Location Fetched Successfully' : 'Pick Location from Map'}
                             </button>
                             ${APP_STATE.locationFetched ? `
@@ -2419,7 +2419,7 @@
             },
 
             // ============================================================
-            // LIVE LOCATION MAP PICKER
+            // LIVE LOCATION MAP PICKER (with search)
             // ============================================================
             showMapPicker: (context) => {
                 APP_STATE.locationPickerContext = context;
@@ -2439,7 +2439,8 @@
                             <strong><i class="fa-solid fa-info-circle"></i> Instructions:</strong>
                             <ul style="margin: 10px 0 0 25px; line-height: 1.8;">
                                 <li>We're fetching your live location</li>
-                                <li>Click on the map to pin your exact delivery location</li>
+                                <li>Use the search box above the map to find a place</li>
+                                <li>Click on the map to pin your exact location</li>
                                 <li>Drag the marker to adjust if needed</li>
                                 <li>Zoom in for more accuracy</li>
                             </ul>
@@ -2474,6 +2475,31 @@
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(APP_STATE.map);
                 
+                // Add geocoder search control
+                const geocoder = L.Control.geocoder({
+                    defaultMarkGeocode: false
+                }).on('markgeocode', function(e) {
+                    const latlng = e.geocode.center;
+                    if (APP_STATE.marker) {
+                        APP_STATE.map.removeLayer(APP_STATE.marker);
+                    }
+                    APP_STATE.marker = L.marker(latlng, { draggable: true }).addTo(APP_STATE.map);
+                    APP_STATE.userLocation = { latitude: latlng.lat, longitude: latlng.lng };
+                    APP_STATE.map.setView(latlng, 15);
+                    
+                    APP_STATE.marker.on('dragend', function(event) {
+                        const position = event.target.getLatLng();
+                        APP_STATE.userLocation = { latitude: position.lat, longitude: position.lng };
+                    });
+
+                    // Update status
+                    const statusEl = document.getElementById('location-status');
+                    if (statusEl) {
+                        statusEl.className = 'location-status success';
+                        statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Location selected from search. Adjust marker if needed.</span>';
+                    }
+                }).addTo(APP_STATE.map);
+                
                 APP_STATE.map.on('click', function(e) {
                     if (APP_STATE.marker) {
                         APP_STATE.map.removeLayer(APP_STATE.marker);
@@ -2495,6 +2521,13 @@
                             longitude: position.lng
                         };
                     });
+
+                    // Update status
+                    const statusEl = document.getElementById('location-status');
+                    if (statusEl) {
+                        statusEl.className = 'location-status success';
+                        statusEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Location pinned on map. Drag to adjust.</span>';
+                    }
                 });
                 
                 // Get live location
@@ -2533,7 +2566,7 @@
                             const statusEl = document.getElementById('location-status');
                             if (statusEl) {
                                 statusEl.className = 'location-status';
-                                statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Could not get live location. Click on map to select manually.</span>';
+                                statusEl.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i><span>Could not get live location. Use search or click on map.</span>';
                             }
                         }
                     );
@@ -2552,7 +2585,7 @@
                 app.closeModal();
                 document.getElementById('modal-body-content').classList.remove('map-modal');
                 
-                // Return to checkout with location fetched message
+                // Return to checkout or support with location fetched message
                 if (APP_STATE.locationPickerContext === 'checkout') {
                     app.checkout();
                 } else if (APP_STATE.locationPickerContext === 'support') {
@@ -2658,16 +2691,16 @@
                     if(res.ok) {
                         const data = await res.json();
                         
-                        if (data.whatsappUrl) {
-                            window.open(data.whatsappUrl, '_blank');
-                        }
+                        // WhatsApp notification to admin is handled server-side,
+                        // but we also want to give customer a button to chat with admin
                         
                         APP_STATE.cart = [];
+                        const locationCopy = APP_STATE.userLocation; // copy before clearing
                         APP_STATE.userLocation = null;
                         APP_STATE.locationFetched = false;
                         
                         app.showToast("Payment successful! Order confirmed.", 'success');
-                        app.renderOrderSuccess(response.razorpay_order_id, total);
+                        app.renderOrderSuccess(response.razorpay_order_id, total, payload.customerDetails);
                         app.syncInventory();
                         app.renderHeader();
                     } else {
@@ -2678,18 +2711,32 @@
                 }
             },
 
-            renderOrderSuccess: (id, amount) => {
+            renderOrderSuccess: (orderId, amount, customerDetails) => {
+                // Construct WhatsApp message for customer to contact admin
+                const shortId = orderId.substr(-8);
+                const itemsList = customerDetails.items.map(i => `${i.qty}x ${i.name} (₹${i.price})`).join('\n');
+                const gmapsLink = customerDetails.location && customerDetails.location.latitude
+                    ? `https://www.google.com/maps?q=${customerDetails.location.latitude},${customerDetails.location.longitude}`
+                    : 'Location not shared';
+                
+                const waMessage = `🛡️ *BNG SURVEILLANCE - ORDER #${shortId}*\n\n👤 *Name:* ${customerDetails.name}\n📞 *Phone:* ${customerDetails.phone}\n📦 *Products:*\n${itemsList}\n💰 *Total:* ₹${amount}\n📍 *Address:* ${customerDetails.address}, ${customerDetails.pincode}\n🗺️ *Map:* ${gmapsLink}`;
+                const encodedMsg = encodeURIComponent(waMessage);
+                const waUrl = `https://wa.me/${COMMAND_CONFIG.WHATSAPP_ID}?text=${encodedMsg}`;
+
                 const html = `
                     <div class="text-center" style="padding: 30px 20px;">
                         <div style="width: 100px; height: 100px; margin: 0 auto 25px; background: linear-gradient(135deg, var(--success) 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; animation: bounce 0.6s ease;">
                             <i class="fa-solid fa-check"></i>
                         </div>
                         <h2 style="font-family: var(--font-display); font-weight: 700; color: var(--text-dark); margin-bottom: 15px;">Order Confirmed!</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 10px;">Order ID: <strong>#${id.substr(-8)}</strong></p>
+                        <p style="color: var(--text-muted); margin-bottom: 10px;">Order ID: <strong>#${shortId}</strong></p>
                         <p style="color: var(--text-main); margin-bottom: 30px; line-height: 1.6;">
                             Thank you for your purchase! Our team will contact you shortly to schedule the installation.
                         </p>
                         
+                        <button onclick="window.open('${waUrl}', '_blank')" class="btn btn-success w-full mb-10">
+                            <i class="fa-brands fa-whatsapp"></i> Chat with Admin on WhatsApp
+                        </button>
                         <button onclick="app.closeModal(); app.renderProfile();" class="btn btn-primary w-full mb-10">
                             <i class="fa-solid fa-receipt"></i> View My Orders
                         </button>
@@ -2729,13 +2776,18 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="label">Phone Number</label>
+                            <input type="tel" id="req-phone" placeholder="Enter your phone number" required>
+                        </div>
+
+                        <div class="form-group">
                             <label class="label">Installation/Service Address</label>
                             <textarea id="req-addr-field" placeholder="Enter complete address" rows="2" required></textarea>
                         </div>
 
                         <div class="form-group">
                             <label class="label">Pincode</label>
-                            <input type="text" id="req-pin-field" placeholder="6-digit pincode" maxlength="6">
+                            <input type="text" id="req-pin-field" placeholder="6-digit pincode" maxlength="6" required>
                         </div>
 
                         <div class="form-group">
@@ -2743,7 +2795,7 @@
                                 <i class="fa-solid fa-map-marker-alt"></i> Select Location on Map
                             </label>
                             <button onclick="app.showMapPicker('support')" id="req-location-btn" class="btn ${APP_STATE.locationFetched ? 'btn-success' : 'btn-secondary'} w-full">
-                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
+                                <i class="fa-solid ${APP_STATE.locationFetched ? 'fa-check-circle' : 'fa-map'}"></i> 
                                 ${APP_STATE.locationFetched ? 'Location Fetched Successfully' : 'Pick Location from Map'}
                             </button>
                             ${APP_STATE.locationFetched ? `
@@ -2777,15 +2829,22 @@
                 const msg = document.getElementById('req-msg-field').value;
                 const addr = document.getElementById('req-addr-field').value;
                 const pin = document.getElementById('req-pin-field').value;
+                const phone = document.getElementById('req-phone').value;
 
-                if(!msg || !addr || !pin) {
+                if(!msg || !addr || !pin || !phone) {
                     app.showToast("Please fill all required fields", 'error');
+                    return;
+                }
+
+                if(!/^[0-9]{10}$/.test(phone.replace(/\D/g, ''))) {
+                    app.showToast("Please enter a valid 10-digit phone number", 'error');
                     return;
                 }
 
                 const data = {
                     customerName: APP_STATE.user.name,
                     email: APP_STATE.user.email,
+                    phone: phone,
                     type: type,
                     message: `${msg}\n\nAddress: ${addr}\nPincode: ${pin}`,
                     location: APP_STATE.userLocation
@@ -2799,7 +2858,7 @@
                     });
 
                     if(res.ok) {
-                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
+                        let waText = `*NEW ${type.toUpperCase()} REQUEST*\nFrom: ${APP_STATE.user.name}\nPhone: ${phone}\nEmail: ${APP_STATE.user.email}\n\n${encodeURIComponent(msg)}\n\nAddress: ${addr}\nPincode: ${pin}`;
                         
                         if (APP_STATE.userLocation) {
                             const gmapsLink = `https://www.google.com/maps?q=${APP_STATE.userLocation.latitude},${APP_STATE.userLocation.longitude}`;
@@ -3002,7 +3061,7 @@
                                 <i class="fa-solid fa-sign-in-alt"></i> Login to Account
                             </button>
                             <p class="text-center mt-20" style="font-size: 0.95rem; color: var(--text-muted);">
-                                Don't have an account? 
+                                Don't have an account? 
                                 <a href="#" onclick="app.showAuth('register'); return false;" style="color: var(--primary); font-weight: 600; text-decoration: none;">
                                     Create Account
                                 </a>
@@ -3032,7 +3091,7 @@
                                 <i class="fa-solid fa-user-plus"></i> Create Account
                             </button>
                             <p class="text-center mt-20" style="font-size: 0.95rem; color: var(--text-muted);">
-                                Already have an account? 
+                                Already have an account? 
                                 <a href="#" onclick="app.showAuth('login'); return false;" style="color: var(--primary); font-weight: 600; text-decoration: none;">
                                     Login Here
                                 </a>
@@ -3428,6 +3487,7 @@
                                     <tr>
                                         <th>Date</th>
                                         <th>Customer</th>
+                                        <th>Phone</th>
                                         <th>Type</th>
                                         <th>Message</th>
                                         <th>Location</th>
@@ -3436,7 +3496,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${APP_STATE.queries.length === 0 ? '<tr><td colspan="7" class="text-center" style="padding: 40px;">No support requests</td></tr>' :
+                                    ${APP_STATE.queries.length === 0 ? '<tr><td colspan="8" class="text-center" style="padding: 40px;">No support requests</td></tr>' :
                                     APP_STATE.queries.map(q => `
                                         <tr>
                                             <td>${new Date(q.date).toLocaleDateString()}</td>
@@ -3444,6 +3504,7 @@
                                                 <strong>${q.customerName}</strong><br>
                                                 <small style="color: var(--text-muted);">${q.email}</small>
                                             </td>
+                                            <td>${q.phone}</td>
                                             <td><span class="badge badge-primary">${q.type}</span></td>
                                             <td style="max-width:300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 ${q.message}
@@ -3567,7 +3628,7 @@
             },
 
             // ============================================================
-            // PRODUCT MANAGEMENT
+            // PRODUCT MANAGEMENT (with multiple image upload)
             // ============================================================
             showAddProduct: () => {
                 const categoryOptions = Object.keys(CATEGORIES).map(key => 
@@ -3604,8 +3665,9 @@
                                 <textarea name="desc" placeholder="Enter product description" required rows="3"></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">Product Image</label>
-                                <input type="file" name="image" required accept="image/*" style="padding: 10px;">
+                                <label class="label">Product Images (up to 5)</label>
+                                <input type="file" name="images" multiple accept="image/*" style="padding: 10px;" onchange="app.previewMultipleImages(event)">
+                                <div id="image-preview-container" class="image-preview-container"></div>
                             </div>
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-plus"></i> Add Product
@@ -3616,10 +3678,33 @@
                 app.openModal(html);
             },
 
+            previewMultipleImages: (event) => {
+                const files = event.target.files;
+                const container = document.getElementById('image-preview-container');
+                if (!container) return;
+                container.innerHTML = '';
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '8px';
+                        img.style.margin = '5px';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            },
+
             executeAddProduct: async (e) => {
                 e.preventDefault();
                 app.showToast("Adding product...", 'warning');
                 const fd = new FormData(e.target);
+                // Ensure 'images' field is used; input name must be "images"
                 try {
                     const res = await fetch(`${COMMAND_CONFIG.API_BASE}/products`, { 
                         method: 'POST', 
@@ -3629,6 +3714,9 @@
                         app.showToast("Product added successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
+                    } else {
+                        const err = await res.json();
+                        app.showToast(err.error || "Failed to add product", 'error');
                     }
                 } catch(err) { 
                     app.showToast("Failed to add product", 'error'); 
@@ -3669,8 +3757,9 @@
                                 <textarea name="desc" required rows="3">${p.desc}</textarea>
                             </div>
                             <div class="form-group">
-                                <label class="label">New Image (Optional)</label>
-                                <input type="file" name="image" accept="image/*" style="padding: 10px;">
+                                <label class="label">New Images (optional, up to 5, will replace existing)</label>
+                                <input type="file" name="images" multiple accept="image/*" style="padding: 10px;" onchange="app.previewMultipleImages(event)">
+                                <div id="image-preview-container" class="image-preview-container"></div>
                             </div>
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">
                                 <i class="fa-solid fa-save"></i> Save Changes
@@ -3694,6 +3783,9 @@
                         app.showToast("Product updated successfully!", 'success');
                         app.closeModal();
                         await app.renderAdminPortal();
+                    } else {
+                        const err = await res.json();
+                        app.showToast(err.error || "Update failed", 'error');
                     }
                 } catch(err) { 
                     app.showToast("Update failed", 'error'); 

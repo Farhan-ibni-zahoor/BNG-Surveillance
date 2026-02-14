@@ -93,7 +93,7 @@ const ProductSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },
     image: { type: String, required: true },
-    images: [String],  // Multiple images array
+    images: [String],  // Multiple images array (supports up to 5)
     desc: { type: String, required: true },
     reviews: [{ 
         user: String, 
@@ -110,7 +110,7 @@ const OrderSchema = new mongoose.Schema({
     payment_status: { type: String, default: 'Pending' },
     customer: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: true },          // Phone number added
     address: { type: String, required: true },
     pincode: { type: String, required: true },
     location: {
@@ -126,7 +126,7 @@ const OrderSchema = new mongoose.Schema({
 const RequestSchema = new mongoose.Schema({
     customerName: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: true },          // Phone number required
     type: { type: String, required: true },
     message: { type: String, required: true },
     location: {
@@ -157,7 +157,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ 
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB per file
 });
 
 // ================================================================
@@ -323,7 +323,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ================================================================
-// PRODUCT ROUTES
+// PRODUCT ROUTES (with multiple image support)
 // ================================================================
 
 app.get('/api/products', async (req, res) => {
@@ -526,7 +526,7 @@ app.post('/api/verify-payment', async (req, res) => {
             `NEW ORDER\n\nCustomer: ${customerDetails.name}\nPhone: ${customerDetails.phone}\nEmail: ${customerDetails.email}\n\nItems:\n${itemList}\n\nTotal: ₹${customerDetails.total}`
         );
 
-        // WhatsApp message
+        // WhatsApp message for admin
         let gmapsLink = '';
         if (customerDetails.location && customerDetails.location.latitude) {
             gmapsLink = `\n\n📍 Location: https://www.google.com/maps?q=${customerDetails.location.latitude},${customerDetails.location.longitude}`;
@@ -634,7 +634,7 @@ app.patch('/api/orders/:id/cancel', async (req, res) => {
 });
 
 // ================================================================
-// SUPPORT REQUEST ROUTES
+// SUPPORT REQUEST ROUTES (with phone)
 // ================================================================
 
 app.post('/api/requests', async (req, res) => {
