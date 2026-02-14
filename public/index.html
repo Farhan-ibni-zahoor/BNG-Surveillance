@@ -2156,15 +2156,42 @@
             // ============================================================
             viewProductDetails: (id) => {
                 const p = APP_STATE.inventory.find(x => x._id === id);
-                if(!p) return;
+                if (!p) return;
 
                 const category = CATEGORIES[p.category] || { badge: '', name: p.category };
                 const hasReviews = p.reviews && p.reviews.length > 0;
 
+                // Determine images to display
+                const images = p.images && p.images.length ? p.images : [p.image];
+                const hasMultipleImages = images.length > 1;
+
+                // Generate carousel HTML
+                let carouselHtml = '';
+                if (hasMultipleImages) {
+                    carouselHtml = `
+                        <div class="image-carousel">
+                            <img src="${images[0]}" class="carousel-image" id="carousel-main-img" alt="${p.name}">
+                            <button class="carousel-btn carousel-btn-prev" onclick="app.changeCarouselImage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="carousel-btn carousel-btn-next" onclick="app.changeCarouselImage(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                            <div class="carousel-indicators" id="carousel-indicators">
+                                ${images.map((_, i) => `<span class="carousel-dot ${i === 0 ? 'active' : ''}" onclick="app.setCarouselImage(${i})"></span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="thumbnail-gallery" id="thumbnail-gallery">
+                            ${images.map((img, i) => `<img src="${img}" class="thumbnail ${i === 0 ? 'active' : ''}" onclick="app.setCarouselImage(${i})" alt="Thumbnail ${i+1}">`).join('')}
+                         </div>
+                    `;
+                    // Set current image index
+                    APP_STATE.currentProductImages = images;
+                    APP_STATE.currentImageIndex = 0;
+                } else {
+                    carouselHtml = `<img src="${images[0]}" style="width:100%; height:300px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">`;
+                }
+
                 const html = `
                     <div class="fade-in">
-                        <img src="${p.image}" style="width:100%; height:300px; object-fit:contain; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 25px; padding: 20px;">
-                        
+                        ${carouselHtml}
+            
                         <div class="flex-between flex-wrap gap-15">
                             <div>
                                 <div class="tag">${category.name}</div>
@@ -2206,7 +2233,7 @@
                             </button>
                         ` : `
                             <button onclick="app.closeModal(); app.showAuth('login');" class="btn btn-primary w-full" style="padding: 18px; font-size: 1.1rem;">
-                                <i class="fa-solid fa-sign-in-alt"></i> Login to Purchase
+                            <i class="fa-solid fa-sign-in-alt"></i> Login to Purchase
                             </button>
                             <p class="text-center mt-10" style="font-size: 0.9rem; color: var(--text-muted);">
                                 Please login to add items to your cart
@@ -2217,7 +2244,7 @@
                             <h4 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 20px; color: var(--text-dark);">
                                 <i class="fa-solid fa-star"></i> Customer Reviews
                             </h4>
-                            
+                
                             <div id="review-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 25px;">
                                 ${!hasReviews ? '<p style="color: var(--text-muted); text-align:center; padding: 30px;">No reviews yet. Be the first to review!</p>' : 
                                     p.reviews.map(r => `
@@ -2245,6 +2272,46 @@
                 `;
 
                 app.openModal(html);
+            },
+
+            // New helper functions for carousel
+            changeCarouselImage: (delta) => {
+                const newIndex = APP_STATE.currentImageIndex + delta;
+                if (newIndex < 0 || newIndex >= APP_STATE.currentProductImages.length) return;
+                APP_STATE.currentImageIndex = newIndex;
+                const mainImg = document.getElementById('carousel-main-img');
+                if (mainImg) {
+                    mainImg.src = APP_STATE.currentProductImages[newIndex];
+                }
+                // Update active dot
+                document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                    if (i === newIndex) dot.classList.add('active');
+                    else dot.classList.remove('active');
+                });
+                // Update active thumbnail
+                document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                    if (i === newIndex) thumb.classList.add('active');
+                    else thumb.classList.remove('active');
+                });
+            },
+
+            setCarouselImage: (index) => {
+                if (index < 0 || index >= APP_STATE.currentProductImages.length) return;
+                APP_STATE.currentImageIndex = index;
+                const mainImg = document.getElementById('carousel-main-img');
+                if (mainImg) {
+                    mainImg.src = APP_STATE.currentProductImages[index];
+                }
+                // Update active dot
+                document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                    if (i === index) dot.classList.add('active');
+                    else dot.classList.remove('active');
+                });
+                // Update active thumbnail
+                document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                    if (i === index) thumb.classList.add('active');
+                    else thumb.classList.remove('active');
+                });
             },
 
             // ============================================================
